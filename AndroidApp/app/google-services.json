@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "970163793973",
+    "project_id": "osh-mobile-2fb56",
+    "storage_bucket": "osh-mobile-2fb56.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:970163793973:android:1c4a8307a8262f29e0817c",
+        "android_client_info": {
+          "package_name": "com.osh"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "970163793973-5tt5014vf7a564d8jtlhst91eg6gap4c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDkQLIld7eJv3TZo7BL6B6810g9PgP4tw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "970163793973-5tt5014vf7a564d8jtlhst91eg6gap4c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,44 @@
+.known-devices-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.known-devices-view vaadin-split-layout {
+  width: 100%;
+  height: 100%;
+}
+
+.known-devices-view vaadin-grid {
+  height: 100%;
+}
+
+.known-devices-view .editor-layout {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+}
+
+.known-devices-view .editor {
+  flex-grow: 1;
+  padding: var(--lumo-space-l);
+}
+
+.known-devices-view .editor vaadin-checkbox {
+  padding-top: var(--lumo-space-m);
+}
+
+.known-devices-view .button-layout {
+  width: 100%;
+  flex-wrap: wrap;
+  background-color: var(--lumo-contrast-5pct);
+  padding-bottom: var(--lumo-space-s);
+  padding-top: var(--lumo-space-s);
+  padding-left: var(--lumo-space-l);
+  padding-right: var(--lumo-space-l);
+  gap: var(--lumo-space-m);
+}
+
+.known-devices-view .grid-wrapper {
+  width: 100%;
+}
