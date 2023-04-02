@@ -13,6 +13,7 @@ import com.osh.communication.MessageBase.MESSAGE_TYPE;
 import com.osh.service.IActorService;
 import com.osh.service.ICommunicationService;
 import com.osh.service.IValueService;
+import com.osh.value.ValueMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,11 @@ public class ActorServiceImpl implements IActorService {
 	public void publishCmd(ActorBase actor, ActorCmds actorCmd, Object value) {
 		ActorMessage msg = new ActorMessage(actor, value, actorCmd);
 		communicationService.sendMessage(msg);
+
+		if (actorCmd != ActorCmds.ACTOR_CMD_SET_VALUE) {
+			ValueMessage valueMessage = new ValueMessage(actor);
+			communicationService.sendMessage(valueMessage);
+		}
 	}
 
 	@Override

@@ -24,3 +24,4 @@ rootProject.name = "OSH"
 include ':app'
 include ':OshCore'
 include ':OshWbb12'
+include ':OshSip'

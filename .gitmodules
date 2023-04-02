@@ -1,0 +1,3 @@
+[submodule "AndroidApp/pjsip-android"]
+	path = AndroidApp/pjsip-android
+	url = https://github.com/VoiSmart/pjsip-android.git
