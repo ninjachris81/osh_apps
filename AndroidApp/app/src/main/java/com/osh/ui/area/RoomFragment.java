@@ -21,5 +21,6 @@ public class RoomFragment extends RoomFragmentBase<FragmentRoomBinding> {
         roomViewModel.initTemperatures(sensorInfos.temperatureIds.size());
         roomViewModel.initHumidities(sensorInfos.humidityIds.size());
         roomViewModel.initWindowStates(sensorInfos.windowStateIds.size());
+        roomViewModel.initBrightnesses(sensorInfos.brightnessIds.size());
     }
 }

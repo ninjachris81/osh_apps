@@ -9,6 +9,9 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <uses-feature
         android:name="android.hardware.nfc"
@@ -24,12 +27,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.OSH"
+        android:usesCleartextTraffic="true"
         tools:targetApi="33">
-
+        <activity
+            android:name=".StatisticsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CameraDetailsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_camera_details">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.osh.MainActivity" />
+        </activity>
         <activity
             android:name=".SettingsActivity"
-            android:exported="false"
             android:configChanges="orientation"
+            android:exported="false"
             android:label="@string/title_activity_settings">
             <meta-data
                 android:name="android.app.lib_name"
@@ -40,28 +54,41 @@
         </activity>
         <activity
             android:name=".DoorOpenActivity"
-            android:exported="true">
+            android:exported="true"
+            android:label="@string/title_activity_door_open">
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="application/x-door-unlock" />
             </intent-filter>
             <intent-filter>
                 <action android:name="com.osh.action.requestDoorUnlockChallenge" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.osh.MainActivity" />
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
+            android:name=".SipCallActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_sip_call"
+            android:launchMode="singleTop" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:launchMode="singleTask"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -70,10 +97,7 @@
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
-        </activity> <!-- Mqtt Service -->
-        <!--
-        <service android:name="org.eclipse.paho.android.service.MqttService"></service>
-        -->
+        </activity>
     </application>
 
 </manifest>

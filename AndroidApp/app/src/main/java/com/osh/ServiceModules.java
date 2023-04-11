@@ -41,7 +41,7 @@ public class ServiceModules {
     @Singleton
     static IDatabaseService provideDatabaseService(IApplicationConfig applicationConfig) {
         try {
-            return new DatabaseServiceImpl(applicationConfig);
+            return new DatabaseServiceImpl(applicationConfig.getDatabase());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -84,7 +84,7 @@ public class ServiceModules {
     @Provides
     @Singleton
     static ICommunicationService provideCommunicationManager(IApplicationConfig applicationConfig) {
-        return new MqttCommunicationServiceImpl(applicationConfig);
+        return new MqttCommunicationServiceImpl(applicationConfig.getMqtt());
     }
 
     @Provides

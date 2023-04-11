@@ -7,10 +7,23 @@
     tools:context=".DoorOpenActivity">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/door_open_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Door Open"
-        tools:layout_editor_absoluteX="179dp"
-        tools:layout_editor_absoluteY="348dp" />
+        android:text="Door Open Status"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/try_again_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:text="Try again"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/door_open_status" />
 </androidx.constraintlayout.widget.ConstraintLayout>

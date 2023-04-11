@@ -3,6 +3,7 @@ package com.osh.ui.area;
 import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableDouble;
 import androidx.databinding.ObservableField;
+import androidx.databinding.ObservableInt;
 import androidx.lifecycle.ViewModel;
 
 import com.osh.actor.AudioPlaybackActor;
@@ -26,6 +27,8 @@ public class RoomViewModel extends ViewModel implements Serializable {
 
     public final ObservableField<AudioPlaybackActor> activePlayback = new ObservableField<>();
 
+    //public final ObservableInt active
+
     public final List<ObservableBoolean> shutterAutoModes = new ArrayList<>();
     public final List<ObservableField<String>> shutterStates = new ArrayList<>();
     public final ObservableField<RoomPosition> roomPosition = new ObservableField<>(RoomPosition.POSITION_TOP);
@@ -34,6 +37,7 @@ public class RoomViewModel extends ViewModel implements Serializable {
 
     public final List<ObservableDouble> humidities = new ArrayList<>();
     public final List<ObservableBoolean> windowStates = new ArrayList<>();
+    public final List<ObservableDouble> brightnesses = new ArrayList<>();
 
     public RoomViewModel(KnownRoom room) {
         this.room = room;
@@ -66,6 +70,12 @@ public class RoomViewModel extends ViewModel implements Serializable {
     public void initWindowStates(int count) {
         for (int i = 0;i<count;i++) {
             windowStates.add(new ObservableBoolean(false));
+        }
+    }
+
+    public void initBrightnesses(int count) {
+        for (int i = 0;i<count;i++) {
+            brightnesses.add(new ObservableDouble(-1f));
         }
     }
 

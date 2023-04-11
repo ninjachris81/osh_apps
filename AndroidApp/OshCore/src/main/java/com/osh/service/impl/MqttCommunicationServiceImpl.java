@@ -36,9 +36,9 @@ import com.osh.actor.ActorMessage;
 import com.osh.communication.MessageBase;
 import com.osh.communication.mqtt.MessageTypeInfo;
 import com.osh.communication.mqtt.MqttConstants;
+import com.osh.communication.mqtt.config.MqttConfig;
 import com.osh.manager.IMqttSupport;
 import com.osh.service.ICommunicationService;
-import com.osh.config.IApplicationConfig;
 import com.osh.controller.ControllerMessage;
 import com.osh.device.DeviceDiscoveryMessage;
 import com.osh.doorunlock.DoorUnlockMessage;
@@ -58,7 +58,7 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 	private static final String TAG = MqttCommunicationServiceImpl.class.getName();
 
 	private ExecutorService executorService;
-	private IApplicationConfig appConfig;
+	private MqttConfig config;
 
 	private final ObservableBoolean connectedState = new ObservableBoolean(false);
 
@@ -69,10 +69,10 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 
 	private String deviceId;
 
-	public MqttCommunicationServiceImpl(IApplicationConfig appConfig) {
+	public MqttCommunicationServiceImpl(MqttConfig config) {
 		this.executorService = Executors.newFixedThreadPool(1);
-		this.appConfig = appConfig;
-		this.deviceId = appConfig.getMqtt().getClientId();		// use clientID as device id
+		this.config = config;
+		this.deviceId = config.getClientId();		// use clientID as device id
 	}
 
     private Mqtt3AsyncClient mqttClient;
@@ -96,10 +96,10 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 		registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_DOOR_UNLOCK, false, MqttConstants.MQTT_MESSAGE_TYPE_DU, 2, true);
 
 		mqttClient = MqttClient.builder()
-				.identifier(appConfig.getMqtt().getClientId())
+				.identifier(config.getClientId())
 				.automaticReconnectWithDefaultConfig()
-				.serverHost(appConfig.getMqtt().getServerHost())
-				.serverPort(appConfig.getMqtt().getServerPort())
+				.serverHost(config.getServerHost())
+				.serverPort(config.getServerPort())
 				.addConnectedListener(listener -> {
 					LogFacade.d(TAG, "Connected");
 					connectedState.changeValue(true);

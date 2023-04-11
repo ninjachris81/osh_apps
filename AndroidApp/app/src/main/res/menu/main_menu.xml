@@ -10,6 +10,11 @@
         app:showAsAction="never"
         android:title="@string/settings" />
 
+    <item android:id="@+id/sip_connected_state_icon"
+        android:title=""
+        app:materialIcon="phone"
+        app:showAsAction="always"/>
+
     <item android:id="@+id/db_connected_state_icon"
         android:title=""
         app:materialIcon="database"
@@ -19,5 +24,7 @@
         android:title=""
         app:materialIcon="wifi_off"
         app:showAsAction="always"/>
+
+
 
 </menu>

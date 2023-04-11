@@ -4,6 +4,7 @@ package com.osh.service.impl;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.osh.actor.ActorBase;
+import com.osh.actor.AudioPlaybackActor;
 import com.osh.actor.DBActor;
 import com.osh.actor.DBAudioActor;
 import com.osh.datamodel.DatamodelBase;
@@ -22,10 +23,12 @@ import com.osh.utils.IObservableBoolean;
 import com.osh.utils.ObservableBoolean;
 import com.osh.actor.DBShutterActor;
 import com.osh.value.DBValue;
+import com.osh.value.StringValue;
 import com.osh.value.ValueBase;
 import com.osh.value.ValueGroup;
 import com.osh.value.ValueType;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class DatamodelServiceImpl implements IDatamodelService {
 
@@ -66,7 +70,7 @@ public class DatamodelServiceImpl implements IDatamodelService {
 
 	private final ICommunicationService communicationService;
 
-	private final ExecutorService executorService;
+	private ExecutorService executorService;
 
 	public DatamodelServiceImpl(ICommunicationService communicationService, IDatabaseService databaseService, IValueService valueService, IActorService actorService) throws SQLException {
 		this.communicationService = communicationService;
@@ -76,12 +80,14 @@ public class DatamodelServiceImpl implements IDatamodelService {
 
 		loadedState = new ObservableBoolean(false);
 
-		executorService = Executors.newFixedThreadPool(1);
+		executorService = Executors.newFixedThreadPool(2);
+
+		datamodel = new DynamicDatamodel();
 		executorService.submit(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					loadDatamodel();
+					loadValues();
 				} catch (SQLException e) {
 					throw new RuntimeException(e);
 				} catch (Exception e1) {
@@ -90,30 +96,57 @@ public class DatamodelServiceImpl implements IDatamodelService {
 			}
 		});
 
+		executorService.submit(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					loadMetadata();
+				} catch (SQLException e) {
+					throw new RuntimeException(e);
+				} catch (Exception e1) {
+					throw new RuntimeException(e1);
+				}
+			}
+		});
+
+		executorService.shutdown();
+		try {
+			executorService.awaitTermination(30000, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+
+		executorService = Executors.newFixedThreadPool(1);
+		executorService.submit(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					mergeDatamodel();
+				} catch (SQLException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		});
+
+		executorService.shutdown();
+		try {
+			executorService.awaitTermination(30000, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+
+		loadedState.changeValue(true);
+
+		communicationService.connectMqtt();
 	}
 
-	private void loadDatamodel() throws SQLException {
+	private void loadValues() throws SQLException {
 		valueGroupDao = DaoManager.createDao(databaseService.getConnectionSource(), ValueGroup.class);
 		valueDao = DaoManager.createDao(databaseService.getConnectionSource(), DBValue.class);
 		actorDao = DaoManager.createDao(databaseService.getConnectionSource(), DBActor.class);
 		audioActorDao = DaoManager.createDao(databaseService.getConnectionSource(), DBAudioActor.class);
 		audioPlaybackSourceDao = DaoManager.createDao(databaseService.getConnectionSource(), AudioPlaybackSource.class);
 		shutterActorDao = DaoManager.createDao(databaseService.getConnectionSource(), DBShutterActor.class);
-		knownRoomsDao = DaoManager.createDao(databaseService.getConnectionSource(), KnownRoom.class);
-		knownAreaDao = DaoManager.createDao(databaseService.getConnectionSource(), KnownArea.class);
-		knownRoomValuesDao = DaoManager.createDao(databaseService.getConnectionSource(), KnownRoomValues.class);
-		knownRoomActorsDao = DaoManager.createDao(databaseService.getConnectionSource(), KnownRoomActors.class);
-
-		datamodel = new DynamicDatamodel();
-
-		for (KnownArea knownArea : knownAreaDao.queryForAll()) {
-			datamodel.addKnownArea(knownArea.getId(), knownArea.getName());
-		}
-
-		for (KnownRoom knownRoom : knownRoomsDao.queryForAll()) {
-			KnownArea knownArea = datamodel.getKnownArea(knownRoom.getKnownAreaId());
-			datamodel.addKnownRoom(knownArea, knownRoom.getId(), knownRoom.getName());
-		}
 
 		for (ValueGroup valueGroup : valueGroupDao.queryForAll()) {
 			datamodel.addValueGroup(valueGroup.getId());
@@ -138,15 +171,10 @@ public class DatamodelServiceImpl implements IDatamodelService {
 			} else {
 				log.error("Unknown class type: " + value.getClassType());
 			}
-			
+
 			valueService.registerValue(val);
 		}
 
-		for (KnownRoomValues knownRoomsValue : knownRoomValuesDao.queryForAll()) {
-			KnownRoom knownRoom = datamodel.getKnownRoom(knownRoomsValue.getRoomId());
-			ValueBase value = datamodel.getValue(knownRoomsValue.getValueId(), knownRoomsValue.getValueGroupId());
-			knownRoom.addValue(value);
-		}
 
 		for (DBActor actor : actorDao.queryForAll()) {
 			ValueGroup valueGroup = datamodel.getValueGroup(actor.getValueGroupId());
@@ -170,7 +198,10 @@ public class DatamodelServiceImpl implements IDatamodelService {
 				List<DBAudioActor> matchList = audioActorDao.queryForFieldValues(Map.of("id", actor.getId(), "value_group_id", valueGroup.getId()));
 				if (matchList.size() == 1) {
 					DBAudioActor audioActor = matchList.get(0);
-					act = datamodel.addAudioPlaybackActor(valueGroup, actor.getId(), ValueType.of(actor.getValueType()), ValueBase.VALUE_TIMEOUT.of(actor.getValueTimeout()), audioActor.getAudioDeviceIds(), audioActor.getAudioActivationRelayId(), audioActor.getAudioVolume(), audioActor.getAudioVolumeId(), audioActor.getAudioUrl(), audioActor.getAudioUrlId());
+					act = datamodel.addAudioPlaybackActor(valueGroup, actor.getId(), ValueType.of(actor.getValueType()), ValueBase.VALUE_TIMEOUT.of(actor.getValueTimeout()), audioActor.getAudioDeviceIds(), audioActor.getAudioActivationRelayId(), audioActor.getAudioVolume(), audioActor.getAudioVolumeId(), audioActor.getAudioUrl(), audioActor.getAudioUrlId(), audioActor.getAudioCurrentTitleId());
+					if (!StringUtils.isEmpty(audioActor.getAudioCurrentTitleId())) {
+						((AudioPlaybackActor) act).setAudioCurrentTitleValue((StringValue) valueService.getValue(audioActor.getAudioCurrentTitleId()));
+					}
 				} else {
 					throw new RuntimeException("Unexpected mapping of actor " + actor.getId());
 				}
@@ -183,8 +214,33 @@ public class DatamodelServiceImpl implements IDatamodelService {
 			for (AudioPlaybackSource audioPlaybackSource : audioPlaybackSourceDao.queryForAll()) {
 				datamodel.addAudioPlaybackSource(audioPlaybackSource);
 			}
-			
+
 			actorService.registerActor(act);
+		}
+	}
+
+	private void loadMetadata() throws SQLException {
+		knownRoomsDao = DaoManager.createDao(databaseService.getConnectionSource(), KnownRoom.class);
+		knownAreaDao = DaoManager.createDao(databaseService.getConnectionSource(), KnownArea.class);
+
+		for (KnownArea knownArea : knownAreaDao.queryForAll()) {
+			datamodel.addKnownArea(knownArea.getId(), knownArea.getName());
+		}
+
+		for (KnownRoom knownRoom : knownRoomsDao.queryForAll()) {
+			KnownArea knownArea = datamodel.getKnownArea(knownRoom.getKnownAreaId());
+			datamodel.addKnownRoom(knownArea, knownRoom.getId(), knownRoom.getName());
+		}
+	}
+
+	private void mergeDatamodel() throws SQLException {
+		knownRoomValuesDao = DaoManager.createDao(databaseService.getConnectionSource(), KnownRoomValues.class);
+		knownRoomActorsDao = DaoManager.createDao(databaseService.getConnectionSource(), KnownRoomActors.class);
+
+		for (KnownRoomValues knownRoomsValue : knownRoomValuesDao.queryForAll()) {
+			KnownRoom knownRoom = datamodel.getKnownRoom(knownRoomsValue.getRoomId());
+			ValueBase value = datamodel.getValue(knownRoomsValue.getValueId(), knownRoomsValue.getValueGroupId());
+			knownRoom.addValue(value);
 		}
 
 		for (KnownRoomActors knownRoomActor : knownRoomActorsDao.queryForAll()) {
@@ -192,10 +248,6 @@ public class DatamodelServiceImpl implements IDatamodelService {
 			ActorBase actor = datamodel.getActor(knownRoomActor.getActorId(), knownRoomActor.getValueGroupId());
 			knownRoom.addActor(actor);
 		}
-
-		loadedState.changeValue(true);
-
-		communicationService.connectMqtt();
 	}
 
 	@Override

@@ -23,11 +23,6 @@ import com.osh.ui.components.AudioPlaybackSourceArrayAdapter;
 
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SelectAudioDialogFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class SelectAudioDialogFragment extends DialogFragment {
 
     public interface StartAudioCallbackHandler {

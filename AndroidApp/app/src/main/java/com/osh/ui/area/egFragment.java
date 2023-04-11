@@ -60,6 +60,7 @@ public class egFragment extends AreaFragmentBase {
         String shutterModeValueGroupId = "shutterModes0";
         String tempValueGroupId = "temps";
         String humsValueGroupId = "hums";
+        String brightnessValueGroupId = "brightnesses";
         String windowStateGroupId = "allSwitches0";
 
         getChildFragmentManager().beginTransaction().replace(R.id.roomFEG, new RoomFragment(serviceContext , areaViewModel, "feg", getChildFragmentManager(), RoomViewModel.RoomPosition.POSITION_TOP)
@@ -70,6 +71,7 @@ public class egFragment extends AreaFragmentBase {
                 .withShutter(shutterValueGroupId, "0", shutterModeValueGroupId, "0")
                 .withTemperature(tempValueGroupId, "25")
                 .withHumidity(humsValueGroupId, "25")
+                .withBrightness(brightnessValueGroupId, "25")
                 .withWindowState(windowStateGroupId, "15")).commit();
 
         getChildFragmentManager().beginTransaction().replace(R.id.roomK, new RoomFragment(serviceContext , areaViewModel, "k", getChildFragmentManager(), RoomViewModel.RoomPosition.POSITION_TOP)

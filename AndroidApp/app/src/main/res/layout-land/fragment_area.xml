@@ -82,6 +82,15 @@
                     android:textAlignment="center" />
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/overlay_presence"
+                    android:layout_width="170dp"
+                    android:layout_height="70dp"
+                    android:checkable="true"
+                    android:text="Presence"
+                    android:checked="@{areaData.currentOverlay == AreaOverlays.PRESENCE}"
+                    android:textAlignment="center" />
+
+                <com.google.android.material.chip.Chip
                     android:id="@+id/overlay_audio"
                     android:layout_width="170dp"
                     android:layout_height="70dp"
@@ -91,13 +100,14 @@
                     android:textAlignment="center" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/overlay_presence"
+                    android:id="@+id/overlay_devices"
                     android:layout_width="170dp"
                     android:layout_height="70dp"
                     android:checkable="true"
-                    android:text="Presence"
-                    android:checked="@{areaData.currentOverlay == AreaOverlays.PRESENCE}"
+                    android:text="Devices"
+                    android:checked="@{areaData.currentOverlay == AreaOverlays.DEVICES}"
                     android:textAlignment="center" />
+
             </com.google.android.material.chip.ChipGroup>
 
 

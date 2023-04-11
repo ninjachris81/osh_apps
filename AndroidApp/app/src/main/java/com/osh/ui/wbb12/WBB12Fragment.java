@@ -25,6 +25,9 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.google.common.math.Stats;
+import com.osh.OshApplication;
+import com.osh.StatisticsActivity;
 import com.osh.databinding.FragmentWbb12Binding;
 import com.osh.wbb12.service.IWBB12Service;
 
@@ -54,6 +57,13 @@ public class WBB12Fragment extends Fragment {
                 //new ViewModelProvider(this).get(WBB12ViewModel.class);
 
         binding = FragmentWbb12Binding.inflate(inflater, container, false);
+
+        OshApplication app = (OshApplication) getActivity().getApplication();
+
+        binding.statsButton.setOnClickListener(view -> {
+            StatisticsActivity.invokeActivity(getContext(), app.getApplicationConfig().getGrafana().getWbb12Url());
+        });
+
         View root = binding.getRoot();
 
         final ArrayList<String> xVals = new ArrayList<>();

@@ -46,7 +46,18 @@
             android:visibility="@{areaData.currentOverlay == AreaOverlays.SENSORS ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/roomLabel" />
+
+        <TextView
+            android:id="@+id/brightnessLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text='@{(areaData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; !roomData.brightnesses.isEmpty()) ? (String.format("%.1f", roomData.brightnesses[0]) + "%") : "" }'
+            android:visibility="@{areaData.currentOverlay == AreaOverlays.SENSORS ? View.VISIBLE : View.GONE}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/roomLabel" />
+
 
         <TextView
             android:id="@+id/humLabel"
@@ -56,7 +67,7 @@
             android:visibility="@{areaData.currentOverlay == AreaOverlays.SENSORS ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tempLabel" />
+            app:layout_constraintTop_toBottomOf="@id/brightnessLabel" />
 
         <ImageView
             android:id="@+id/roomBackground"

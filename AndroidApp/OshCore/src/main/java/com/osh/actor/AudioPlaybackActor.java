@@ -21,8 +21,11 @@ public class AudioPlaybackActor extends ActorBase {
 	private final ObservableString audioUrl;
 	private StringValue audioUrlValue;
 	private final String audioUrlId;
+	private StringValue audioCurrentTitleValue;
 
-	public AudioPlaybackActor(ValueGroup valueGroup, String id, ValueType valueType, String audioDeviceIds, String audioActivationRelayId, float audioVolume, String audioVolumeId, String audioUrl, String audioUrlId) {
+	private final ObservableString audioCurrentTitle;
+
+	public AudioPlaybackActor(ValueGroup valueGroup, String id, ValueType valueType, String audioDeviceIds, String audioActivationRelayId, float audioVolume, String audioVolumeId, String audioUrl, String audioUrlId, String audioCurrentTitleId) {
 		super(valueGroup, id, valueType);
 		this.audioDeviceIds = audioDeviceIds;
 		this.audioActivationRelayId = audioActivationRelayId;
@@ -30,6 +33,7 @@ public class AudioPlaybackActor extends ActorBase {
 		this.audioVolumeId = audioVolumeId;
 		this.audioUrl = new ObservableString(audioUrl);
 		this.audioUrlId = audioUrlId;
+		this.audioCurrentTitle = new ObservableString("");
 	}
 
 	@Override
@@ -81,6 +85,14 @@ public class AudioPlaybackActor extends ActorBase {
 		return audioUrlValue;
 	}
 
+	public StringValue getAudioCurrentTitleValue() {
+		return audioCurrentTitleValue;
+	}
+
+	public void setAudioCurrentTitleValue(StringValue audioCurrentTitleValue) {
+		this.audioCurrentTitleValue = audioCurrentTitleValue;
+	}
+
 	public void setVolumeValue(DoubleValue volume) {
 		this.audioVolumeValue = volume;
 		audioVolumeValue.addItemChangeListener(item -> {
@@ -94,4 +106,6 @@ public class AudioPlaybackActor extends ActorBase {
 			audioUrl.changeValue(item.getValue());
 		});
 	}
+
+
 }

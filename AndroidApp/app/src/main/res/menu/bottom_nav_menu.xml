@@ -20,6 +20,6 @@
     <item
         android:id="@+id/navigation_wbb12"
         app:materialIcon="radiator"
-        android:title="WBB12" />
+        android:title="@string/title_wbb12" />
 
 </menu>

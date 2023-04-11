@@ -6,12 +6,91 @@
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment">
 
-    <Button
-        android:id="@+id/unlockDoor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="Unlock Front Door"
-        />
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:columnCount="2"
+        android:rowCount="2"
+        >
+
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:layout_gravity="fill"
+            android:layout_margin="10dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@color/seek_bar_background"
+            app:cardCornerRadius="4dp"
+            >
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                >
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnUnlockDoor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:text="Unlock Front Door"
+                    />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnFrontCamera"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:text="Front Door Camera"
+                    />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:layout_gravity="fill"
+            android:layout_margin="10dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@color/seek_bar_background"
+            app:cardCornerRadius="4dp"
+            >
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:layout_gravity="fill"
+            android:layout_margin="10dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@color/seek_bar_background"
+            app:cardCornerRadius="4dp"
+            >
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:layout_gravity="fill"
+            android:layout_margin="10dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@color/seek_bar_background"
+            app:cardCornerRadius="4dp"
+            >
+
+        </androidx.cardview.widget.CardView>
+    </GridLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

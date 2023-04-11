@@ -3,8 +3,10 @@ package com.osh;
 import static android.widget.Toast.*;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 
 import androidx.biometric.BiometricManager;
@@ -14,9 +16,16 @@ import androidx.core.content.ContextCompat;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Parcelable;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
+import com.osh.config.IApplicationConfig;
+import com.osh.databinding.ActivityDoorOpenBinding;
+import com.osh.databinding.ActivitySipCallBinding;
 import com.osh.service.IDoorUnlockService;
 
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +39,9 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class DoorOpenActivity extends AppCompatActivity implements IDoorUnlockService.CallbackListener {
 
+    private ActivityDoorOpenBinding binding;
     public static final String DU_EXTRA_DOOR_ID = "doorId";
+    public static final String DU_EXTRA_FROM_APP = "fromApp";
     private static final String TAG = DoorOpenActivity.class.getName();
 
     public static final String REQUEST_DOOR_UNLOCK_CHALLENGE_INTENT = "com.osh.action.requestDoorUnlockChallenge";
@@ -38,13 +49,40 @@ public class DoorOpenActivity extends AppCompatActivity implements IDoorUnlockSe
     @Inject
     IDoorUnlockService doorUnlockManager;
 
+    CountDownTimer finishTimer;
+
+    public static void invokeActivity(Context context, String doorId) {
+        Intent intent = new Intent(DoorOpenActivity.REQUEST_DOOR_UNLOCK_CHALLENGE_INTENT);
+        intent.putExtra(DoorOpenActivity.DU_EXTRA_DOOR_ID, doorId);
+        intent.putExtra(DoorOpenActivity.DU_EXTRA_FROM_APP, true);
+        context.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_door_open);
-        handleIntent(getIntent());
+        binding = ActivityDoorOpenBinding.inflate(getLayoutInflater());
+
+        binding.tryAgainBtn.setOnClickListener(view -> {
+            executeAuth("frontDoor.door", true);
+        });
+
+        setContentView(binding.getRoot());
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         doorUnlockManager.setCallbackListener(this);
+
+        finishTimer = new CountDownTimer(3000, 1000) {
+            public void onTick(long millisUntilFinished) {
+            }
+
+            public void onFinish() {
+                finish();
+            }
+        };
+
+        handleIntent(getIntent());
     }
 
     @Override
@@ -70,7 +108,7 @@ public class DoorOpenActivity extends AppCompatActivity implements IDoorUnlockSe
 
                         if (!StringUtils.isEmpty(data)) {
                             Log.i(TAG, "Requesting challenge");
-                            executeAuth(data);
+                            executeAuth(data, false);
                         } else {
                             Log.w(TAG, "No doorid defined");
                         }
@@ -86,9 +124,10 @@ public class DoorOpenActivity extends AppCompatActivity implements IDoorUnlockSe
             Log.i(TAG, "Requesting challenge");
 
             String doorId = intent.getStringExtra(DU_EXTRA_DOOR_ID);
+            boolean fromApp = intent.getBooleanExtra(DU_EXTRA_FROM_APP, false);
 
             if (!StringUtils.isEmpty(doorId)) {
-                executeAuth(doorId);
+                executeAuth(doorId, fromApp);
             } else {
                 Log.w(TAG, "No doorid defined");
             }
@@ -97,65 +136,84 @@ public class DoorOpenActivity extends AppCompatActivity implements IDoorUnlockSe
         }
     }
 
-    private void executeAuth(String doorId) {
+    private void executeAuth(String doorId, boolean fromApp) {
         Executor executor;
         BiometricPrompt biometricPrompt;
         BiometricPrompt.PromptInfo promptInfo;
 
+        String userId = ((OshApplication)getApplication()).getApplicationConfig().getUser().getUserId();
+
         executor = ContextCompat.getMainExecutor(this);
 
-        biometricPrompt = new BiometricPrompt(DoorOpenActivity.this,
-                executor, new BiometricPrompt.AuthenticationCallback() {
-            @Override
-            public void onAuthenticationError(int errorCode,
-                                              @NonNull CharSequence errString) {
-                super.onAuthenticationError(errorCode, errString);
-                makeText(getApplicationContext(),
-                        "Authentication error: " + errString, LENGTH_SHORT)
-                        .show();
-            }
+        if (fromApp) {
+            biometricPrompt = new BiometricPrompt(this,
+                    executor, new BiometricPrompt.AuthenticationCallback() {
+                @Override
+                public void onAuthenticationError(int errorCode,
+                                                  @NonNull CharSequence errString) {
+                    super.onAuthenticationError(errorCode, errString);
+                    makeText(getApplicationContext(),
+                            "Authentication error: " + errString, LENGTH_SHORT)
+                            .show();
+                }
 
-            @Override
-            public void onAuthenticationSucceeded(
-                    @NonNull BiometricPrompt.AuthenticationResult result) {
-                super.onAuthenticationSucceeded(result);
-                doorUnlockManager.requestChallenge("chris", doorId);
-            }
+                @Override
+                public void onAuthenticationSucceeded(
+                        @NonNull BiometricPrompt.AuthenticationResult result) {
+                    super.onAuthenticationSucceeded(result);
+                    doorUnlockManager.requestChallenge(userId, doorId);
+                }
 
-            @Override
-            public void onAuthenticationFailed() {
-                super.onAuthenticationFailed();
-                makeText(getApplicationContext(), "Authentication failed",
-                        LENGTH_SHORT)
-                        .show();
-            }
-        });
+                @Override
+                public void onAuthenticationFailed() {
+                    super.onAuthenticationFailed();
+                    makeText(getApplicationContext(), "Bio Authentication failed",
+                            LENGTH_SHORT)
+                            .show();
+                }
+            });
 
-        promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Biometric login")
-                .setNegativeButtonText("Cancel")
-                .setSubtitle("Log in to unlock door")
-                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
-                .build();
+            promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                    .setTitle("Biometric login")
+                    .setNegativeButtonText("Cancel")
+                    .setSubtitle("Log in to unlock door")
+                    .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+                    .build();
 
-        biometricPrompt.authenticate(promptInfo);
+            biometricPrompt.authenticate(promptInfo);
+        } else {
+            // directly send
+            doorUnlockManager.requestChallenge(userId, doorId);
+        }
     }
 
     @Override
     public void onAuthSuccess() {
-
         runOnUiThread(() -> {
-            makeText(getApplicationContext(),
-                    "Authentication succeeded!", LENGTH_SHORT).show();
+            binding.tryAgainBtn.setVisibility(View.GONE);
+            binding.doorOpenStatus.setText("Door opened");
         });
 
+        finishTimer.cancel();
+        finishTimer.start();
     }
 
     @Override
     public void onAuthFailure() {
         runOnUiThread(() -> {
-            makeText(getApplicationContext(),
-                    "Authentication Failed!", LENGTH_SHORT).show();
+            binding.tryAgainBtn.setVisibility(View.VISIBLE);
+            binding.tryAgainBtn.invalidate();
+            binding.tryAgainBtn.requestLayout();
+            binding.doorOpenStatus.setText("Failed to open door");
+            binding.tryAgainBtn.invalidate();
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (finishTimer != null) {
+            finishTimer.cancel();
+        }
     }
 }

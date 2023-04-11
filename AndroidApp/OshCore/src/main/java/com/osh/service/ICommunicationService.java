@@ -1,7 +1,6 @@
 package com.osh.service;
 
 import com.osh.communication.MessageBase;
-import com.osh.config.IApplicationConfig;
 import com.osh.manager.IMqttSupport;
 import com.osh.utils.IObservableBoolean;
 

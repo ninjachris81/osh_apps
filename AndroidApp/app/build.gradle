@@ -10,12 +10,12 @@ plugins {
 
 android {
     namespace 'com.osh'
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.osh"
         minSdk 29
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -72,7 +72,30 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+
+    implementation 'commons-net:commons-net:3.6'
+    implementation 'commons-io:commons-io:2.7'
+
+    //implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    //implementation 'com.rvirin.onvif:onvifcamera:1.1.6'
+
+    //implementation("com.seanproctor:onvifcamera:1.5.0")
+
+    //runtimeOnly 'org.videolan.android:libvlc-all:3.5.1'
+    //implementation "androidx.media3:media3-exoplayer:1.0.0"
+    //implementation "androidx.media3:media3-exoplayer-dash:1.0.0"
+    //implementation "androidx.media3:media3-ui:1.0.0"
+    //implementation 'com.google.android.exoplayer:exoplayer-rtsp:2.18.5'
+
+    implementation "com.google.android.exoplayer:exoplayer-rtsp:2.18.5"
+    implementation "com.google.android.exoplayer:exoplayer-core:2.18.5"
+    implementation "com.google.android.exoplayer:exoplayer-dash:2.18.5"
+    implementation "com.google.android.exoplayer:exoplayer-ui:2.18.5"
+
     implementation project(path: ':OshWbb12')
+    implementation project(path: ':sipservice')
+    implementation project(path: ':OshSip')
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
     kapt "com.google.dagger:hilt-compiler:2.44"
 

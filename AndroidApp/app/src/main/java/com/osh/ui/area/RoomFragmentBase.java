@@ -69,6 +69,8 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
         public final List<String> temperatureIds = new ArrayList<>();
         public final List<String> humidityIds = new ArrayList<>();
         public final List<String> windowStateIds = new ArrayList<>();
+
+        public final List<String> brightnessIds = new ArrayList<>();
     }
 
     protected AreaViewModel areaViewModel;
@@ -146,6 +148,9 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
             bindWindowState(sensorInfos.windowStateIds.get(i), i);
         }
 
+        for (int i = 0;i<sensorInfos.brightnessIds.size();i++) {
+            bindBrightnessSensor(sensorInfos.brightnessIds.get(i), i);
+        }
 
         return binding.getRoot();
     }
@@ -170,37 +175,53 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
         return this;
     }
 
-    protected void bindTemperatureSensor(String temperatureId, int index) {
-        DoubleValue tempVal = (DoubleValue) serviceContext.getDatamodelService().getDatamodel().getValue(temperatureId);
-        if (tempVal != null) {
-            tempVal.addItemChangeListener(item -> {
+    public RoomFragmentBase withBrightness(String valueGroupId, String id) {
+        sensorInfos.brightnessIds.add(ValueBase.getFullId(valueGroupId, id));
+        return this;
+    }
+
+    protected void bindTemperatureSensor(String id, int index) {
+        DoubleValue value = (DoubleValue) serviceContext.getDatamodelService().getDatamodel().getValue(id);
+        if (value != null) {
+            value.addItemChangeListener(item -> {
                 roomViewModel.temperatures.get(index).set(item.getValue(-1.0));
             }, true);
         } else {
-            throw new RuntimeException("Sensor value not found: " +temperatureId);
+            throw new RuntimeException("Sensor value not found: " + id);
         }
     }
 
-    protected  void bindHumiditySensor(String humidityId, int index) {
-        DoubleValue humVal = (DoubleValue) serviceContext.getDatamodelService().getDatamodel().getValue(humidityId);
-        if (humVal != null) {
-            humVal.addItemChangeListener(item -> {
+    protected  void bindHumiditySensor(String id, int index) {
+        DoubleValue value = (DoubleValue) serviceContext.getDatamodelService().getDatamodel().getValue(id);
+        if (value != null) {
+            value.addItemChangeListener(item -> {
                 roomViewModel.humidities.get(index).set(item.getValue(-1.0));
             }, true);
         } else {
-            throw new RuntimeException("Sensor value not found: " + humidityId);
+            throw new RuntimeException("Sensor value not found: " + id);
         }
     }
 
 
-    protected void bindWindowState(String windowStateId, int index) {
-        BooleanValue stateVal = (BooleanValue) serviceContext.getValueService().getValue(windowStateId);
-        if (stateVal != null) {
-            stateVal.addItemChangeListener(item -> {
+    protected void bindWindowState(String id, int index) {
+        BooleanValue value = (BooleanValue) serviceContext.getValueService().getValue(id);
+        if (value != null) {
+            value.addItemChangeListener(item -> {
                 roomViewModel.windowStates.get(index).set(item.getValue(false));
             });
         } else {
-            throw new RuntimeException("Sensor value not found: " + windowStateId);
+            throw new RuntimeException("Sensor value not found: " + id);
+        }
+    }
+
+    protected void bindBrightnessSensor(String id, int index) {
+        DoubleValue value = (DoubleValue) serviceContext.getValueService().getValue(id);
+        if (value != null) {
+            value.addItemChangeListener(item -> {
+                roomViewModel.brightnesses.get(index).set(item.getValue(-1.0));
+            });
+        } else {
+            throw new RuntimeException("Sensor value not found: " + id);
         }
     }
 

@@ -1,5 +1,7 @@
 package com.osh.service.impl;
 
+import static com.osh.service.impl.psk.PSK;
+
 import android.util.Base64;
 
 import com.osh.communication.MessageBase;
@@ -19,8 +21,6 @@ import java.util.Map;
 public class DoorUnlockServiceImpl implements IDoorUnlockService {
 
     private static final String TAG = DoorUnlockServiceImpl.class.getName();
-
-    private static final String PSK = "q7XtfMBWAmKYWUekFPxS";
 
     private ICommunicationService communicationManager;
 

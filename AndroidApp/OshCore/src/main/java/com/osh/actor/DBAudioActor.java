@@ -30,6 +30,9 @@ public class DBAudioActor {
     @DatabaseField(columnName = "audio_url_id")
     String audioUrlId;
 
+    @DatabaseField(columnName = "audio_current_title_id")
+    String audioCurrentTitleId;
+
     public String getId() {
         return id;
     }
@@ -60,5 +63,9 @@ public class DBAudioActor {
 
     public String getAudioUrlId() {
         return audioUrlId;
+    }
+
+    public String getAudioCurrentTitleId() {
+        return audioCurrentTitleId;
     }
 }

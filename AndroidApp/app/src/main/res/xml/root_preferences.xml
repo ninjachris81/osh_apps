@@ -1,6 +1,15 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <PreferenceCategory app:title="@string/user_settings">
+
+    <EditTextPreference
+        app:defaultValue="DefaultUser"
+        app:key="@string/user_id_key"
+        app:title="@string/user_id"
+        app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="@string/mqtt_settings">
 
         <EditTextPreference
@@ -60,6 +69,96 @@
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="Password" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/sip_settings">
+
+        <EditTextPreference
+            app:defaultValue="localhost"
+            app:key="@string/sip_host_key"
+            app:title="@string/sip_host"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:defaultValue="5060"
+            app:key="@string/sip_port_key"
+            app:title="@string/sip_port"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:defaultValue="*"
+            app:key="@string/sip_realm_key"
+            app:title="@string/sip_realm_id"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:defaultValue=""
+            app:key="@string/sip_username_key"
+            app:title="@string/sip_username"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:defaultValue="*"
+            app:key="@string/sip_password_key"
+            app:title="@string/sip_password"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:defaultValue="80"
+            app:key="@string/sip_ring_volume_key"
+            app:title="@string/sip_ring_volume"
+            android:inputType="number"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/camera_settings" >
+    <PreferenceCategory android:title="@string/front_door_camera_settings" >
+        <EditTextPreference
+            app:defaultValue="frontDoor.door"
+            app:key="@string/front_door_camera_id_key"
+            app:title="@string/camera_id"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="rtsp://localhost"
+            app:key="@string/front_door_stream_uri_key"
+            app:title="@string/camera_stream_url"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="frontDoor.door"
+            app:key="@string/front_door_camera_ftp_id_key"
+            app:title="@string/camera_id"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="localhost"
+            app:key="@string/front_door_camera_ftp_host_key"
+            app:title="@string/camera_ftp_host"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="ftp"
+            app:key="@string/front_door_camera_ftp_username_key"
+            app:title="@string/camera_ftp_username"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="ftp"
+            app:key="@string/front_door_camera_ftp_password_key"
+            app:title="@string/camera_ftp_password"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="/home/pi"
+            app:key="@string/front_door_camera_ftp_remote_dir_key"
+            app:title="@string/camera_ftp_remote_dir"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/grafana_settings">
+
+        <EditTextPreference
+            app:defaultValue="http://localhost:3000/grafana"
+            app:key="@string/grafana_wbb12_url_key"
+            app:title="@string/grafana_wbb12_url"
+            app:useSimpleSummaryProvider="true" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

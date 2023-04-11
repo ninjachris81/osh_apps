@@ -13,4 +13,10 @@
     <dimen name="shutter_mode_button_width">150dp</dimen>
     <dimen name="audio_dialog_width">700dp</dimen>
     <dimen name="audio_dialog_height">500dp</dimen>
+    <dimen name="appbar_padding">16dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="appbar_padding_top">8dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
+    <dimen name="image_dialog_width">800dp</dimen>
+    <dimen name="image_dialog_height">550dp</dimen>
 </resources>

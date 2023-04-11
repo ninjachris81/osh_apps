@@ -117,8 +117,8 @@ public class DatamodelBase extends Identifyable {
 		return actor;
 	}
 
-	public ActorBase addAudioPlaybackActor(ValueGroup valueGroup, String id, ValueType valueType, ValueBase.VALUE_TIMEOUT timeout, String audioDeviceIds, String audioActivationRelayId, float audioVolume, String audioVolumeId, String audioUrl, String audioUrlId) {
-		AudioPlaybackActor actor = new AudioPlaybackActor(valueGroup, id, valueType, audioDeviceIds, audioActivationRelayId, audioVolume, audioVolumeId, audioUrl, audioUrlId);
+	public ActorBase addAudioPlaybackActor(ValueGroup valueGroup, String id, ValueType valueType, ValueBase.VALUE_TIMEOUT timeout, String audioDeviceIds, String audioActivationRelayId, float audioVolume, String audioVolumeId, String audioUrl, String audioUrlId, String audioCurrentTitleId) {
+		AudioPlaybackActor actor = new AudioPlaybackActor(valueGroup, id, valueType, audioDeviceIds, audioActivationRelayId, audioVolume, audioVolumeId, audioUrl, audioUrlId, audioCurrentTitleId);
 		actor.withValueTimeout(timeout);
 		actors.put(actor.getFullId(), actor);
 		return actor;

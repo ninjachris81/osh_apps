@@ -44,8 +44,9 @@ public class AreaFragment extends Fragment {
         LIGHTS,
         SHUTTERS,
         SENSORS,
+        PRESENCE,
         AUDIO,
-        PRESENCE
+        DEVICES
     }
 
     public AreaFragment(IServiceContext serviceContext) {

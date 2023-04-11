@@ -15,4 +15,13 @@
         <item name="android:windowFullscreen">true</item>
     </style>
 
+    <style name="Theme.OSH.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.OSH.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.OSH.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
 </resources>
