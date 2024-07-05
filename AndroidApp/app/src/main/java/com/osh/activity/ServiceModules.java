@@ -1,4 +1,4 @@
-package com.osh;
+package com.osh.activity;
 
 import com.osh.service.IActorService;
 import com.osh.service.IAudioActorService;
@@ -89,8 +89,8 @@ public class ServiceModules {
 
     @Provides
     @Singleton
-    static IDoorUnlockService provideDoorUnlockManager(ICommunicationService communicationManager) {
-        return new DoorUnlockServiceImpl(communicationManager);
+    static IDoorUnlockService provideDoorUnlockManager(ICommunicationService communicationManager, IApplicationConfig applicationConfig) {
+        return new DoorUnlockServiceImpl(communicationManager, applicationConfig.getMqtt().getClientId());
     }
 
     @Provides

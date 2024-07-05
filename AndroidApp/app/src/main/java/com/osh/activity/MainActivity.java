@@ -1,13 +1,13 @@
-package com.osh;
+package com.osh.activity;
 
 import android.Manifest;
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,33 +19,31 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.osh.R;
 import com.osh.databinding.ActivityMainBinding;
-import com.osh.log.LogFacade;
 import com.osh.service.IServiceContext;
 import com.osh.sip.OshAccount;
 import com.osh.ui.area.AreaFragment;
 import com.osh.ui.dashboard.DashboardFragment;
 import com.osh.ui.home.HomeFragment;
 import com.osh.ui.wbb12.WBB12Fragment;
-import com.osh.utils.IObservableBoolean;
 import com.osh.utils.ObservableBoolean;
 import com.osh.wbb12.service.IWBB12Service;
 
-import net.gotev.sipservice.SipAccountData;
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 import net.steamcrafted.materialiconlib.MaterialMenuInflater;
 
 import javax.inject.Inject;
 
+import dagger.Lazy;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
 
     @Inject
-    IWBB12Service wbb12Service;
+    Lazy<IWBB12Service> wbb12Service;
 
     @Inject
     IServiceContext serviceContext;
@@ -54,7 +52,12 @@ public class MainActivity extends AppCompatActivity {
     private ObservableBoolean sipConnectedState = new ObservableBoolean(false);
     private static final int REQUEST_PERMISSIONS_APP = 0x100;
 
-    ActivityMainBinding binding;
+    private ActivityMainBinding binding;
+
+    public static void invokeActivity(Context context) {
+        Intent intent = new Intent(context, MainActivity.class);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void registrationFailure(int registrationStateCode) {
-                Toast.makeText(getApplicationContext(), "Registration failed " + registrationStateCode, Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(), "Registration failed " + registrationStateCode, Toast.LENGTH_LONG).show();
                 sipConnectedState.changeValue(false);
             }
 
@@ -119,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
 
         requestPermissions();
     }
+
+
 
     private void setMaterialIcon(int i, MaterialDrawableBuilder.IconValue icon) {
         MenuItem item = binding.navView.getMenu().getItem(i);
@@ -180,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                 selectedFragment = AreaFragment.newInstance(serviceContext);
                 break;
             case R.id.navigation_wbb12:
-                selectedFragment = WBB12Fragment.newInstance(wbb12Service);
+                selectedFragment = WBB12Fragment.newInstance(wbb12Service.get());
                 break;
         }
         // It will help to replace the

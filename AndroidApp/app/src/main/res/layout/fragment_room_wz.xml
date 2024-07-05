@@ -61,7 +61,6 @@
             android:id="@+id/roomBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:alpha="@{roomData.backgroundVisible ? 1f : 0f}"
             >
 
             <ImageView
@@ -70,7 +69,10 @@
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:alpha="@{(areaData.currentOverlay==AreaOverlays.LIGHTS &amp;&amp; roomData.lightStates[0]) || (areaData.currentOverlay==AreaOverlays.PRESENCE &amp;&amp; roomData.roomPresences[0]) ? 1f : 0f}"
+                android:background="@{areaData.currentOverlay==AreaOverlays.LIGHTS ? @drawable/light_background : areaData.currentOverlay==AreaOverlays.PRESENCE ? @drawable/presence_background : null}"
+                />
 
             <ImageView
                 android:id="@+id/lightBackgroundWZ2"
@@ -80,7 +82,10 @@
                 app:layout_constraintBottom_toBottomOf="@id/lightBackgroundWZ1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/lightBackgroundWZ1"
-                app:layout_constraintTop_toTopOf="@id/lightBackgroundWZ1" />
+                app:layout_constraintTop_toTopOf="@id/lightBackgroundWZ1"
+                android:alpha="@{(areaData.currentOverlay==AreaOverlays.LIGHTS &amp;&amp; roomData.lightStates[1]) || (areaData.currentOverlay==AreaOverlays.PRESENCE &amp;&amp; roomData.roomPresences[0]) ? 1f : 0f}"
+                android:background="@{areaData.currentOverlay==AreaOverlays.LIGHTS ? @drawable/light_background : areaData.currentOverlay==AreaOverlays.PRESENCE ? @drawable/presence_background : null}"
+                />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView

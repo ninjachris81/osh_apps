@@ -24,9 +24,12 @@ public class RoomFragmentB extends RoomFragmentBase<FragmentRoomBBinding> {
     protected void setBindingData() {
         binding.setAreaData(areaViewModel);
         binding.setRoomData(roomViewModel);
+        roomViewModel.initLightStates(lightInfos.size());
         roomViewModel.initShutters(shutterInfos.size());
+        roomViewModel.initLightStates(lightInfos.size());
         roomViewModel.initTemperatures(sensorInfos.temperatureIds.size());
         roomViewModel.initHumidities(sensorInfos.humidityIds.size());
         roomViewModel.initWindowStates(sensorInfos.windowStateIds.size());
+        roomViewModel.initPresences(sensorInfos.presenceIds.size());
     }
 }

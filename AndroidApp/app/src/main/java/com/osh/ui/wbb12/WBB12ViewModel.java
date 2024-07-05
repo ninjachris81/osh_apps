@@ -48,10 +48,12 @@ public class WBB12ViewModel extends ViewModel {
 
         wbb12Consumption = new MutableLiveData<>();
         IntegerValue cons = ((IntegerValue) wbb12Manager.getWBB12Value("wbb12.heatPumpConsumption"));
-        wbb12Consumption.postValue(cons.getValue(0));
-        cons.addItemChangeListener(item -> {
-            wbb12Consumption.postValue(item.getValue(0));
-        }, true);
+        if (cons != null) {
+            wbb12Consumption.postValue(cons.getValue(0));
+            cons.addItemChangeListener(item -> {
+                wbb12Consumption.postValue(item.getValue(0));
+            }, true);
+        }
     }
 
     public void setValue(MutableLiveData<String> liveData, ValueBase val) {

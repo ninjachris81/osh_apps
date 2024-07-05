@@ -1,28 +1,22 @@
 package com.osh.ui.camera;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-
 import com.osh.R;
-import com.osh.actor.ActorCmds;
 import com.osh.camera.config.CameraFTPSource;
 import com.osh.databinding.FragmentSurveillanceListBinding;
 import com.osh.log.LogFacade;
 import com.osh.ui.dialogs.SelectAudioDialogFragment;
 import com.osh.ui.dialogs.ShowImageDetailsFragment;
+import com.osh.ui.dialogs.ShowVideoDetailsFragment;
 import com.osh.worker.FTPImageWorker;
 
 import java.util.ArrayList;
@@ -31,11 +25,11 @@ import java.util.List;
 /**
  * A fragment representing a list of Items.
  */
-public class SurveillancePictureFragment extends Fragment {
+public class SurveillanceRingFragment extends Fragment {
 
     FragmentSurveillanceListBinding binding;
 
-    private static final String TAG = SurveillancePictureFragment.class.getName();
+    private static final String TAG = SurveillanceRingFragment.class.getName();
     CameraFTPSource source;
 
     final List<CameraImageContent.ThumbnailImageItem> imageList = new ArrayList<>();
@@ -44,10 +38,10 @@ public class SurveillancePictureFragment extends Fragment {
     private final FTPImageWorker worker = new FTPImageWorker();
     private CameraImageFolderArrayAdapter folderArrayAdapter;
 
-    public SurveillancePictureFragment() {
+    public SurveillanceRingFragment() {
     }
 
-    public SurveillancePictureFragment(CameraFTPSource source) {
+    public SurveillanceRingFragment(CameraFTPSource source) {
         this.source = source;
     }
 
@@ -71,10 +65,10 @@ public class SurveillancePictureFragment extends Fragment {
         recyclerViewAdapter = new MySurveillancePictureRecyclerViewAdapter(imageList, new MySurveillancePictureRecyclerViewAdapter.ImageClickListener() {
             @Override
             public void onImageClicked(CameraImageContent.ThumbnailImageItem item) {
-                worker.fetchOriginal(source, item, getResources(), image -> {
+                worker.fetchVideo(source, item, getContext(), file -> {
                     getActivity().runOnUiThread(() -> {
-                        ShowImageDetailsFragment dialog = ShowImageDetailsFragment.newInstance();
-                        dialog.setImage(image);
+                        ShowVideoDetailsFragment dialog = ShowVideoDetailsFragment.newInstance();
+                        dialog.setVideoFile(file);
                         dialog.show(getChildFragmentManager(), SelectAudioDialogFragment.TAG);
                     });
                 });
@@ -86,7 +80,7 @@ public class SurveillancePictureFragment extends Fragment {
         folderArrayAdapter = new CameraImageFolderArrayAdapter(getContext(), R.layout.spinner_dropdown_item);
         binding.surveillanceDaySelectionTextview.setAdapter(folderArrayAdapter);
 
-        worker.fetchFolders(source, source.getRemoteDirImages(), folders -> {
+        worker.fetchFolders(source, source.getRemoteDirVideos(), folders -> {
             folderArrayAdapter.clear();
             folderArrayAdapter.addAll(folders);
 
@@ -112,7 +106,7 @@ public class SurveillancePictureFragment extends Fragment {
         imageList.clear();
         recyclerViewAdapter.refresh();
 
-        worker.fetchThumbnails(source, source.getRemoteDirImages() + "/" + folder.getName() + "/images/thumbnails", getResources(), new FTPImageWorker.GetThumbnailCallback() {
+        worker.fetchThumbnails(source, source.getRemoteDirVideos() + "/" + folder.getName() + "/thumbnails", getResources(), new FTPImageWorker.GetThumbnailCallback() {
             @Override
             public void onComplete(List<CameraImageContent.ThumbnailImageItem> thumbnails) {
                 LogFacade.d(TAG, "" + thumbnails.size());

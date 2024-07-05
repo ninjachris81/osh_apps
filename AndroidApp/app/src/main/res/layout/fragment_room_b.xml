@@ -61,7 +61,7 @@
             android:id="@+id/roomBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:alpha="@{roomData.backgroundVisible ? 1f : 0f}"
+            android:alpha="@{(areaData.currentOverlay==AreaOverlays.LIGHTS &amp;&amp; roomData.lightStates[0]) || (areaData.currentOverlay==AreaOverlays.PRESENCE &amp;&amp; roomData.roomPresences[0]) ? 1f : 0f}"
             >
 
             <ImageView
@@ -70,7 +70,9 @@
                 android:layout_height="match_parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="@{areaData.currentOverlay==AreaOverlays.LIGHTS ? @drawable/light_background : areaData.currentOverlay==AreaOverlays.PRESENCE ? @drawable/presence_background : null}"
+                />
 
             <ImageView
                 android:id="@+id/lightBackgroundB2"
@@ -79,7 +81,9 @@
                 android:layout_marginTop="83dp"
                 app:layout_constraintBottom_toBottomOf="@id/lightBackgroundB1"
                 app:layout_constraintStart_toEndOf="@id/lightBackgroundB1"
-                app:layout_constraintTop_toTopOf="@id/lightBackgroundB1"/>
+                app:layout_constraintTop_toTopOf="@id/lightBackgroundB1"
+                android:background="@{areaData.currentOverlay==AreaOverlays.LIGHTS ? @drawable/light_background : areaData.currentOverlay==AreaOverlays.PRESENCE ? @drawable/presence_background : null}"
+                />
 
             <ImageView
                 android:id="@+id/lightBackgroundB3"
@@ -88,7 +92,9 @@
                 app:layout_constraintBottom_toBottomOf="@id/lightBackgroundB1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/lightBackgroundB2"
-                app:layout_constraintTop_toTopOf="@id/lightBackgroundB1"/>
+                app:layout_constraintTop_toTopOf="@id/lightBackgroundB1"
+                android:background="@{areaData.currentOverlay==AreaOverlays.LIGHTS ? @drawable/light_background : areaData.currentOverlay==AreaOverlays.PRESENCE ? @drawable/presence_background : null}"
+                />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView

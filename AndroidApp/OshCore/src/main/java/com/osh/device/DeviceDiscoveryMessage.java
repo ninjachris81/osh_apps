@@ -7,9 +7,12 @@ public class DeviceDiscoveryMessage extends MessageBase {
     private String deviceId;
     private String serviceId;
 
-	public DeviceDiscoveryMessage(String deviceId, String serviceId) {
+	private long upTime;
+
+	public DeviceDiscoveryMessage(String deviceId, String serviceId, long upTime) {
 		this.deviceId = deviceId;
 		this.serviceId = serviceId;
+		this.upTime = upTime;
 	}
 
 	@Override
@@ -42,5 +45,8 @@ public class DeviceDiscoveryMessage extends MessageBase {
 	public void setServiceId(String serviceId) {
 		this.serviceId = serviceId;
 	}
-	
+
+	public long getUpTime() {
+		return upTime;
+	}
 }

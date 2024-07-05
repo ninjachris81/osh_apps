@@ -71,7 +71,8 @@
     <string name="camera_stream_url">Stream URI</string>
     <string name="title_activity_camera_details">Front Door Camera</string>
     <string name="tab_camera_stream">Camera Stream</string>
-    <string name="tab_surveillance">Surveillance</string>
+    <string name="tab_pic_surveillance">Surveillance</string>
+    <string name="tab_ring_surveillance">Door Ring</string>
     <string name="title_activity_sip_call">Call</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"

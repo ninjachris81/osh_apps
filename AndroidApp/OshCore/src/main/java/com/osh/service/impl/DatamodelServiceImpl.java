@@ -87,6 +87,7 @@ public class DatamodelServiceImpl implements IDatamodelService {
 			@Override
 			public void run() {
 				try {
+					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 					loadValues();
 				} catch (SQLException e) {
 					throw new RuntimeException(e);
@@ -100,6 +101,7 @@ public class DatamodelServiceImpl implements IDatamodelService {
 			@Override
 			public void run() {
 				try {
+					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 					loadMetadata();
 				} catch (SQLException e) {
 					throw new RuntimeException(e);
@@ -121,6 +123,7 @@ public class DatamodelServiceImpl implements IDatamodelService {
 			@Override
 			public void run() {
 				try {
+					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 					mergeDatamodel();
 				} catch (SQLException e) {
 					throw new RuntimeException(e);
@@ -137,7 +140,7 @@ public class DatamodelServiceImpl implements IDatamodelService {
 
 		loadedState.changeValue(true);
 
-		communicationService.connectMqtt();
+		communicationService.datamodelReady();
 	}
 
 	private void loadValues() throws SQLException {

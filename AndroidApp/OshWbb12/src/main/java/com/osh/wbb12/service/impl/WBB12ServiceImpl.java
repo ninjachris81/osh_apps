@@ -1,6 +1,7 @@
 package com.osh.wbb12.service.impl;
 
 import com.osh.actor.ActorBase;
+import com.osh.actor.ActorCmds;
 import com.osh.communication.MessageBase;
 import com.osh.service.IActorService;
 import com.osh.service.IDatamodelService;
@@ -9,7 +10,6 @@ import com.osh.value.DoubleValue;
 import com.osh.value.IntegerValue;
 import com.osh.value.ValueBase;
 import com.osh.value.ValueGroup;
-import com.osh.value.ValueType;
 import com.osh.wbb12.WBB12_Enums;
 import com.osh.wbb12.WBB12_Holding_Registers;
 import com.osh.wbb12.WBB12_Input_Registers;
@@ -235,6 +235,10 @@ public class WBB12ServiceImpl implements IWBB12Service {
     public void handleReceivedMessage(MessageBase msg) {
     }
 
+    private String getMqttName(WBB12_Holding_Registers reg) {
+        return CaseUtils.toCamelCase(reg.toString(), false, '_');
+    }
+
     private void registerInputRegister(WBB12_Input_Registers reg, WBB12Unit unit, boolean isDouble) {
         if (unit == WBB12Unit.Enum) {
             log.warn("Should provide enum type");
@@ -271,7 +275,7 @@ public class WBB12ServiceImpl implements IWBB12Service {
     }
 
     private void registerHoldingRegister(WBB12_Holding_Registers reg, WBB12Unit unit, boolean isDouble, boolean canWrite, Class<? extends Enum> enumType) {
-        String mqttName = CaseUtils.toCamelCase(reg.toString(), false, '_');
+        String mqttName = getMqttName(reg);
 
         log.info("Registering WBB12 holding " + mqttName);
 
@@ -301,5 +305,14 @@ public class WBB12ServiceImpl implements IWBB12Service {
     @Override
     public WBB12Format getWBB12InputFormat(String fullId) {
         return wbb12Formats.get(fullId);
+    }
+
+    @Override
+    public void addWarmwaterPush() {
+        String mqttName = getMqttName(WBB12_Holding_Registers.WARM_WATER_PUSH);
+
+        ActorBase actor = actorService.getActor(ValueBase.getFullId(wbb12ValueGroup.getId(), mqttName));
+        actor.updateValue(10);
+        actorService.publishCmd(actor, ActorCmds.ACTOR_CMD_SET_VALUE);
     }
 }

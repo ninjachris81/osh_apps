@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
-import com.osh.OshApplication;
+import com.osh.activity.OshApplication;
 import com.osh.R;
 import com.osh.camera.config.CameraFTPSource;
 import com.osh.camera.config.CameraSource;
@@ -24,7 +24,7 @@ import java.util.List;
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @StringRes
-    private static final int[] TAB_TITLES = new int[]{R.string.tab_camera_stream, R.string.tab_surveillance};
+    private static final int[] TAB_TITLES = new int[]{R.string.tab_camera_stream, R.string.tab_pic_surveillance, R.string.tab_ring_surveillance};
     private final Context mContext;
 
     private List<Fragment> fragmentList = new ArrayList<>();
@@ -37,6 +37,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         CameraFTPSource cameraFTPSource = ((OshApplication) activity.getApplication()).getApplicationConfig().getCamera().getCameraFTPSource("frontDoor.door");
         fragmentList.add(new CameraStreamFragment(cameraSource));
         fragmentList.add(new SurveillancePictureFragment(cameraFTPSource));
+        fragmentList.add(new SurveillanceRingFragment(cameraFTPSource));
     }
 
     @Override
@@ -52,7 +53,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        // Show 2 total pages.
         return fragmentList.size();
     }
 }

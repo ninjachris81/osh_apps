@@ -10,8 +10,10 @@ public interface ICommunicationService {
 
     void registerMessageType(MessageBase.MESSAGE_TYPE messageType, IMqttSupport service);
 
-    public void sendMessage(MessageBase msg);
+    public boolean sendMessage(MessageBase msg);
 
 	public IObservableBoolean connectedState();
+
+    public void datamodelReady();
 
 }

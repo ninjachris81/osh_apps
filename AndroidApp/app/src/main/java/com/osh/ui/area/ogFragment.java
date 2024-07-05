@@ -59,29 +59,35 @@ public class ogFragment extends AreaFragmentBase {
 
         getChildFragmentManager().beginTransaction().replace(R.id.roomSZ, new RoomFragment(serviceContext , areaViewModel, "sz", getChildFragmentManager(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
                 .withLight(relayValueGroupId, "16", toggleValueGroupId, "lightSZ")
-                .withShutter(shutterValueGroupId, "6", shutterModeValueGroupId, "6")).commit();
+                .withShutter(shutterValueGroupId, "6", shutterModeValueGroupId, "6"))
+                .commit();
 
         getChildFragmentManager().beginTransaction().replace(R.id.roomUZ, new RoomFragment(serviceContext , areaViewModel, "uz", getChildFragmentManager(), RoomViewModel.RoomPosition.POSITION_TOP)
                 .withLight(relayValueGroupId, "17", toggleValueGroupId, "lightUZ")
-                .withShutter(shutterValueGroupId, "7", shutterModeValueGroupId, "7")).commit();
+                .withShutter(shutterValueGroupId, "7", shutterModeValueGroupId, "7"))
+                .commit();
 
         getChildFragmentManager().beginTransaction().replace(R.id.roomB, new RoomFragmentB(serviceContext , areaViewModel, "b", getChildFragmentManager(), RoomViewModel.RoomPosition.POSITION_TOP)
                 .withLight(relayValueGroupId, "18", toggleValueGroupId, "lightB_All")
                 .withLight(relayValueGroupId, "19", toggleValueGroupId, "lightB_All")
                 .withShutter(shutterValueGroupId, "8", shutterModeValueGroupId, "8")
-                .withShutter(shutterValueGroupId, "9", shutterModeValueGroupId, "9")).commit();
+                .withShutter(shutterValueGroupId, "9", shutterModeValueGroupId, "9"))
+                .commit();
 
         getChildFragmentManager().beginTransaction().replace(R.id.roomWZ, new RoomFragmentWz(serviceContext , areaViewModel, "wz", getChildFragmentManager(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
-                .withLight(relayValueGroupId, "20", toggleValueGroupId, "lightWZ_All")
-                .withLight(relayValueGroupId, "21", toggleValueGroupId, "lightWZ_All")
+                .withLight(relayValueGroupId, "20", toggleValueGroupId, "lightWZ1")
+                .withLight(relayValueGroupId, "21", toggleValueGroupId, "lightWZ2")
                 .withShutter(shutterValueGroupId, "10", shutterModeValueGroupId, "10")
-                .withShutter(shutterValueGroupId, "11", shutterModeValueGroupId, "11")).commit();
+                .withShutter(shutterValueGroupId, "11", shutterModeValueGroupId, "11"))
+                .commit();
 
         getChildFragmentManager().beginTransaction().replace(R.id.roomFOG, new RoomFragment(serviceContext , areaViewModel, "fog", getChildFragmentManager(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
-                .withLight(relayValueGroupId, "22", toggleValueGroupId, "lightFOG")).commit();
+                .withLight(relayValueGroupId, "22", toggleValueGroupId, "lightFOG"))
+                .commit();
 
         getChildFragmentManager().beginTransaction().replace(R.id.roomHFO, new RoomFragment(serviceContext , areaViewModel, "hfo", getChildFragmentManager(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
-                .withLight(relayValueGroupId, "23", toggleValueGroupId, "lightHFO")).commit();
+                .withLight(relayValueGroupId, "23", toggleValueGroupId, "lightHFO"))
+                .commit();
     }
 
 

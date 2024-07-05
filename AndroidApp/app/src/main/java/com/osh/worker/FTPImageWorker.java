@@ -1,5 +1,6 @@
 package com.osh.worker;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -14,6 +15,8 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -42,10 +45,16 @@ public class FTPImageWorker {
         void onComplete(Drawable image);
     }
 
-    public void fetchFolders(CameraFTPSource source, GetFolderCallback callback) {
+    public interface GetVideoCallback {
+
+        void onComplete(File tempFile);
+
+    }
+
+    public void fetchFolders(CameraFTPSource source, String pathName, GetFolderCallback callback) {
         executorService.submit(() -> {
             try {
-                List<CameraImageFolder> folders = _fetchFolders(source);
+                List<CameraImageFolder> folders = _fetchFolders(source, pathName);
                 callback.onComplete(folders);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -53,9 +62,9 @@ public class FTPImageWorker {
         });
     }
 
-    private List<CameraImageFolder> _fetchFolders(CameraFTPSource source) throws IOException {
+    private List<CameraImageFolder> _fetchFolders(CameraFTPSource source, String pathName) throws IOException {
         FTPClient ftpClient = login(source);
-        ftpClient.changeWorkingDirectory(source.getRemoteDir());
+        ftpClient.changeWorkingDirectory(pathName);
         FTPFile[] folders = ftpClient.listFiles(".", FTPFile::isDirectory);
 
         List<CameraImageFolder> returnList = new ArrayList<>(folders.length);
@@ -86,7 +95,7 @@ public class FTPImageWorker {
 
     private List<CameraImageContent.ThumbnailImageItem> _fetchThumbnails(CameraFTPSource source, String pathName, Resources res, GetThumbnailCallback callback) throws IOException {
         FTPClient ftpClient = login(source);
-        ftpClient.changeWorkingDirectory(source.getRemoteDir() + "/" + pathName + "/images/thumbnails");
+        ftpClient.changeWorkingDirectory(pathName);
         ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
         FTPFile[] files = ftpClient.listFiles(".", FTPFile::isFile);
@@ -113,7 +122,7 @@ public class FTPImageWorker {
     public void fetchOriginal(CameraFTPSource source, CameraImageContent.ThumbnailImageItem item, Resources res, GetOriginalCallback callback) {
         executorService.submit(() -> {
             try {
-                Drawable image = _fetchOriginal(source, item.folder, item.name, res);
+                Drawable image = _fetchOriginal(source, item.folder.replace("/thumbnails", ""), item.name, res);
                 callback.onComplete(image);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -123,7 +132,7 @@ public class FTPImageWorker {
 
     private Drawable _fetchOriginal(CameraFTPSource source, String pathName, String fileName, Resources res) throws IOException {
         FTPClient ftpClient = login(source);
-        ftpClient.changeWorkingDirectory(source.getRemoteDir() + "/" + pathName + "/images");
+        ftpClient.changeWorkingDirectory(pathName);
         ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
         ftpClient.setDataTimeout(10000);
 
@@ -137,6 +146,42 @@ public class FTPImageWorker {
         logout(ftpClient);
 
         return new BitmapDrawable(res, BitmapFactory.decodeByteArray(imageData, 0, imageData.length));
+    }
+
+    public void fetchVideo(CameraFTPSource source, CameraImageContent.ThumbnailImageItem item, Context context, GetVideoCallback callback) {
+        executorService.submit(() -> {
+            try {
+                File file = _fetchVideo(source, item.folder.replace("/thumbnails", ""), item.name.replace(".jpg", ""), context);
+                callback.onComplete(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private File _fetchVideo(CameraFTPSource source, String pathName, String fileName, Context context) throws IOException {
+        FTPClient ftpClient = login(source);
+        ftpClient.changeWorkingDirectory(pathName);
+        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+        ftpClient.setDataTimeout(10000);
+
+        ftpClient.enterLocalPassiveMode();
+
+        InputStream is = ftpClient.retrieveFileStream(fileName);
+        //ftpClient.completePendingCommand();
+
+        File outputDir = context.getCacheDir();
+        File outputFile = File.createTempFile(fileName, ".mp4", outputDir);
+        FileOutputStream out = new FileOutputStream(outputFile);
+
+        IOUtils.copy(is, out);
+
+        logout(ftpClient);
+
+        out.close();
+        is.close();
+
+        return outputFile;
     }
 
     private FTPClient login(CameraFTPSource source) throws IOException {

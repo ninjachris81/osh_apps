@@ -76,6 +76,8 @@ dependencies {
     implementation 'commons-net:commons-net:3.6'
     implementation 'commons-io:commons-io:2.7'
 
+    implementation "com.ncorti:slidetoact:0.10.0"
+
     //implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     //implementation 'com.rvirin.onvif:onvifcamera:1.1.6'
 
@@ -104,6 +106,9 @@ dependencies {
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
     implementation 'net.steamcrafted:materialiconlib:1.1.5'
+
+    def lottieVersion = "3.4.0"
+    implementation "com.airbnb.android:lottie:$lottieVersion"
 
     /*
     implementation 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'

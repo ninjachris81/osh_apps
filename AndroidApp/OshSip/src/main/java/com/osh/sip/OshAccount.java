@@ -47,6 +47,10 @@ public class OshAccount {
         mAccount.setRealm(sipRealm); //realm：sip:1004@192.168.2.243
         mAccount.setUsername(sipUsername);
         mAccount.setPassword(sipPassword);
+        tryLogin();
+    }
+
+    private void tryLogin() {
         mAccountId = SipServiceCommand.setAccount(context, mAccount);
     }
 
@@ -70,6 +74,8 @@ public class OshAccount {
                 callbackReceiver.registrationSuccess();
             } else {
                 callbackReceiver.registrationFailure(registrationStateCode);
+                // try re-login
+                tryLogin();
             }
         }
 

@@ -12,6 +12,8 @@ public class DoorUnlockMessage extends MessageBase {
     public static String DU_ATTRIB_OTH = "oth";
     public static String DU_ATTRIB_RESULT_HASH = "rh";
 
+    public static String DU_ATTRIB_INITIATOR_ID = "iid";
+
     public enum DU_AUTH_STAGE {
         CHALLENGE_REQUEST,
         CHALLENGE_CREATED,

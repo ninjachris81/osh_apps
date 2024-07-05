@@ -17,10 +17,12 @@ public class RoomFragment extends RoomFragmentBase<FragmentRoomBinding> {
     protected void setBindingData() {
         binding.setAreaData(areaViewModel);
         binding.setRoomData(roomViewModel);
+        roomViewModel.initLightStates(lightInfos.size());
         roomViewModel.initShutters(shutterInfos.size());
         roomViewModel.initTemperatures(sensorInfos.temperatureIds.size());
         roomViewModel.initHumidities(sensorInfos.humidityIds.size());
         roomViewModel.initWindowStates(sensorInfos.windowStateIds.size());
         roomViewModel.initBrightnesses(sensorInfos.brightnessIds.size());
+        roomViewModel.initPresences(sensorInfos.presenceIds.size());
     }
 }

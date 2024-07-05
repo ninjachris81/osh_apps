@@ -10,6 +10,7 @@ public interface IWBB12Service extends IMqttSupport {
     Set<String> getWBB12Keys();
 
     ValueBase getWBB12Value(String fullId);
-
     WBB12ServiceImpl.WBB12Format getWBB12InputFormat(String fullId);
+
+    void addWarmwaterPush();
 }

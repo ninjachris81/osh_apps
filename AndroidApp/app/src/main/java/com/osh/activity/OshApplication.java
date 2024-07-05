@@ -1,10 +1,11 @@
-package com.osh;
+package com.osh.activity;
 
 import static androidx.preference.PreferenceManager.getDefaultSharedPreferences;
 
 import android.app.Application;
 import android.content.SharedPreferences;
 
+import com.osh.R;
 import com.osh.config.IApplicationConfig;
 
 import javax.inject.Inject;

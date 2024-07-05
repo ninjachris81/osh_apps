@@ -23,7 +23,7 @@ public class RoomViewModel extends ViewModel implements Serializable {
     private final KnownRoom room;
 
     public final ObservableField<String> name = new ObservableField<>("Unknown Room");
-    public final ObservableBoolean backgroundVisible = new ObservableBoolean(false);
+    //public final ObservableBoolean backgroundVisible = new ObservableBoolean(false);
 
     public final ObservableField<AudioPlaybackActor> activePlayback = new ObservableField<>();
 
@@ -33,11 +33,15 @@ public class RoomViewModel extends ViewModel implements Serializable {
     public final List<ObservableField<String>> shutterStates = new ArrayList<>();
     public final ObservableField<RoomPosition> roomPosition = new ObservableField<>(RoomPosition.POSITION_TOP);
 
+    public final List<ObservableBoolean> lightStates = new ArrayList<>();
+
     public final List<ObservableDouble> temperatures = new ArrayList<>();
 
     public final List<ObservableDouble> humidities = new ArrayList<>();
     public final List<ObservableBoolean> windowStates = new ArrayList<>();
     public final List<ObservableDouble> brightnesses = new ArrayList<>();
+
+    public final List<ObservableBoolean> roomPresences = new ArrayList<>();
 
     public RoomViewModel(KnownRoom room) {
         this.room = room;
@@ -52,6 +56,12 @@ public class RoomViewModel extends ViewModel implements Serializable {
         for (int i = 0;i<count;i++) {
             shutterAutoModes.add(new ObservableBoolean(false));
             shutterStates.add(new ObservableField<>(""));
+        }
+    }
+
+    public void initLightStates(int count) {
+        for (int i = 0;i<count;i++) {
+            lightStates.add(new ObservableBoolean(false));
         }
     }
 
@@ -78,5 +88,12 @@ public class RoomViewModel extends ViewModel implements Serializable {
             brightnesses.add(new ObservableDouble(-1f));
         }
     }
+
+    public void initPresences(int count) {
+        for (int i = 0;i<count;i++) {
+            roomPresences.add(new ObservableBoolean(false));
+        }
+    }
+
 
 }

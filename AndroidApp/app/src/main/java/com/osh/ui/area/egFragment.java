@@ -62,6 +62,7 @@ public class egFragment extends AreaFragmentBase {
         String humsValueGroupId = "hums";
         String brightnessValueGroupId = "brightnesses";
         String windowStateGroupId = "allSwitches0";
+        String presenceGroupdId = "presence";
 
         getChildFragmentManager().beginTransaction().replace(R.id.roomFEG, new RoomFragment(serviceContext , areaViewModel, "feg", getChildFragmentManager(), RoomViewModel.RoomPosition.POSITION_TOP)
                 .withLight(relayValueGroupId, "0", toggleValueGroupId, "lightFEG")).commit();
@@ -72,6 +73,7 @@ public class egFragment extends AreaFragmentBase {
                 .withTemperature(tempValueGroupId, "25")
                 .withHumidity(humsValueGroupId, "25")
                 .withBrightness(brightnessValueGroupId, "25")
+                .withPresence(presenceGroupdId, "25")
                 .withWindowState(windowStateGroupId, "15")).commit();
 
         getChildFragmentManager().beginTransaction().replace(R.id.roomK, new RoomFragment(serviceContext , areaViewModel, "k", getChildFragmentManager(), RoomViewModel.RoomPosition.POSITION_TOP)

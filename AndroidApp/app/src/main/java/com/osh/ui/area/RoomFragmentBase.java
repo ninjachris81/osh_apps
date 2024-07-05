@@ -10,6 +10,7 @@ import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.renderscript.Sampler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,17 +72,18 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
         public final List<String> windowStateIds = new ArrayList<>();
 
         public final List<String> brightnessIds = new ArrayList<>();
+        public final List<String> presenceIds = new ArrayList<>();
     }
 
     protected AreaViewModel areaViewModel;
-    private IServiceContext serviceContext;
+    protected IServiceContext serviceContext;
     protected BINDING_TYPE binding;
 
     protected List<ShutterInfo> shutterInfos = new ArrayList<>();
 
     protected List<Integer> shutterModeButtons = List.of(R.id.shutterModeButton);
 
-    private List<LightInfo> lightInfos = new ArrayList<>();
+    protected List<LightInfo> lightInfos = new ArrayList<>();
 
     protected final SensorInfo sensorInfos = new SensorInfo();
 
@@ -124,8 +126,10 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
             throw new RuntimeException("No room background defined!");
         }
 
-        for (LightInfo lightInfo : lightInfos) {
-            bindLight(lightInfo);
+        initRoom();
+
+        for (int i = 0;i<lightInfos.size();i++) {
+            bindLight(lightInfos.get(i), i);
         }
 
         if (!shutterInfos.isEmpty() && shutterInfos.size() != shutterModeButtons.size()) {
@@ -152,9 +156,56 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
             bindBrightnessSensor(sensorInfos.brightnessIds.get(i), i);
         }
 
+        for (int i = 0;i<sensorInfos.presenceIds.size();i++) {
+            bindPresence(sensorInfos.presenceIds.get(i), i);
+        }
+
         return binding.getRoot();
     }
 
+    protected void initRoom() {
+        roomBackground.setOnClickListener((item) -> {
+            handleBackgroundClickEvent();
+        });
+    }
+
+    protected void handleBackgroundClickEvent() {
+        switch(areaViewModel.currentOverlay.get()) {
+            case LIGHTS:
+                handleBackgroundClickEventLight(0);
+                break;
+            case AUDIO:
+                handleBackgroundClickEventAudio();
+                break;
+        }
+    }
+
+    protected void handleBackgroundClickEventLight(int index) {
+        ToggleActor lightToggleActor = (ToggleActor) serviceContext.getDatamodelService().getDatamodel().getActor(lightInfos.get(index).lightToggleId, lightInfos.get(index).lightToggleValueGroupId);
+        serviceContext.getActorService().publishCmd(lightToggleActor, ActorCmds.ACTOR_CMD_TOGGLE);
+    }
+
+    protected void handleBackgroundClickEventAudio() {
+        List<AudioPlaybackActor> audioActors = serviceContext.getAudioActorService().getAudioActorsByRoom(roomViewModel.getRoom().getId(), true);
+        if (!audioActors.isEmpty()) {
+            SelectAudioDialogFragment dialog = SelectAudioDialogFragment.newInstance();
+            dialog.setAudioActors(audioActors);
+            dialog.setAudioPlaybackSources(serviceContext.getAudioSourceService().getAudioPlaybackSources());
+            dialog.setStartCallback((actor, source) -> {
+                actor.getAudioUrlValue().updateValue(source.getSourceUrl(), false);
+                serviceContext.getValueService().publishValue(actor.getAudioUrlValue());
+                serviceContext.getActorService().publishCmd(actor, ActorCmds.ACTOR_CMD_START);
+                roomViewModel.activePlayback.set(actor);
+            });
+            dialog.setStopAudioCallbackhandler((actor) -> {
+                serviceContext.getActorService().publishCmd(actor, ActorCmds.ACTOR_CMD_STOP);
+                //model.activePlayback.set(null);
+            });
+            dialog.show(fragmentManager, SelectAudioDialogFragment.TAG);
+        } else {
+            Toast.makeText(getContext(),"No audio actor", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     public RoomFragmentBase withLight(String lightRelayValueGroupId, String lightRelayId, String lightToggleValueGroupId, String lightToggleId) {
         lightInfos.add(new LightInfo(lightRelayValueGroupId, lightRelayId, lightToggleValueGroupId, lightToggleId));
@@ -177,6 +228,11 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
 
     public RoomFragmentBase withBrightness(String valueGroupId, String id) {
         sensorInfos.brightnessIds.add(ValueBase.getFullId(valueGroupId, id));
+        return this;
+    }
+
+    public RoomFragmentBase withPresence(String valueGroupId, String id) {
+        sensorInfos.presenceIds.add(ValueBase.getFullId(valueGroupId, id));
         return this;
     }
 
@@ -225,51 +281,27 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
         }
     }
 
-    protected void bindLight(LightInfo lightInfo) {
-        ToggleActor lightToggleActor = (ToggleActor) serviceContext.getDatamodelService().getDatamodel().getActor(lightInfo.lightToggleId, lightInfo.lightToggleValueGroupId);
+    protected void bindPresence(String id, int index) {
+        BooleanValue value = (BooleanValue) serviceContext.getValueService().getValue(id);
+
+        if (value != null) {
+            value.addItemChangeListener(item -> {
+                if (areaViewModel.currentOverlay.get() == AreaFragment.AreaOverlays.PRESENCE) {
+                    roomViewModel.roomPresences.get(index).set(item.getValue(false));
+                    //roomViewModel.backgroundVisible.set(item.getValue(false));
+                }
+            }, true);
+        } else {
+            throw new RuntimeException("Sensor value not found: " + id);
+        }
+    }
+
+    protected void bindLight(LightInfo lightInfo, int index) {
         DigitalActor lightActor = (DigitalActor) serviceContext.getDatamodelService().getDatamodel().getActor(lightInfo.lightRelayId, lightInfo.lightRelayValueGroupId);
 
         lightActor.addItemChangeListener(isEnabled -> {
-            roomViewModel.backgroundVisible.set(isEnabled.getValue(false));
+            roomViewModel.lightStates.get(index).set(isEnabled.getValue(false));
         }, true);
-
-        roomBackground.setOnClickListener((item) -> {
-            switch(areaViewModel.currentOverlay.get()) {
-                case LIGHTS:
-                    serviceContext.getActorService().publishCmd(lightToggleActor, ActorCmds.ACTOR_CMD_TOGGLE);
-                    break;
-                case AUDIO:
-                    List<AudioPlaybackActor> audioActors = serviceContext.getAudioActorService().getAudioActorsByRoom(roomViewModel.getRoom().getId(), true);
-                    if (!audioActors.isEmpty()) {
-                        SelectAudioDialogFragment dialog = SelectAudioDialogFragment.newInstance();
-                        dialog.setAudioActors(audioActors);
-                        dialog.setAudioPlaybackSources(serviceContext.getAudioSourceService().getAudioPlaybackSources());
-                        dialog.setStartCallback((actor, source) -> {
-                            actor.getAudioUrlValue().updateValue(source.getSourceUrl(), false);
-                            serviceContext.getValueService().publishValue(actor.getAudioUrlValue());
-                            serviceContext.getActorService().publishCmd(actor, ActorCmds.ACTOR_CMD_START);
-                            roomViewModel.activePlayback.set(actor);
-                        });
-                        dialog.setStopAudioCallbackhandler((actor) -> {
-                            serviceContext.getActorService().publishCmd(actor, ActorCmds.ACTOR_CMD_STOP);
-                            //model.activePlayback.set(null);
-                        });
-                        dialog.show(fragmentManager, SelectAudioDialogFragment.TAG);
-                    } else {
-                        Toast.makeText(getContext(),"No audio actor", Toast.LENGTH_SHORT).show();
-                    }
-                    break;
-            }
-        });
-
-        areaViewModel.currentOverlay.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                setBackgroundForOverlay(roomBackground);
-            }
-        });
-
-        setBackgroundForOverlay(roomBackground);
     }
 
     public RoomFragmentBase withShutter(String shutterValueGroupId, String shutterId, String shutterModeValueGroupId, String shutterModeId) {
@@ -315,6 +347,9 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
         switch(areaViewModel.currentOverlay.get()) {
             case LIGHTS:
                 setBackgroundRecursive(roomBackground, R.drawable.light_background);
+                break;
+            case PRESENCE:
+                setBackgroundRecursive(roomBackground, R.drawable.presence_background);
                 break;
             default:
                 setBackgroundRecursive(roomBackground, null);

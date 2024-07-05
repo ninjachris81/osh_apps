@@ -28,7 +28,8 @@ public class CameraImageContent {
      * A placeholder item representing a piece of content.
      */
     public static class ThumbnailImageItem {
-        static final DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyMMddHHmmss");
+        static final String INPUT_FORMAT = "yyMMddHHmmss";
+        static final DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern(INPUT_FORMAT);
         static final DateTimeFormatter targetFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
 
         public final String name;
@@ -37,7 +38,10 @@ public class CameraImageContent {
         public String folder;
 
         public String getDateString() {
-            String returnString = name.substring(1, name.length() - 6);
+            String returnString = name;
+            if (name.startsWith("A")) returnString = returnString.substring(1);
+
+            returnString = returnString.substring(0, INPUT_FORMAT.length());
             return LocalDateTime.parse(returnString, inputFormat).format(targetFormat);
         }
 

@@ -1,4 +1,4 @@
-package com.osh;
+package com.osh.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,25 +18,18 @@ import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.rtsp.RtspMediaSource;
+import com.osh.R;
 import com.osh.camera.config.CameraSource;
 import com.osh.databinding.ActivitySipCallBinding;
 
 import net.gotev.sipservice.BroadcastEventReceiver;
 import net.gotev.sipservice.CodecPriority;
-import net.gotev.sipservice.Logger;
 import net.gotev.sipservice.MediaState;
 import net.gotev.sipservice.RtpStreamStats;
 import net.gotev.sipservice.SipServiceCommand;
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
-import org.pjsip.pjsua2.CallInfo;
-import org.pjsip.pjsua2.CallMediaInfo;
-import org.pjsip.pjsua2.Media;
-import org.pjsip.pjsua2.OnCallMediaStateParam;
-import org.pjsip.pjsua2.pjmedia_type;
 import org.pjsip.pjsua2.pjsip_inv_state;
-import org.pjsip.pjsua2.pjsua2;
-import org.pjsip.pjsua2.pjsua_call_media_status;
 
 import java.util.ArrayList;
 
@@ -76,6 +69,7 @@ public class SipCallActivity extends AppCompatActivity implements SurfaceHolder.
         binding.btnMuteMic.setOnClickListener(this::onViewClicked);
         binding.btnHangUp.setOnClickListener(this::onViewClicked);
         binding.btnSwitchCamera.setOnClickListener(this::onViewClicked);
+        binding.unlockDoor.setOnClickListener(this::onViewClicked);
         setContentView(binding.getRoot());
 
         ringToneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, getIntent().getIntExtra("ringVolume", 80));
@@ -93,6 +87,12 @@ public class SipCallActivity extends AppCompatActivity implements SurfaceHolder.
         player.setMediaSource(mediaSource);
         player.setPlayWhenReady(true);
         player.prepare();
+
+        binding.unlockDoor.setOnClickListener(view -> {
+            SipServiceCommand.hangUpActiveCalls(this, mAccountID);
+            finish();
+            DoorOpenActivity.invokeActivity(view.getContext(), DoorOpenActivity.FRONT_DOOR_ID);
+        });
     }
 
     private void registReceiver() {
@@ -179,6 +179,7 @@ public class SipCallActivity extends AppCompatActivity implements SurfaceHolder.
                 SipServiceCommand.declineIncomingCall(this, mAccountID, mCallID);
                 finish();
                 break;
+            case R.id.unlock_door:
             case R.id.btnCancel:
                 SipServiceCommand.hangUpActiveCalls(this, mAccountID);
                 finish();

@@ -7,6 +7,8 @@ import static com.osh.communication.mqtt.MqttConstants.MQTT_SENDER_DEVICE_ID_ATT
 import static com.osh.communication.mqtt.MqttConstants.MQTT_SINGLE_VALUE_ATTR;
 import static com.osh.communication.mqtt.MqttConstants.MQTT_TS;
 
+import android.util.Log;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -46,7 +48,6 @@ import com.osh.log.LogFacade;
 import com.osh.log.LogMessage;
 import com.osh.log.LogMessage.MsgType;
 import com.osh.processor.ScriptResultMessage;
-import com.osh.service.IDeviceDiscoveryService;
 import com.osh.time.SystemtimeMessage;
 import com.osh.utils.IObservableBoolean;
 import com.osh.utils.ObservableBoolean;
@@ -61,6 +62,7 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 	private MqttConfig config;
 
 	private final ObservableBoolean connectedState = new ObservableBoolean(false);
+	private boolean datamodelReady = false;
 
 	@Override
 	public IObservableBoolean connectedState() {
@@ -73,6 +75,7 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 		this.executorService = Executors.newFixedThreadPool(1);
 		this.config = config;
 		this.deviceId = config.getClientId();		// use clientID as device id
+		connectMqtt();
 	}
 
     private Mqtt3AsyncClient mqttClient;
@@ -85,8 +88,6 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 	public void connectMqtt() {
 		LogFacade.i(TAG, "Init Mqtt");
 		
-	    registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_VALUE, true, MqttConstants.MQTT_MESSAGE_TYPE_VA, 2, false);
-	    registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_ACTOR, true, MqttConstants.MQTT_MESSAGE_TYPE_AC, 2, false);
 	    registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_DEVICE_DISCOVERY, false, MqttConstants.MQTT_MESSAGE_TYPE_DD, 2, false);
 	    registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_SYSTEM_TIME, false, MqttConstants.MQTT_MESSAGE_TYPE_ST, 0, true);
 	    registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_SYSTEM_WARNING, false, MqttConstants.MQTT_MESSAGE_TYPE_SW, 1, true);
@@ -121,6 +122,14 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 				subscribeChannels();
 			}
 		});
+	}
+
+	@Override
+	public void datamodelReady() {
+		this.datamodelReady = true;
+
+		registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_VALUE, true, MqttConstants.MQTT_MESSAGE_TYPE_VA, 2, false);
+		registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_ACTOR, true, MqttConstants.MQTT_MESSAGE_TYPE_AC, 2, false);
 	}
 
 	@Override
@@ -168,7 +177,7 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 		if (mqttClient.getState() == MqttClientState.CONNECTED) {
 			mqttClient.subscribeWith()
 					.topicFilter(path)
-					.qos(MqttQos.AT_LEAST_ONCE)
+					.qos(MqttQos.EXACTLY_ONCE)
 					.callback(cb -> {
 						onMessage(cb.getTopic(), cb.getPayload(), cb.isRetain());
 					})
@@ -186,9 +195,9 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 	}
 
 	@Override
-	public void sendMessage(MessageBase msg) {
+	public boolean sendMessage(MessageBase msg) {
 		try {
-			if (mqttClient.getState() == MqttClientState.CONNECTED) {
+			if (mqttClient != null && mqttClient.getState() == MqttClientState.CONNECTED) {
 				String topic = getTopicName(msg);
 				String payload = serializePayload(msg);
 				boolean isRetained = isRetainedMessage(msg);
@@ -205,12 +214,14 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 								LogFacade.w(TAG, "Publish failed: " + error.toString());
 							}
 						});
+				return true;
 			} else {
 				LogFacade.w(TAG, "Cannot send - not connected!");
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+		return false;
 	}
 	
 	private String serializePayload(MessageBase msg) throws JSONException {
@@ -229,7 +240,7 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 	    case MESSAGE_TYPE_SYSTEM_WARNING:
 	        return serializeSingleJSONValue(((SystemWarningMessage) msg).getMsg());
 	    case MESSAGE_TYPE_DEVICE_DISCOVERY:
-	    	return serializeSingleJSONValue(((SystemtimeMessage) msg).getTs());
+	    	return serializeSingleJSONValue(((DeviceDiscoveryMessage) msg).getUpTime());
 	    case MESSAGE_TYPE_CONTROLLER:
 	    	return serializeSingleJSONValue(((ControllerMessage) msg).getData());
 	    case MESSAGE_TYPE_LOG:
@@ -307,68 +318,78 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 	    List<String> firstLevelPath = removeMessageTypePath(paths);
 	    MessageTypeInfo info = getMessageType(paths[0]);
 
-	    if (info.mqttPathLevels == firstLevelPath.size()) {
-	        Map<String, Object> rawValue = parseJSONPayload(payload);
+		if (info != null) {
+			if (info.mqttPathLevels == firstLevelPath.size()) {
+				Map<String, Object> rawValue = parseJSONPayload(payload);
 
-			String senderDeviceId = "";
-			if (rawValue.containsKey(MQTT_SENDER_DEVICE_ID_ATTR)) {
-				senderDeviceId = rawValue.get(MQTT_SENDER_DEVICE_ID_ATTR).toString();
-				if (info.dropOwnMessages && senderDeviceId.equals(deviceId)) {
-					LogFacade.w(TAG, "Dropping own message " + info.messageType);
+				String senderDeviceId = "";
+				if (rawValue.containsKey(MQTT_SENDER_DEVICE_ID_ATTR)) {
+					senderDeviceId = rawValue.get(MQTT_SENDER_DEVICE_ID_ATTR).toString();
+					if (info.dropOwnMessages && senderDeviceId.equals(deviceId)) {
+						LogFacade.w(TAG, "Dropping own message " + info.messageType);
+						return null;
+					}
+				}
+
+				long ts = 0;
+				if (rawValue.containsKey(MQTT_TS)) {
+					ts =  ((Number)rawValue.get(MQTT_TS)).longValue();
+				}
+
+				LogFacade.d(TAG,info.messageType + " " +  rawValue);
+
+				switch (info.messageType) {
+				case MESSAGE_TYPE_VALUE: {
+					return new ValueMessage(firstLevelPath.get(0), firstLevelPath.get(1), rawValue);
+				}
+				case MESSAGE_TYPE_ACTOR: {
+					if (rawValue.containsKey(MQTT_ACTOR_CMD_ATTR)) {
+						ActorCmds cmd = ActorCmds.of(Integer.parseInt(rawValue.get(MQTT_ACTOR_CMD_ATTR).toString()));
+						Object value = rawValue.get(MQTT_SINGLE_VALUE_ATTR);
+						return new ActorMessage(firstLevelPath.get(0), firstLevelPath.get(1), value, cmd);
+					} else {
+						LogFacade.w(TAG, "Cmd attribute missing: " + rawValue.toString());
+						return null;
+					}
+				}
+				case MESSAGE_TYPE_DEVICE_DISCOVERY: {
+					return new DeviceDiscoveryMessage(firstLevelPath.get(0), firstLevelPath.get(1), Long.parseLong(parseSingleValue(rawValue).toString()));
+				}
+				case MESSAGE_TYPE_SYSTEM_TIME: {
+					return new SystemtimeMessage(((Number) parseSingleValue(rawValue)).longValue());
+				}
+				case MESSAGE_TYPE_SYSTEM_WARNING: {
+					return new SystemWarningMessage(firstLevelPath.get(0), parseSingleValue(rawValue).toString());
+				}
+				case MESSAGE_TYPE_CONTROLLER: {
+					return new ControllerMessage(firstLevelPath.get(0), rawValue);
+				}
+				case MESSAGE_TYPE_LOG: {
+					return new LogMessage(firstLevelPath.get(0), MsgType.fromString(firstLevelPath.get(0)), parseSingleValue(rawValue).toString());
+				}
+				case MESSAGE_TYPE_SCRIPT_RESULT: {
+					return new ScriptResultMessage(firstLevelPath.get(0), rawValue);
+				}
+				case MESSAGE_TYPE_DOOR_UNLOCK: {
+					return new DoorUnlockMessage(firstLevelPath.get(0), firstLevelPath.get(1), rawValue);
+				}
+				default:
+					LogFacade.w(TAG, "Unknown message type " + info.messageType);
 					return null;
 				}
+			} else {
+				LogFacade.w(TAG, "Invalid path levels " + firstLevelPath.size() + ", expected " + info.mqttPathLevels);
+				return null;
+			}
+		} else {
+			if (datamodelReady) {
+				LogFacade.w(TAG, "Invalid message info");
+			} else {
+				// ok, ignore this message
 			}
 
-			long ts = 0;
-			if (rawValue.containsKey(MQTT_TS)) {
-				ts =  ((Number)rawValue.get(MQTT_TS)).longValue();
-			}
-
-			LogFacade.d(TAG,info.messageType + " " +  rawValue);
-
-	        switch (info.messageType) {
-	        case MESSAGE_TYPE_VALUE: {
-	            return new ValueMessage(firstLevelPath.get(0), firstLevelPath.get(1), rawValue);
-	        }
-	        case MESSAGE_TYPE_ACTOR: {
-				if (rawValue.containsKey(MQTT_ACTOR_CMD_ATTR)) {
-					ActorCmds cmd = ActorCmds.of(Integer.parseInt(rawValue.get(MQTT_ACTOR_CMD_ATTR).toString()));
-					Object value = rawValue.get(MQTT_SINGLE_VALUE_ATTR);
-					return new ActorMessage(firstLevelPath.get(0), firstLevelPath.get(1), value, cmd);
-				} else {
-					LogFacade.w(TAG, "Cmd attribute missing: " + rawValue.toString());
-					return null;
-				}
-	        }
-	        case MESSAGE_TYPE_DEVICE_DISCOVERY: {
-	            return new DeviceDiscoveryMessage(firstLevelPath.get(0), firstLevelPath.get(1));
-	        }
-	        case MESSAGE_TYPE_SYSTEM_TIME: {
-	            return new SystemtimeMessage(((Number) parseSingleValue(rawValue)).longValue());
-	        }
-	        case MESSAGE_TYPE_SYSTEM_WARNING: {
-	            return new SystemWarningMessage(firstLevelPath.get(0), parseSingleValue(rawValue).toString());
-	        }
-	        case MESSAGE_TYPE_CONTROLLER: {
-	            return new ControllerMessage(firstLevelPath.get(0), rawValue);
-	        }
-	        case MESSAGE_TYPE_LOG: {
-	            return new LogMessage(firstLevelPath.get(0), MsgType.fromString(firstLevelPath.get(0)), parseSingleValue(rawValue).toString());
-	        }
-	        case MESSAGE_TYPE_SCRIPT_RESULT: {
-	            return new ScriptResultMessage(firstLevelPath.get(0), rawValue);
-	        }
-			case MESSAGE_TYPE_DOOR_UNLOCK: {
-				return new DoorUnlockMessage(firstLevelPath.get(0), firstLevelPath.get(1), rawValue);
-			}
-	        default:
-				LogFacade.w(TAG, "Unknown message type " + info.messageType);
-	            return null;
-	        }
-	    } else {
-			LogFacade.w(TAG, "Invalid path levels " + firstLevelPath.size() + ", expected " + info.mqttPathLevels);
-	        return null;
-	    }
+			return null;
+		}
 	}
 	
 	private Object parseSingleValue(Map<String, Object> value) {

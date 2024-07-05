@@ -3,7 +3,6 @@ package com.osh.ui.wbb12;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.graphics.Paint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -25,9 +24,8 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
-import com.google.common.math.Stats;
-import com.osh.OshApplication;
-import com.osh.StatisticsActivity;
+import com.osh.activity.OshApplication;
+import com.osh.activity.StatisticsActivity;
 import com.osh.databinding.FragmentWbb12Binding;
 import com.osh.wbb12.service.IWBB12Service;
 
@@ -62,6 +60,10 @@ public class WBB12Fragment extends Fragment {
 
         binding.statsButton.setOnClickListener(view -> {
             StatisticsActivity.invokeActivity(getContext(), app.getApplicationConfig().getGrafana().getWbb12Url());
+        });
+
+        binding.actionButton.setOnClickListener(view -> {
+            wbb12Manager.addWarmwaterPush();
         });
 
         View root = binding.getRoot();

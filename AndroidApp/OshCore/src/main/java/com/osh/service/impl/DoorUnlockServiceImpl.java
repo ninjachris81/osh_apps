@@ -1,7 +1,9 @@
 package com.osh.service.impl;
 
+import static com.osh.doorunlock.DoorUnlockMessage.DU_ATTRIB_INITIATOR_ID;
 import static com.osh.service.impl.psk.PSK;
 
+import android.content.Context;
 import android.util.Base64;
 
 import com.osh.communication.MessageBase;
@@ -17,8 +19,16 @@ import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class DoorUnlockServiceImpl implements IDoorUnlockService {
+
+    public interface DoorUnlockCallback {
+
+        void result(boolean success);
+
+    }
 
     private static final String TAG = DoorUnlockServiceImpl.class.getName();
 
@@ -26,9 +36,15 @@ public class DoorUnlockServiceImpl implements IDoorUnlockService {
 
     private CallbackListener callbackListener;
 
-    public DoorUnlockServiceImpl(ICommunicationService communicationManager) {
+    private ExecutorService executorService;
+
+    private final String deviceId;
+
+
+    public DoorUnlockServiceImpl(ICommunicationService communicationManager, String deviceId) {
         this.communicationManager = communicationManager;
         communicationManager.registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_DOOR_UNLOCK, this);
+        this.deviceId = deviceId;
     }
 
     @Override
@@ -45,7 +61,7 @@ public class DoorUnlockServiceImpl implements IDoorUnlockService {
     public void handleReceivedMessage(MessageBase msg) {
         if (msg instanceof DoorUnlockMessage) {
             DoorUnlockMessage dum = (DoorUnlockMessage) msg;
-            if (dum.getValues().containsKey(DoorUnlockMessage.DU_ATTRIB_STAGE)) {
+            if (dum.getValues().containsKey(DU_ATTRIB_INITIATOR_ID) && dum.getValues().get(DU_ATTRIB_INITIATOR_ID).toString().equals(deviceId) && dum.getValues().containsKey(DoorUnlockMessage.DU_ATTRIB_STAGE)) {
                 DoorUnlockMessage.DU_AUTH_STAGE stage = DoorUnlockMessage.DU_AUTH_STAGE.values()[(int) dum.getValues().get(DoorUnlockMessage.DU_ATTRIB_STAGE)];
 
                 switch (stage) {
@@ -108,7 +124,8 @@ public class DoorUnlockServiceImpl implements IDoorUnlockService {
                     DoorUnlockMessage.DU_ATTRIB_STAGE, DoorUnlockMessage.DU_AUTH_STAGE.CHALLENGE_CALCULATED.ordinal(),
                     DoorUnlockMessage.DU_ATTRIB_OTH, oth,
                     DoorUnlockMessage.DU_ATTRIB_TS, ts,
-                    DoorUnlockMessage.DU_ATTRIB_RESULT_HASH, resultHash
+                    DoorUnlockMessage.DU_ATTRIB_RESULT_HASH, resultHash,
+                    DoorUnlockMessage.DU_ATTRIB_INITIATOR_ID, deviceId
                     ));
             communicationManager.sendMessage(msg);
         } else {
@@ -117,13 +134,34 @@ public class DoorUnlockServiceImpl implements IDoorUnlockService {
     }
 
     @Override
-    public void requestChallenge(String userId, String doorId) {
-        DoorUnlockMessage msg = new DoorUnlockMessage(userId, doorId, Map.of(DoorUnlockMessage.DU_ATTRIB_STAGE, DoorUnlockMessage.DU_AUTH_STAGE.CHALLENGE_REQUEST.ordinal()));
-        communicationManager.sendMessage(msg);
+    public void requestChallenge(Context context, String userId, String doorId) {
+        executorService = Executors.newFixedThreadPool(1);
+
+        executorService.submit(() -> {
+            DoorUnlockMessage msg = new DoorUnlockMessage(userId, doorId, Map.of(
+                    DoorUnlockMessage.DU_ATTRIB_STAGE, DoorUnlockMessage.DU_AUTH_STAGE.CHALLENGE_REQUEST.ordinal(),
+                    DoorUnlockMessage.DU_ATTRIB_INITIATOR_ID, deviceId)
+            );
+
+            int timeout = 4;
+
+            while (timeout > 0) {
+                if (communicationManager.sendMessage(msg)) {
+                    break;
+                } else {
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    timeout--;
+                }
+            }
+        });
     }
 
     @Override
-    public void requestChallenge(User user, String doorId) {
-        requestChallenge(user.getId(), doorId);
+    public void requestChallenge(Context context, User user, String doorId) {
+        requestChallenge(context, user.getId(), doorId);
     }
 }

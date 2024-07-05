@@ -10,6 +10,7 @@ import com.osh.utils.ObservableManagerImpl;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public abstract class ValueBase<VALUE_TYPE extends ValueBase, NATIVE_TYPE> extends SerializableIdentifyable implements IObservableItem<VALUE_TYPE>, IObservableListenerHolder<VALUE_TYPE> {
@@ -137,7 +138,7 @@ public abstract class ValueBase<VALUE_TYPE extends ValueBase, NATIVE_TYPE> exten
 	public boolean updateValue(Object newValue, boolean invokeListeners) {
 	    currentSignalCount++;
 
-	    boolean isDifferent = value == null ? true : !(value).equals(newValue);
+	    boolean isDifferent = Objects.equals(value, newValue);
 	    value = _updateValue(newValue);
 
 		if (invokeListeners) {

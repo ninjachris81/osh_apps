@@ -1,4 +1,4 @@
-package com.osh;
+package com.osh.activity;
 
 import com.osh.config.ApplicationConfig;
 import com.osh.config.IApplicationConfig;

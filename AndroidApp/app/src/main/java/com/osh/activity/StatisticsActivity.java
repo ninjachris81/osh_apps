@@ -1,4 +1,4 @@
-package com.osh;
+package com.osh.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 

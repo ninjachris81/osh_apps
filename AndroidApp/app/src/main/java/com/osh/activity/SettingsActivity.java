@@ -1,10 +1,12 @@
-package com.osh;
+package com.osh.activity;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceFragmentCompat;
+
+import com.osh.R;
 
 public class SettingsActivity extends AppCompatActivity {
 

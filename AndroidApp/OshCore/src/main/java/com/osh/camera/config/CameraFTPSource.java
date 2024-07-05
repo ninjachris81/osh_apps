@@ -35,7 +35,11 @@ public class CameraFTPSource {
         return password;
     }
 
-    public String getRemoteDir() {
-        return remoteDir;
+    public String getRemoteDirImages() {
+        return remoteDir + "/images";
+    }
+
+    public String getRemoteDirVideos() {
+        return remoteDir + "/videos";
     }
 }
