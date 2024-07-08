@@ -308,7 +308,7 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 	    messageTypes.put(messageType, info);
 	}
 
-	private MessageBase getMessage(String topic, Optional<ByteBuffer> payload) throws JSONException {
+	private synchronized MessageBase getMessage(String topic, Optional<ByteBuffer> payload) throws JSONException {
 
 		if (topic.startsWith(MQTT_BASE_PATH)) {
 			topic = topic.substring(MQTT_BASE_PATH.length() + 1);
@@ -421,7 +421,7 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 	    	}
 	    }
 
-		LogFacade.w(TAG, "Unknown message type " + name);
+		//LogFacade.w(TAG, "Unknown message type " + name);
 	    return null;
 	}
 	

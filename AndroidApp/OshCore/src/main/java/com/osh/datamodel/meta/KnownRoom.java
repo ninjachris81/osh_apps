@@ -1,5 +1,10 @@
 package com.osh.datamodel.meta;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,25 +14,44 @@ import com.osh.actor.ActorBase;
 import com.osh.datamodel.ItemMetaInfo;
 import com.osh.value.ValueBase;
 
-@DatabaseTable(tableName = "dm_known_rooms")
+import org.jetbrains.annotations.NotNull;
+
+@DatabaseTable(tableName = KnownRoom.TABLE_NAME)
+@Entity(tableName = KnownRoom.TABLE_NAME)
 public class KnownRoom {
 
+	@Ignore
+	public static final String TABLE_NAME = "dm_known_rooms";
+
 	@DatabaseField(id = true)
-	private String id;
+	@PrimaryKey
+	@NotNull
+	@ColumnInfo(name = "id")
+	public String id;
+
     @DatabaseField(canBeNull = false)
-	private String name;
+	@NotNull
+	@ColumnInfo(name = "name")
+	public String name;
 
 	@DatabaseField(canBeNull = false, columnName = "known_area_id")
-	private String knownAreaId;
+	@NotNull
+	@ColumnInfo(name = "known_area_id")
+	public String knownAreaId;
+
+	@Ignore
 	private KnownArea knownArea;
 
-    private Map<String, ActorBase> actors = new HashMap<>();
-    
+	@Ignore
+	private Map<String, ActorBase> actors = new HashMap<>();
+
+	@Ignore
 	private Map<String, ValueBase> values = new HashMap<>();
-    
+
+	@Ignore
     private ItemMetaInfo meta = new ItemMetaInfo();
 
-	protected KnownRoom() {
+	public KnownRoom() {
 	}
 
 	public KnownRoom(String id, String name) {
@@ -81,6 +105,7 @@ public class KnownRoom {
 
 	public void setKnownArea(KnownArea knownArea) {
 		this.knownArea = knownArea;
+		this.knownAreaId = knownArea.getId();
 	}
 
 	public void addValue(ValueBase value) {

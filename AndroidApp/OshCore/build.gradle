@@ -4,14 +4,20 @@ plugins {
 
 android {
     namespace 'com.osh'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 29
-        targetSdk 33
+        targetSdk 34
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
 
     buildTypes {
@@ -21,8 +27,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_9
-        targetCompatibility JavaVersion.VERSION_1_9
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     packagingOptions {
@@ -47,6 +53,10 @@ dependencies {
     //implementation 'com.j256.ormlite:ormlite-android:6.1'
     implementation 'com.j256.ormlite:ormlite-jdbc:6.1'
     implementation 'org.postgresql:postgresql:42.2.5'
+
+    def room_version = "2.6.1"
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
 
     implementation "com.google.dagger:hilt-android:2.44"
 

@@ -1,5 +1,7 @@
 package com.osh.activity;
 
+import android.content.Context;
+
 import com.osh.service.IActorService;
 import com.osh.service.IAudioActorService;
 import com.osh.service.IAudioSourceService;
@@ -14,6 +16,7 @@ import com.osh.service.impl.AudioSourceServiceImpl;
 import com.osh.service.impl.ClientDeviceDiscoveryServiceImpl;
 import com.osh.service.impl.DatabaseServiceImpl;
 import com.osh.service.impl.DatamodelServiceImpl;
+import com.osh.service.impl.LocalDatabaseServiceImpl;
 import com.osh.service.impl.MqttCommunicationServiceImpl;
 import com.osh.config.IApplicationConfig;
 import com.osh.service.impl.DoorUnlockServiceImpl;
@@ -31,6 +34,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
+import dagger.hilt.android.qualifiers.ApplicationContext;
 import dagger.hilt.components.SingletonComponent;
 
 @Module
@@ -39,9 +43,16 @@ public class ServiceModules {
 
     @Provides
     @Singleton
-    static IDatabaseService provideDatabaseService(IApplicationConfig applicationConfig) {
+    static IDatabaseService provideDatabaseService(@ApplicationContext Context context, IApplicationConfig applicationConfig) {
         try {
-            return new DatabaseServiceImpl(applicationConfig.getDatabase());
+            LocalDatabaseServiceImpl localDatabaseService = new LocalDatabaseServiceImpl(context, applicationConfig.getDatabase());
+            if (localDatabaseService.isEmpty()) {
+                // if not, connect to real one and copy
+                DatabaseServiceImpl databaseService = new DatabaseServiceImpl(applicationConfig.getDatabase());
+                localDatabaseService.copyData(databaseService);
+            }
+
+            return localDatabaseService;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -70,4 +70,8 @@ public class ShutterActor extends ActorBase<ShutterActor, Integer> implements Se
         if (this.value == SHUTTER_STATE_CLOSED) return "Closed";
         return this.value + " %";
     }
+
+    public DBShutterActor toDBShutterActor() {
+        return new DBShutterActor(id, getValueGroup().getId(), tiltSupport, fullCloseDuration, fullTiltDuration);
+    }
 }

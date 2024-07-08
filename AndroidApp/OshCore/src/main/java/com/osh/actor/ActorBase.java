@@ -25,5 +25,21 @@ public abstract class ActorBase<VALUE_TYPE extends ActorBase, NATIVE_TYPE> exten
 	    }
 	}
 
-
+	public DBActor toDBActor() {
+		if (this instanceof DigitalActor) {
+			return new DBActor(id, this.getClass().getSimpleName(), getValueGroup().getId(), getValueType().getValue(), getValueTimeout(), ((DigitalActor) this).isAsync);
+		} else if (this instanceof  DoorActor) {
+			return new DBActor(id, this.getClass().getSimpleName(), getValueGroup().getId(), getValueType().getValue(), getValueTimeout(), false);
+		} else if (this instanceof  ToggleActor) {
+			return new DBActor(id, this.getClass().getSimpleName(), getValueGroup().getId(), getValueType().getValue(), getValueTimeout(), false);
+		} else if (this instanceof  ValueActor) {
+			return new DBActor(id, this.getClass().getSimpleName(), getValueGroup().getId(), getValueType().getValue(), getValueTimeout(), false);
+		} else if (this instanceof  ShutterActor) {
+			return new DBActor(id, this.getClass().getSimpleName(), getValueGroup().getId(), getValueType().getValue(), getValueTimeout(), false);
+		} else if (this instanceof  AudioPlaybackActor) {
+			return new DBActor(id, this.getClass().getSimpleName(), getValueGroup().getId(), getValueType().getValue(), getValueTimeout(), false);
+		} else {
+			throw new RuntimeException("Unsupported type");
+		}
+	}
 }

@@ -91,13 +91,13 @@ public class DatamodelBase extends Identifyable {
 	    return valueGroup;
 	}
 	
-	public DigitalActor addDigitalActor(ValueGroup valueGroup, String id, ValueType valueType, ValueBase.VALUE_TIMEOUT timeout, boolean isAsync) {
+	public DigitalActor addDigitalActor(ValueGroup valueGroup, String id, ValueType valueType, int timeout, boolean isAsync) {
 	    DigitalActor actor = new DigitalActor(valueGroup, id, valueType, isAsync);
 	    actor.withValueTimeout(timeout);
 	    actors.put(actor.getFullId(), actor);
 	    return actor;
 	}
-	public ShutterActor addShutterActor(ValueGroup valueGroup, String id, ValueType valueType, ValueBase.VALUE_TIMEOUT timeout, boolean tiltSupport, long fullCloseDuration, long fullTiltDuration) {
+	public ShutterActor addShutterActor(ValueGroup valueGroup, String id, ValueType valueType, int timeout, boolean tiltSupport, long fullCloseDuration, long fullTiltDuration) {
 		ShutterActor actor = new ShutterActor(valueGroup, id, valueType, tiltSupport, fullCloseDuration, fullTiltDuration);
 		actor.withValueTimeout(timeout);
 		actors.put(actor.getFullId(), actor);
@@ -110,63 +110,63 @@ public class DatamodelBase extends Identifyable {
 		return actor;
 	}
 
-	public ValueActor addValueActor(ValueGroup valueGroup, String id, ValueType valueType, ValueBase.VALUE_TIMEOUT timeout) {
+	public ValueActor addValueActor(ValueGroup valueGroup, String id, ValueType valueType, int timeout) {
 		ValueActor actor = new ValueActor(valueGroup, id, valueType);
 		actor.withValueTimeout(timeout);
 		actors.put(actor.getFullId(), actor);
 		return actor;
 	}
 
-	public ActorBase addAudioPlaybackActor(ValueGroup valueGroup, String id, ValueType valueType, ValueBase.VALUE_TIMEOUT timeout, String audioDeviceIds, String audioActivationRelayId, float audioVolume, String audioVolumeId, String audioUrl, String audioUrlId, String audioCurrentTitleId) {
+	public ActorBase addAudioPlaybackActor(ValueGroup valueGroup, String id, ValueType valueType, int timeout, String audioDeviceIds, String audioActivationRelayId, float audioVolume, String audioVolumeId, String audioUrl, String audioUrlId, String audioCurrentTitleId) {
 		AudioPlaybackActor actor = new AudioPlaybackActor(valueGroup, id, valueType, audioDeviceIds, audioActivationRelayId, audioVolume, audioVolumeId, audioUrl, audioUrlId, audioCurrentTitleId);
 		actor.withValueTimeout(timeout);
 		actors.put(actor.getFullId(), actor);
 		return actor;
 	}
 
-	public ActorBase addDoorActor(ValueGroup valueGroup, String id, ValueType valueType, ValueBase.VALUE_TIMEOUT timeout) {
+	public ActorBase addDoorActor(ValueGroup valueGroup, String id, ValueType valueType, int timeout) {
 		DoorActor actor = new DoorActor(valueGroup, id, valueType);
 		actor.withValueTimeout(timeout);
 		actors.put(actor.getFullId(), actor);
 		return actor;
 	}
 
-	public BooleanValue addBooleanValue(ValueGroup valueGroup, String id, ValueType valueType, ValueBase.VALUE_TIMEOUT timeout) {
+	public BooleanValue addBooleanValue(ValueGroup valueGroup, String id, ValueType valueType, int timeout) {
 	    BooleanValue value = new BooleanValue(valueGroup, id, valueType);
 	    value.withValueTimeout(timeout);
 	    values.put(value.getFullId(), value);
 	    return value;
 	}
 	
-	public DoubleValue addDoubleValue(ValueGroup valueGroup, String id, ValueType valueType, ValueBase.VALUE_TIMEOUT timeout) {
+	public DoubleValue addDoubleValue(ValueGroup valueGroup, String id, ValueType valueType, int timeout) {
 	    DoubleValue value = new DoubleValue(valueGroup, id, valueType);
 	    value.withValueTimeout(timeout);
 	    values.put(value.getFullId(), value);
 	    return value;
 	}
 
-	public IntegerValue addIntegerValue(ValueGroup valueGroup, String id, ValueType valueType, ValueBase.VALUE_TIMEOUT timeout) {
+	public IntegerValue addIntegerValue(ValueGroup valueGroup, String id, ValueType valueType, int timeout) {
 		IntegerValue value = new IntegerValue(valueGroup, id, valueType);
 		value.withValueTimeout(timeout);
 		values.put(value.getFullId(), value);
 		return value;
 	}
 
-	public LongValue addLongValue(ValueGroup valueGroup, String id, ValueType valueType, ValueBase.VALUE_TIMEOUT timeout) {
+	public LongValue addLongValue(ValueGroup valueGroup, String id, ValueType valueType, int timeout) {
 		LongValue value = new LongValue(valueGroup, id, valueType);
 		value.withValueTimeout(timeout);
 		values.put(value.getFullId(), value);
 		return value;
 	}
 
-	public StringValue addStringValue(ValueGroup valueGroup, String id, ValueType valueType, ValueBase.VALUE_TIMEOUT timeout) {
+	public StringValue addStringValue(ValueGroup valueGroup, String id, ValueType valueType, int timeout) {
 		StringValue value = new StringValue(valueGroup, id, valueType);
 		value.withValueTimeout(timeout);
 		values.put(value.getFullId(), value);
 		return value;
 	}
 
-	public EnumValue addEnumValue(ValueGroup valueGroup, String id, ValueType valueType, ValueBase.VALUE_TIMEOUT timeout, int enumCount) {
+	public EnumValue addEnumValue(ValueGroup valueGroup, String id, ValueType valueType, int timeout, int enumCount) {
 		EnumValue value = new EnumValue(valueGroup, id, valueType, enumCount);
 		value.withValueTimeout(timeout);
 		values.put(value.getFullId(), value);

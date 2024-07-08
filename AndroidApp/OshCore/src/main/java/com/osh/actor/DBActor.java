@@ -1,31 +1,60 @@
 package com.osh.actor;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName = "dm_actors")
+import org.jetbrains.annotations.NotNull;
+
+@DatabaseTable(tableName = DBActor.TABLE_NAME)
+@Entity(tableName = DBActor.TABLE_NAME, primaryKeys = {"id", "value_group_id"})
 public class DBActor {
 
+    @Ignore
+    public static final String TABLE_NAME = "dm_actors";
+
     @DatabaseField(uniqueCombo = true)
-    String id;
+    @ColumnInfo(name = "id")
+    @NotNull
+    public String id;
 
     @DatabaseField(canBeNull = false, columnName = "class_type")
-    String classType;
+    @ColumnInfo(name = "class_type")
+    @NotNull
+    public String classType;
 
     @DatabaseField(uniqueCombo = true, columnName = "value_group_id")
-    String valueGroupId;
+    @ColumnInfo(name = "value_group_id")
+    @NotNull
+    public String valueGroupId;
 
     @DatabaseField(columnName = "value_type")
-    int valueType;
+    @ColumnInfo(name = "value_type")
+    public int valueType;
 
     @DatabaseField(columnName = "value_timeout")
-    int valueTimeout;
+    @ColumnInfo(name = "value_timeout")
+    public int valueTimeout;
 
     @DatabaseField(columnName = "is_async")
-    boolean isAsync;
+    @ColumnInfo(name = "enum_count")
+    public boolean isAsync;
 
-    @DatabaseField
-    String comment;
+
+    public DBActor() {
+    }
+
+    public DBActor(@NotNull String id, @NotNull String classType, @NotNull String valueGroupId, int valueType, int valueTimeout, boolean isAsync) {
+        this.id = id;
+        this.classType = classType;
+        this.valueGroupId = valueGroupId;
+        this.valueType = valueType;
+        this.valueTimeout = valueTimeout;
+        this.isAsync = isAsync;
+    }
 
     public String getId() {
         return id;
@@ -51,7 +80,4 @@ public class DBActor {
         return isAsync;
     }
 
-    public String getComment() {
-        return comment;
-    }
 }

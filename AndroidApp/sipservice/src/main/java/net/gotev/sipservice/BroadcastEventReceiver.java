@@ -1,5 +1,7 @@
 package net.gotev.sipservice;
 
+import static android.content.Context.RECEIVER_NOT_EXPORTED;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -144,7 +146,7 @@ public class BroadcastEventReceiver extends BroadcastReceiver implements SipServ
                 BroadcastEventEmitter.BroadcastAction.SILENT_CALL_STATUS));
         intentFilter.addAction(BroadcastEventEmitter.getAction(
                 BroadcastEventEmitter.BroadcastAction.NOTIFY_TLS_VERIFY_STATUS_FAILED));
-        context.registerReceiver(this, intentFilter);
+        context.registerReceiver(this, intentFilter, RECEIVER_NOT_EXPORTED);
     }
 
     /**

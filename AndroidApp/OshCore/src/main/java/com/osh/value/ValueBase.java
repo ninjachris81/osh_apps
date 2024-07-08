@@ -10,33 +10,23 @@ import com.osh.utils.ObservableManagerImpl;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 public abstract class ValueBase<VALUE_TYPE extends ValueBase, NATIVE_TYPE> extends SerializableIdentifyable implements IObservableItem<VALUE_TYPE>, IObservableListenerHolder<VALUE_TYPE> {
 
-	public enum VALUE_TIMEOUT {
-		VT_NONE(0), VT_SHORT(5000), VT_MID(30000), VT_LONG(120000);
-
-		private int timeout;
-		VALUE_TIMEOUT(int timeout) {
-			this.timeout = timeout;
-		}
-
-		public static VALUE_TIMEOUT of(int timeout) {
-			for (VALUE_TIMEOUT vt : VALUE_TIMEOUT.values()) {
-				if (vt.timeout == timeout) return vt;
-			}
-
-			return null;
-		}
-	};
+	public static final int VT_NONE = 0;
+	public static final int VT_SHORT = 5000;
+	public static final int VT_MID = 30000;
+	public static final int VT_LONG = 120000;
 
 	public static final String VALUE_SEPARATOR = ".";
 
 	protected abstract NATIVE_TYPE _updateValue(Object newValue);
 
-	private VALUE_TIMEOUT valueTimeout = VALUE_TIMEOUT.VT_NONE;
+	private int valueTimeout = VT_NONE;
 
 	private final ObservableManagerImpl<VALUE_TYPE> observableManager = new ObservableManagerImpl<>();
 
@@ -57,6 +47,8 @@ public abstract class ValueBase<VALUE_TYPE extends ValueBase, NATIVE_TYPE> exten
 	
 	long lastUpdate = 0;
 
+	String comment;
+
 	public ValueBase(ValueGroup valueGroup, String id, ValueType valueType) {
 		super(id);
 		this.valueGroup = valueGroup;
@@ -64,6 +56,17 @@ public abstract class ValueBase<VALUE_TYPE extends ValueBase, NATIVE_TYPE> exten
 	}
 
 	public ValueBase() {
+	}
+
+	public DBValue toDBValue() {
+		return new DBValue(valueGroup.getId(), id, this.getClass().getSimpleName(), valueType, valueTimeout, getEnumCount());
+	}
+
+	protected int getEnumCount() {
+		if (this instanceof EnumValue) {
+			return ((EnumValue) this).getEnumCount();
+		}
+		return 0;
 	}
 
 	public boolean isValid() {
@@ -102,16 +105,16 @@ public abstract class ValueBase<VALUE_TYPE extends ValueBase, NATIVE_TYPE> exten
 	 * ValueGroup(valueGroupId); }
 	 */
 
-	public ValueBase withValueTimeout(VALUE_TIMEOUT timeout) {
+	public ValueBase withValueTimeout(int timeout) {
 		this.valueTimeout = timeout;
 		return this;
 	}
 
-	public VALUE_TIMEOUT getValueTimeout() {
+	public int getValueTimeout() {
 		return valueTimeout;
 	}
 
-	public void setValueTimeout(VALUE_TIMEOUT valueTimeout) {
+	public void setValueTimeout(int valueTimeout) {
 		this.valueTimeout = valueTimeout;
 	}
 

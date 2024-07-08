@@ -13,4 +13,9 @@ public class EnumValue extends IntegerValue {
     protected Integer _updateValue(Object newValue) {
         return super._updateValue(newValue);
     }
+
+    @Override
+    public int getEnumCount() {
+        return enumCount;
+    }
 }
