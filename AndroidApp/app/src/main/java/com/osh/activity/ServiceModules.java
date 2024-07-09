@@ -28,6 +28,10 @@ import com.osh.wbb12.service.IWBB12Service;
 import com.osh.wbb12.service.impl.WBB12ServiceImpl;
 
 import java.sql.SQLException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.inject.Singleton;
 
@@ -41,19 +45,29 @@ import dagger.hilt.components.SingletonComponent;
 @InstallIn(SingletonComponent.class)
 public class ServiceModules {
 
+    static ExecutorService service = Executors.newFixedThreadPool(2);
+
     @Provides
     @Singleton
     static IDatabaseService provideDatabaseService(@ApplicationContext Context context, IApplicationConfig applicationConfig) {
         try {
-            LocalDatabaseServiceImpl localDatabaseService = new LocalDatabaseServiceImpl(context, applicationConfig.getDatabase());
-            if (localDatabaseService.isEmpty()) {
-                // if not, connect to real one and copy
-                DatabaseServiceImpl databaseService = new DatabaseServiceImpl(applicationConfig.getDatabase());
-                localDatabaseService.copyData(databaseService);
-            }
+            return service.submit(() -> {
+                try {
+                    LocalDatabaseServiceImpl localDatabaseService = new LocalDatabaseServiceImpl(context, applicationConfig.getDatabase());
+                    if (localDatabaseService.isEmpty()) {
+                        // if not, connect to real one and copy
+                        DatabaseServiceImpl databaseService = new DatabaseServiceImpl(applicationConfig.getDatabase());
+                        localDatabaseService.copyData(databaseService);
+                    }
 
-            return localDatabaseService;
-        } catch (SQLException e) {
+                    return localDatabaseService;
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }).get();
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
@@ -62,8 +76,16 @@ public class ServiceModules {
     @Singleton
     static IDatamodelService provideDatamodelService(ICommunicationService communicationService, IDatabaseService databaseService, IValueService valueService, IActorService actorService) {
         try {
-            return new DatamodelServiceImpl(communicationService, databaseService, valueService, actorService);
-        } catch (SQLException e) {
+            return service.submit(() -> {
+                try {
+                    return new DatamodelServiceImpl(communicationService, databaseService, valueService, actorService);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }).get();
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }

@@ -78,12 +78,12 @@ public class InitActivity extends AppCompatActivity {
                 Log.w(TAG, "No payload data");
             }
         } else {
-            service.submit(() -> {
+            //service.submit(() -> {
                 serviceContext.get();
                 MainActivity.invokeActivity(this);
                 finish();
-            });
-            service.shutdown();
+            //});
+            //service.shutdown();
         }
     }
 
