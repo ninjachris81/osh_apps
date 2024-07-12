@@ -18,6 +18,7 @@ import com.osh.service.impl.dao.LocalAppDatabase;
 import com.osh.value.DBValue;
 import com.osh.value.ValueGroup;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +30,7 @@ public class LocalDatabaseServiceImpl extends DatabaseServiceBaseImpl implements
 
     private static final String TAG = LocalDatabaseServiceImpl.class.getName();
 
+    private final String databasePath;
     private final LocalAppDatabase appDB;
 
     public void copyData(IDatabaseService databaseService) {
@@ -52,12 +54,30 @@ public class LocalDatabaseServiceImpl extends DatabaseServiceBaseImpl implements
     }
 
     public LocalDatabaseServiceImpl(Context context, DatabaseConfig config) throws SQLException {
+        databasePath = context.getDatabasePath(config.getName()).getAbsolutePath();
         appDB = Room.databaseBuilder(context, LocalAppDatabase.class, config.getName()).build();
     }
 
     @Override
     public boolean isEmpty() {
         return appDB.getValueGroupDao().getCount() == 0;
+    }
+
+    @Override
+    public void resetDatabase() {
+        appDB.close();
+        File dbFile = new File(databasePath);
+        if (dbFile.exists()) {
+            dbFile.delete();
+        }
+        dbFile = new File(databasePath + "-shm");
+        if (dbFile.exists()) {
+            dbFile.delete();
+        }
+        dbFile = new File(databasePath + "-wal");
+        if (dbFile.exists()) {
+            dbFile.delete();
+        }
     }
 
     @Override

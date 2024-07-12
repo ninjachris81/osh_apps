@@ -13,9 +13,26 @@ import net.gotev.sipservice.BroadcastEventReceiver;
 import net.gotev.sipservice.SipAccountData;
 import net.gotev.sipservice.SipServiceCommand;
 
+import org.pjsip.pjsua2.Account;
+import org.pjsip.pjsua2.AccountConfig;
+import org.pjsip.pjsua2.OnIncomingCallParam;
+import org.pjsip.pjsua2.OnRegStateParam;
 import org.pjsip.pjsua2.pjsip_status_code;
 
-public class OshAccount {
+public class OshAccount extends Account {
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private final CallbackReceiver callbackReceiver;
 

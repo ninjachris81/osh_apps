@@ -7,8 +7,6 @@ import static com.osh.communication.mqtt.MqttConstants.MQTT_SENDER_DEVICE_ID_ATT
 import static com.osh.communication.mqtt.MqttConstants.MQTT_SINGLE_VALUE_ATTR;
 import static com.osh.communication.mqtt.MqttConstants.MQTT_TS;
 
-import android.util.Log;
-
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -18,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -48,6 +47,7 @@ import com.osh.log.LogFacade;
 import com.osh.log.LogMessage;
 import com.osh.log.LogMessage.MsgType;
 import com.osh.processor.ScriptResultMessage;
+import com.osh.service.IDatamodelService;
 import com.osh.time.SystemtimeMessage;
 import com.osh.utils.IObservableBoolean;
 import com.osh.utils.ObservableBoolean;
@@ -62,7 +62,6 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 	private MqttConfig config;
 
 	private final ObservableBoolean connectedState = new ObservableBoolean(false);
-	private boolean datamodelReady = false;
 
 	@Override
 	public IObservableBoolean connectedState() {
@@ -71,18 +70,23 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 
 	private String deviceId;
 
+	private Mqtt3AsyncClient mqttClient;
+
+	private Map<MessageBase.MESSAGE_TYPE, MessageTypeInfo> messageTypes = new ConcurrentHashMap<>();
+
+	private Map<MessageBase.MESSAGE_TYPE, IMqttSupport> messageTypeServices = new ConcurrentHashMap<>();
+
 	public MqttCommunicationServiceImpl(MqttConfig config) {
 		this.executorService = Executors.newFixedThreadPool(1);
 		this.config = config;
 		this.deviceId = config.getClientId();		// use clientID as device id
-		connectMqtt();
 	}
 
-    private Mqtt3AsyncClient mqttClient;
-    
-    private Map<MessageBase.MESSAGE_TYPE, MessageTypeInfo> messageTypes = new HashMap<>();
-    
-    private Map<MessageBase.MESSAGE_TYPE, IMqttSupport> messageTypeServices = new HashMap<>();
+
+	@Override
+	public void datamodelReady() {
+		connectMqtt();
+	}
 
 	@Override
 	public void connectMqtt() {
@@ -95,6 +99,9 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 	    registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_LOG, false, MqttConstants.MQTT_MESSAGE_TYPE_LO, 2, false);
 	    registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_SCRIPT_RESULT, false, MqttConstants.MQTT_MESSAGE_TYPE_SR, 1, true);
 		registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_DOOR_UNLOCK, false, MqttConstants.MQTT_MESSAGE_TYPE_DU, 2, true);
+
+		registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_VALUE, true, MqttConstants.MQTT_MESSAGE_TYPE_VA, 2, false);
+		registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_ACTOR, true, MqttConstants.MQTT_MESSAGE_TYPE_AC, 2, false);
 
 		mqttClient = MqttClient.builder()
 				.identifier(config.getClientId())
@@ -122,14 +129,6 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 				subscribeChannels();
 			}
 		});
-	}
-
-	@Override
-	public void datamodelReady() {
-		this.datamodelReady = true;
-
-		registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_VALUE, true, MqttConstants.MQTT_MESSAGE_TYPE_VA, 2, false);
-		registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_ACTOR, true, MqttConstants.MQTT_MESSAGE_TYPE_AC, 2, false);
 	}
 
 	@Override
@@ -382,12 +381,7 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 				return null;
 			}
 		} else {
-			if (datamodelReady) {
-				LogFacade.w(TAG, "Invalid message info");
-			} else {
-				// ok, ignore this message
-			}
-
+			LogFacade.w(TAG, "Invalid message info");
 			return null;
 		}
 	}
@@ -401,7 +395,7 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 	}
 
 	
-	List<String> removeMessageTypePath(String[] paths) {
+	synchronized List<String> removeMessageTypePath(String[] paths) {
 		for (MessageTypeInfo messageTypeInfo : messageTypes.values()) {
 			
 	        if (paths[0].equals(messageTypeInfo.mqttTypePath)) {
@@ -413,8 +407,8 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 
 	    return List.of();
 	}
-	
-	MessageTypeInfo getMessageType(String name) {
+
+	synchronized MessageTypeInfo getMessageType(String name) {
 	    for (MessageTypeInfo messageTypeInfo : messageTypes.values()) {
 	    	if (messageTypeInfo.mqttTypePath.equals(name)) {
 	    		return messageTypeInfo;

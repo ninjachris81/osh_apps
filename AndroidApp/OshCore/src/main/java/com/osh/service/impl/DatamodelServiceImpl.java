@@ -51,10 +51,7 @@ public class DatamodelServiceImpl implements IDatamodelService {
 	private final IValueService valueService;
 	private final IActorService actorService;
 
-	private final ICommunicationService communicationService;
-
-	public DatamodelServiceImpl(ICommunicationService communicationService, IDatabaseService databaseService, IValueService valueService, IActorService actorService) throws SQLException {
-		this.communicationService = communicationService;
+	public DatamodelServiceImpl(IDatabaseService databaseService, IValueService valueService, IActorService actorService) throws SQLException {
 		this.databaseService = databaseService;
 		this.valueService = valueService;
 		this.actorService = actorService;
@@ -67,7 +64,6 @@ public class DatamodelServiceImpl implements IDatamodelService {
 
 		loadedState.changeValue(true);
 
-		communicationService.datamodelReady();
 	}
 
 	private void registerData() {

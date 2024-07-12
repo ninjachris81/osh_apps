@@ -11,4 +11,5 @@ public interface IDatabaseService {
 
     DatamodelBase loadDatamodel();
 
+    void resetDatabase();
 }

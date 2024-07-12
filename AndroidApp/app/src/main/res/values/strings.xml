@@ -178,5 +178,6 @@
     <string name="grafana_wbb12_url_key">grafana_wbb12_url_key</string>
     <string name="sip_ring_volume_key">sip_ring_volume_key</string>
     <string name="sip_ring_volume">Ring Volume</string>
+    <string name="title_activity_call">CallActivity</string>
 
 </resources>

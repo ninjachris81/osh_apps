@@ -20,6 +20,7 @@
             android:layout_columnWeight="1"
             android:layout_gravity="fill"
             android:layout_margin="10dp"
+            android:padding="5dp"
             app:cardBackgroundColor="@color/seek_bar_background"
             app:cardCornerRadius="4dp"
             app:cardElevation="6dp">
@@ -73,6 +74,117 @@
             app:cardCornerRadius="4dp"
             app:cardElevation="6dp">
 
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:useDefaultMargins="true"
+                android:padding="1dp"
+                android:columnCount="3"
+                android:rowCount="3">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/currentMode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_gravity="fill"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/cloud_question_outline"
+                    app:iconGravity="textTop"
+                    app:iconSize="70dp"
+                    app:iconPadding="0dp"
+                    android:clickable="false"
+                    android:inputType="text"
+                    />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_gravity="fill"
+                    app:cardBackgroundColor="@color/design_default_color_primary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="4dp"
+                    >
+
+
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/batteryState"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                         />
+                </androidx.cardview.widget.CardView>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/currentTrend"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_gravity="fill"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/cloud_question_outline"
+                    app:iconGravity="textTop"
+                    app:iconSize="70dp"
+                    app:iconPadding="0dp"
+                    android:clickable="false"
+                    android:inputType="text"
+                    />
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/powerConsumption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_gravity="fill"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/home_lightning_bolt_outline"
+                    app:iconGravity="textTop"
+                    app:iconSize="70dp"
+                    app:iconPadding="0dp"
+                    android:clickable="false"
+                    android:inputType="text"
+                    />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/test2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_gravity="fill"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:iconGravity="textStart"
+                    app:iconSize="96dp"
+                    app:iconPadding="0dp"
+                    android:clickable="false"
+                    />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/test3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_gravity="fill"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:iconGravity="textStart"
+                    app:iconSize="96dp"
+                    app:iconPadding="0dp"
+                    android:clickable="false"
+                    />
+
+            </GridLayout>
+
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
@@ -98,6 +210,117 @@
             app:cardBackgroundColor="@color/seek_bar_background"
             app:cardCornerRadius="4dp"
             app:cardElevation="6dp">
+
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:useDefaultMargins="true"
+                android:padding="1dp"
+                android:columnCount="3"
+                android:rowCount="3">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/dishwasherInfos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:icon="@drawable/cloud_question_outline"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                android:inputType="text"
+                />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/washingmachine"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_gravity="fill"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/cloud_question_outline"
+                    app:iconGravity="textTop"
+                    app:iconSize="70dp"
+                    app:iconPadding="0dp"
+                    android:clickable="false"
+                    />
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/app3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_gravity="fill"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/cloud_question_outline"
+                    app:iconGravity="textTop"
+                    app:iconSize="70dp"
+                    app:iconPadding="0dp"
+                    android:clickable="false"
+                    />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/washingMachineInfos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_gravity="fill"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/cloud_question_outline"
+                    app:iconGravity="textTop"
+                    app:iconSize="70dp"
+                    app:iconPadding="0dp"
+                    android:clickable="false"
+                    android:inputType="text"
+                    />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/app5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_gravity="fill"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/cloud_question_outline"
+                    app:iconGravity="textTop"
+                    app:iconSize="70dp"
+                    app:iconPadding="0dp"
+                    android:clickable="false"
+                    />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/app6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_gravity="fill"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/cloud_question_outline"
+                    app:iconGravity="textTop"
+                    app:iconSize="70dp"
+                    app:iconPadding="0dp"
+                    android:clickable="false"
+                    />
+
+            </GridLayout>
 
         </androidx.cardview.widget.CardView>
     </GridLayout>

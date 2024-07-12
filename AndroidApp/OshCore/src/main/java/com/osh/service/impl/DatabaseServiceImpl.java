@@ -85,6 +85,11 @@ public class DatabaseServiceImpl extends DatabaseServiceBaseImpl implements IDat
     }
 
     @Override
+    public void resetDatabase() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     protected List<ValueGroup> loadValueGroups() {
         try {
             return valueGroupDao.queryForAll();

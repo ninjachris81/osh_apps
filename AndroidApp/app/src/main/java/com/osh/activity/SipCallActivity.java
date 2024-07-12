@@ -1,80 +1,188 @@
 package com.osh.activity;
 
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
+import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.media3.common.MediaItem;
+import androidx.media3.common.util.UnstableApi;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.rtsp.RtspMediaSource;
+import androidx.media3.exoplayer.source.MediaSource;
 
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.rtsp.RtspMediaSource;
 import com.osh.R;
 import com.osh.camera.config.CameraSource;
 import com.osh.databinding.ActivitySipCallBinding;
 
-import net.gotev.sipservice.BroadcastEventReceiver;
-import net.gotev.sipservice.CodecPriority;
-import net.gotev.sipservice.MediaState;
-import net.gotev.sipservice.RtpStreamStats;
 import net.gotev.sipservice.SipServiceCommand;
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
+import org.pjsip.pjsua2.CallInfo;
+import org.pjsip.pjsua2.CallMediaInfo;
+import org.pjsip.pjsua2.CallOpParam;
+import org.pjsip.pjsua2.OnCallMediaEventParam;
+import org.pjsip.pjsua2.StreamInfo;
+import org.pjsip.pjsua2.VideoWindow;
+import org.pjsip.pjsua2.VideoWindowHandle;
+import org.pjsip.pjsua2.VideoWindowInfo;
+import org.pjsip.pjsua2.pjmedia_event_type;
 import org.pjsip.pjsua2.pjsip_inv_state;
+import org.pjsip.pjsua2.pjsip_role_e;
+import org.pjsip.pjsua2.pjsip_status_code;
 
-import java.util.ArrayList;
+class VideoSurfaceHandler implements SurfaceHolder.Callback {
+    private SurfaceHolder holder;
+    private VideoWindow videoWindow = null;
+    private boolean active = false;
 
-public class SipCallActivity extends AppCompatActivity implements SurfaceHolder.Callback {
+    public VideoSurfaceHandler(SurfaceHolder holder_) {
+        holder = holder_;
+    }
+
+    public void setVideoWindow(VideoWindow vw) {
+        videoWindow = vw;
+        active = true;
+        setSurfaceHolder(holder);
+    }
+
+    public void resetVideoWindow() {
+        active = false;
+        videoWindow = null;
+    }
+
+    private void setSurfaceHolder(SurfaceHolder holder) {
+        if (!active) return;
+
+        try {
+            VideoWindowHandle wh = new VideoWindowHandle();
+            wh.getHandle().setWindow(holder != null? holder.getSurface() : null);
+            videoWindow.setWindow(wh);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int w, int h)
+    {
+        setSurfaceHolder(holder);
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) { }
+
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder)
+    {
+        setSurfaceHolder(null);
+    }
+}
+
+public class SipCallActivity extends AppCompatActivity implements Handler.Callback {
     private static final String TAG = "SipCallActivity";
 
     private ActivitySipCallBinding binding;
 
+    private VideoSurfaceHandler localVideoHandler;
+    private VideoSurfaceHandler remoteVideoHandler;
+
+    private static CallInfo lastCallInfo;
 
     private String mAccountID;
     private String mDisplayName;
-    private String mRemoteUri;
     private int mCallID;
     private boolean mIsVideo;
-    private int mType;
     private String mNumber;
-    private boolean mIsVideoConference;
     private boolean micMute;
-
-    public static final int TYPE_INCOMING_CALL = 646;
-    public static final int TYPE_OUT_CALL = 647;
-    public static final int TYPE_CALL_CONNECTED = 648;
 
     private ToneGenerator ringToneGenerator;
     private ExoPlayer player;
     private Drawable micOnIcon;
     private Drawable micOffIcon;
 
+    @OptIn(markerClass = UnstableApi.class)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivitySipCallBinding.inflate(getLayoutInflater());
 
-        binding.buttonAccept.setOnClickListener(this::onViewClicked);
-        binding.buttonHangup.setOnClickListener(this::onViewClicked);
-        binding.btnCancel.setOnClickListener(this::onViewClicked);
-        binding.btnMuteMic.setOnClickListener(this::onViewClicked);
-        binding.btnHangUp.setOnClickListener(this::onViewClicked);
-        binding.btnSwitchCamera.setOnClickListener(this::onViewClicked);
-        binding.unlockDoor.setOnClickListener(this::onViewClicked);
+        SurfaceView surfaceInVideo = binding.surfaceIncomingVideo;
+        SurfaceView surfacePreview = binding.surfaceIncomingVideo;
+
+        /* Avoid visible black boxes (blank video views) initially */
+        if (MainActivity.currentCall == null ||
+                MainActivity.currentCall.vidWin == null)
+        {
+            surfaceInVideo.setVisibility(View.GONE);
+            surfacePreview.setVisibility(View.GONE);
+        }
+
+        localVideoHandler = new VideoSurfaceHandler(surfacePreview.getHolder());
+        remoteVideoHandler = new VideoSurfaceHandler(surfaceInVideo.getHolder());
+        surfaceInVideo.getHolder().addCallback(remoteVideoHandler);
+        surfacePreview.getHolder().addCallback(localVideoHandler);
+
+        if (MainActivity.currentCall != null) {
+            try {
+                lastCallInfo = MainActivity.currentCall.getInfo();
+                updateCallState(lastCallInfo);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        } else {
+            updateCallState(lastCallInfo);
+        }
+
+        binding.buttonAccept.setOnClickListener(v -> {
+            acceptCall(v);
+        });
+
+        binding.buttonHangup.setOnClickListener(v -> {
+            hangupCall(v);
+            finish();
+        });
+        binding.btnCancel.setOnClickListener(v -> {
+            hangupCall(v);
+            finish();
+        });
+        binding.btnMuteMic.setOnClickListener(v -> {
+            micMute = !micMute;
+            SipServiceCommand.setCallMute(this, mAccountID, mCallID, micMute);
+            binding.btnMuteMic.setIcon(micMute ? micOffIcon : micOnIcon);
+            binding.btnMuteMic.setText(micMute ? "Muted" : "Mute");
+        });
+        binding.btnHangUp.setOnClickListener(v -> {
+            hangupCall(v);
+            finish();
+        });
+        binding.btnSwitchCamera.setOnClickListener(v -> {
+            // TODO
+        });
+
+        binding.unlockDoor.setOnClickListener(view -> {
+            SipServiceCommand.hangUpActiveCalls(this, mAccountID);
+            finish();
+            DoorOpenActivity.invokeActivity(view.getContext(), DoorOpenActivity.FRONT_DOOR_ID);
+        });
+
         setContentView(binding.getRoot());
 
         ringToneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, getIntent().getIntExtra("ringVolume", 80));
 
-        registReceiver();
         initData();
 
         player = new ExoPlayer.Builder(this).build();
@@ -88,18 +196,55 @@ public class SipCallActivity extends AppCompatActivity implements SurfaceHolder.
         player.setPlayWhenReady(true);
         player.prepare();
 
-        binding.unlockDoor.setOnClickListener(view -> {
-            SipServiceCommand.hangUpActiveCalls(this, mAccountID);
-            finish();
-            DoorOpenActivity.invokeActivity(view.getContext(), DoorOpenActivity.FRONT_DOOR_ID);
-        });
     }
 
-    private void registReceiver() {
-        mReceiver.register(this);
+    public void acceptCall(View view)
+    {
+        CallOpParam prm = new CallOpParam();
+        prm.setStatusCode(pjsip_status_code.PJSIP_SC_OK);
+        try {
+            MainActivity.currentCall.answer(prm);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        view.setVisibility(View.GONE);
+    }
+
+    public void hangupCall(View view)
+    {
+        localVideoHandler.resetVideoWindow();
+        remoteVideoHandler.resetVideoWindow();
+
+        finish();
+
+        if (MainActivity.currentCall != null) {
+            CallOpParam prm = new CallOpParam();
+            prm.setStatusCode(pjsip_status_code.PJSIP_SC_DECLINE);
+            try {
+                MainActivity.currentCall.hangup(prm);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
     }
 
     private void initData() {
+        if (getIntent().hasExtra("msgType")) {
+            switch(getIntent().getIntExtra("msgType", 0)) {
+                case MainActivity.MSG_TYPE.CALL_MEDIA_EVENT:
+                    handleCallMediaEvent(getIntent().getIntExtra("evType", 0), getIntent().getLongExtra("medIdx", 0));
+                    break;
+                case MainActivity.MSG_TYPE.CALL_STATE:
+                    handleCallStateEvent(getIntent().getIntExtra("state", 0));
+                    break;
+                case MainActivity.MSG_TYPE.CALL_MEDIA_STATE:
+                    handleCallMediaState();
+                    break;
+            }
+        }
+
+        /*
         mAccountID = getIntent().getStringExtra("accountID");
         mCallID = getIntent().getIntExtra("callID", -1);
         mType = getIntent().getIntExtra("type", -1);
@@ -108,8 +253,9 @@ public class SipCallActivity extends AppCompatActivity implements SurfaceHolder.
         mNumber = getIntent().getStringExtra("number");
         mIsVideo = getIntent().getBooleanExtra("isVideo", false);
         mIsVideoConference = getIntent().getBooleanExtra("isVideoConference", false);
+         */
 
-        showLayout(mType);
+        //showLayout(mType);
         binding.textViewPeer.setText(String.format("%s", mDisplayName));
         binding.tvOutCallInfo.setText(String.format("You are calling %s", mNumber));
 
@@ -126,6 +272,7 @@ public class SipCallActivity extends AppCompatActivity implements SurfaceHolder.
         binding.btnSwitchCamera.setIcon(MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.CAMERA_SWITCH).setColor(Color.WHITE).build());
         binding.btnSwitchCamera.setVisibility(mIsVideo ? View.VISIBLE : View.GONE);
 
+        /*
         SurfaceHolder holder = binding.svLocal.getHolder();
         holder.addCallback(this);
 
@@ -144,62 +291,10 @@ public class SipCallActivity extends AppCompatActivity implements SurfaceHolder.
             public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
                 SipServiceCommand.setupIncomingVideoFeed(SipCallActivity.this, mAccountID, mCallID, null);
             }
-        });
+        });*/
     }
 
-    public static void startActivityIn(Context context, String accountID, int callID, String displayName, String remoteUri, boolean isVideo, int ringVolume) {
-        Intent intent = new Intent(context, SipCallActivity.class);
-        intent.putExtra("accountID", accountID);
-        intent.putExtra("callID", callID);
-        intent.putExtra("displayName", displayName);
-        intent.putExtra("remoteUri", remoteUri);
-        intent.putExtra("isVideo", isVideo);
-        intent.putExtra("type", TYPE_INCOMING_CALL);
-        intent.putExtra("ringVolume", ringVolume);
-        context.startActivity(intent);
-    }
-
-    public static void startActivityOut(Context context, String accountID, int callID, String number, boolean isVideo, boolean isVideoConference) {
-        Intent intent = new Intent(context, SipCallActivity.class);
-        intent.putExtra("accountID", accountID);
-        intent.putExtra("callID", callID);
-        intent.putExtra("number", number);
-        intent.putExtra("isVideo", isVideo);
-        intent.putExtra("isVideoConference", isVideoConference);
-        intent.putExtra("type", TYPE_OUT_CALL);
-        context.startActivity(intent);
-    }
-
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.buttonAccept:
-                SipServiceCommand.acceptIncomingCall(this, mAccountID, mCallID, mIsVideo);
-                break;
-            case R.id.buttonHangup:
-                SipServiceCommand.declineIncomingCall(this, mAccountID, mCallID);
-                finish();
-                break;
-            case R.id.unlock_door:
-            case R.id.btnCancel:
-                SipServiceCommand.hangUpActiveCalls(this, mAccountID);
-                finish();
-                break;
-            case R.id.btnMuteMic:
-                micMute = !micMute;
-                SipServiceCommand.setCallMute(this, mAccountID, mCallID, micMute);
-                binding.btnMuteMic.setIcon(micMute ? micOffIcon : micOnIcon);
-                binding.btnMuteMic.setText(micMute ? "Muted" : "Mute");
-                break;
-            case R.id.btnHangUp:
-                SipServiceCommand.hangUpCall(this, mAccountID, mCallID);
-                finish();
-                break;
-            case R.id.btnSwitchCamera:
-                SipServiceCommand.switchVideoCaptureDevice(this,mAccountID,mCallID);
-                break;
-        }
-    }
-
+    /*
     private void showLayout(int type) {
         if (type == TYPE_INCOMING_CALL) {
             binding.layoutIncomingCall.setVisibility(View.VISIBLE);
@@ -222,28 +317,16 @@ public class SipCallActivity extends AppCompatActivity implements SurfaceHolder.
             binding.parent.addView(textView);
         }
     }
+     */
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mReceiver.unregister(this);
+        //mReceiver.unregister(this);
         player.stop();
     }
 
-    @Override
-    public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        SipServiceCommand.startVideoPreview(SipCallActivity.this, mAccountID, mCallID, binding.svLocal.getHolder().getSurface());
-
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-    }
-
+    /*
     public BroadcastEventReceiver mReceiver = new BroadcastEventReceiver() {
 
         @Override
@@ -318,4 +401,185 @@ public class SipCallActivity extends AppCompatActivity implements SurfaceHolder.
             super.onCallStats(callID, duration, audioCodec, callStatusCode, rx, tx);
         }
     };
+
+     */
+
+
+    private void updateCallState(CallInfo ci) {
+        TextView tvPeer = (TextView) findViewById(R.id.textViewPeer);
+        TextView tvState = (TextView) findViewById(R.id.textViewCallState);
+        Button buttonHangup = (Button) findViewById(R.id.buttonHangup);
+        Button buttonAccept = (Button) findViewById(R.id.buttonAccept);
+        String call_state = "";
+
+        if (ci == null) {
+            buttonAccept.setVisibility(View.GONE);
+            buttonHangup.setText("OK");
+            tvState.setText("Call disconnected");
+            return;
+        }
+
+        if (ci.getRole() == pjsip_role_e.PJSIP_ROLE_UAC) {
+            buttonAccept.setVisibility(View.GONE);
+        }
+
+        if (ci.getState() < pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
+            ringToneGenerator.startTone(ToneGenerator.TONE_SUP_RINGTONE);
+
+            if (ci.getRole() == pjsip_role_e.PJSIP_ROLE_UAS) {
+                call_state = "Incoming call..";
+                /* Default button texts are already 'Accept' & 'Reject' */
+            } else {
+                buttonHangup.setText("Cancel");
+                call_state = ci.getStateText();
+            }
+        } else if (ci.getState() >= pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
+            ringToneGenerator.stopTone();
+
+            buttonAccept.setVisibility(View.GONE);
+            call_state = ci.getStateText();
+            if (ci.getState() == pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
+                buttonHangup.setText("Hangup");
+            } else if (ci.getState() ==
+                    pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
+                buttonHangup.setText("OK");
+                call_state = "Call disconnected: " + ci.getLastReason();
+            }
+        }
+    }
+
+    @Override
+    public boolean handleMessage(@NonNull Message m) {
+
+        if (m.what == MainActivity.MSG_TYPE.CALL_STATE) {
+            lastCallInfo = (CallInfo) m.obj;
+            handleCallStateEvent(lastCallInfo.getState());
+        } else if (m.what == MainActivity.MSG_TYPE.CALL_MEDIA_STATE) {
+            handleCallMediaState();
+        } else if (m.what == MainActivity.MSG_TYPE.CALL_MEDIA_EVENT) {
+            OnCallMediaEventParam prm = (OnCallMediaEventParam)m.obj;
+            handleCallMediaEvent(prm.getEv().getType(), prm.getMedIdx());
+        } else {
+
+            /* Message not handled */
+            return false;
+
+        }
+
+        return true;
+
+    }
+
+    private void handleCallMediaState() {
+        if (MainActivity.currentCall.vidWin != null) {
+            /* Set capture orientation according to current
+             * device orientation.
+             */
+            onConfigurationChanged(getResources().getConfiguration());
+
+        }
+
+        if (MainActivity.currentCall.vidPrev != null) {
+            localVideoHandler.setVideoWindow(MainActivity.currentCall.vidPrev.getVideoWindow());
+            setupVideoPreviewLayout();
+        }
+    }
+
+    private void handleCallStateEvent(int state) {
+        if (state==pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
+            localVideoHandler.resetVideoWindow();
+            remoteVideoHandler.resetVideoWindow();
+        }
+
+        updateCallState(lastCallInfo);
+    }
+
+    private void handleCallMediaEvent(int type, long medIdx) {
+
+        if (type == pjmedia_event_type.PJMEDIA_EVENT_FMT_CHANGED &&
+                medIdx == MainActivity.currentCall.vidGetStreamIdx() &&
+                MainActivity.currentCall.vidWin != null)
+        {
+            CallMediaInfo cmi;
+            try {
+                CallInfo ci = MainActivity.currentCall.getInfo();
+                cmi = ci.getMedia().get((int)medIdx);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            remoteVideoHandler.setVideoWindow(cmi.getVideoWindow());
+            setupIncomingVideoLayout();
+        }
+
+    }
+
+    private void setupIncomingVideoLayout()
+    {
+        try {
+            StreamInfo si = MainActivity.currentCall.getStreamInfo(MainActivity.currentCall.vidGetStreamIdx());
+            int w = (int)si.getVidCodecParam().getDecFmt().getWidth();
+            int h = (int)si.getVidCodecParam().getDecFmt().getHeight();
+
+            /* Adjust width to match the parent layout */
+            RelativeLayout videoLayout = findViewById(R.id.bottom_layout);
+            h = (int)((double)videoLayout.getMeasuredWidth() / w * h);
+            w = videoLayout.getMeasuredWidth();
+
+            /* Also adjust height to match the parent layout */
+            if (h > videoLayout.getMeasuredHeight()) {
+                w = (int)((double)videoLayout.getMeasuredHeight() / h * w);
+                h = videoLayout.getMeasuredHeight();
+            }
+            System.out.println("Remote video size=" + w + "x" + h);
+
+            /* Resize the remote video surface */
+            SurfaceView svRemoteVideo = findViewById(R.id.surfaceIncomingVideo);
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(w, h);
+            params.leftMargin = (w == videoLayout.getMeasuredWidth())? 0 : (videoLayout.getMeasuredWidth()-w)/2;
+            params.topMargin = 0;
+            svRemoteVideo.setLayoutParams(params);
+            svRemoteVideo.setVisibility(View.VISIBLE);
+
+            /* Put local preview always on top */
+            if (MainActivity.currentCall.vidPrevStarted) {
+                SurfaceView surfacePreview = findViewById(R.id.surfacePreviewCapture);
+                surfacePreview.setVisibility(View.VISIBLE);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void setupVideoPreviewLayout()
+    {
+        /* Resize the preview video surface */
+        try {
+            int w, h;
+            SurfaceView surfacePreview = findViewById(R.id.surfacePreviewCapture);
+            VideoWindowInfo vwi = MainActivity.currentCall.vidPrev.getVideoWindow().getInfo();
+            w = (int) vwi.getSize().getW();
+            h = (int) vwi.getSize().getH();
+
+            /* Adjust width to match the parent layout */
+            RelativeLayout videoLayout = findViewById(R.id.bottom_layout);
+            h = (int) ((double) videoLayout.getMeasuredWidth() / 2 / w * h);
+            w = videoLayout.getMeasuredWidth() / 2;
+
+            /* Also adjust height to match the parent layout */
+            if (h > videoLayout.getMeasuredHeight() / 2) {
+                w = (int) ((double) videoLayout.getMeasuredHeight() / 2 / h * w);
+                h = videoLayout.getMeasuredHeight() / 2;
+            }
+            System.out.println("Preview video size=" + w + "x" + h);
+
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(w, h);
+            params.leftMargin = videoLayout.getMeasuredWidth() - w;
+            params.topMargin = videoLayout.getMeasuredHeight() - h;
+            surfacePreview.setLayoutParams(params);
+            surfacePreview.setVisibility(View.VISIBLE);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
 }

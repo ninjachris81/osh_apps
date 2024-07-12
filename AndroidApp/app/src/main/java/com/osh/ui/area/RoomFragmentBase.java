@@ -240,8 +240,10 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
         DoubleValue value = (DoubleValue) serviceContext.getDatamodelService().getDatamodel().getValue(id);
         if (value != null) {
             value.addItemChangeListener(item -> {
-                roomViewModel.temperatures.get(index).set(item.getValue(-1.0));
-            }, true);
+                if (roomViewModel!=null) {
+                    roomViewModel.temperatures.get(index).set(item.getValue(-1.0));
+                }
+            }, true, () -> {return roomViewModel!=null;});
         } else {
             throw new RuntimeException("Sensor value not found: " + id);
         }
@@ -251,8 +253,10 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
         DoubleValue value = (DoubleValue) serviceContext.getDatamodelService().getDatamodel().getValue(id);
         if (value != null) {
             value.addItemChangeListener(item -> {
-                roomViewModel.humidities.get(index).set(item.getValue(-1.0));
-            }, true);
+                if (roomViewModel!=null) {
+                    roomViewModel.humidities.get(index).set(item.getValue(-1.0));
+                }
+            }, true, () -> { return roomViewModel!=null;});
         } else {
             throw new RuntimeException("Sensor value not found: " + id);
         }
@@ -263,8 +267,10 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
         BooleanValue value = (BooleanValue) serviceContext.getValueService().getValue(id);
         if (value != null) {
             value.addItemChangeListener(item -> {
-                roomViewModel.windowStates.get(index).set(item.getValue(false));
-            });
+                if (roomViewModel!=null) {
+                    roomViewModel.windowStates.get(index).set(item.getValue(false));
+                }
+            }, true, () -> {return roomViewModel!=null;});
         } else {
             throw new RuntimeException("Sensor value not found: " + id);
         }
@@ -274,8 +280,10 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
         DoubleValue value = (DoubleValue) serviceContext.getValueService().getValue(id);
         if (value != null) {
             value.addItemChangeListener(item -> {
-                roomViewModel.brightnesses.get(index).set(item.getValue(-1.0));
-            });
+                if (roomViewModel!=null) {
+                    roomViewModel.brightnesses.get(index).set(item.getValue(-1.0));
+                }
+            }, true, () -> { return roomViewModel!=null; });
         } else {
             throw new RuntimeException("Sensor value not found: " + id);
         }
@@ -286,11 +294,13 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
 
         if (value != null) {
             value.addItemChangeListener(item -> {
-                if (areaViewModel.currentOverlay.get() == AreaFragment.AreaOverlays.PRESENCE) {
-                    roomViewModel.roomPresences.get(index).set(item.getValue(false));
-                    //roomViewModel.backgroundVisible.set(item.getValue(false));
+                if (areaViewModel!=null && roomViewModel!=null) {
+                    if (areaViewModel.currentOverlay.get() == AreaFragment.AreaOverlays.PRESENCE) {
+                        roomViewModel.roomPresences.get(index).set(item.getValue(false));
+                        //roomViewModel.backgroundVisible.set(item.getValue(false));
+                    }
                 }
-            }, true);
+            }, true, () -> { return areaViewModel!=null && roomViewModel!=null; });
         } else {
             throw new RuntimeException("Sensor value not found: " + id);
         }
@@ -300,8 +310,10 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
         DigitalActor lightActor = (DigitalActor) serviceContext.getDatamodelService().getDatamodel().getActor(lightInfo.lightRelayId, lightInfo.lightRelayValueGroupId);
 
         lightActor.addItemChangeListener(isEnabled -> {
-            roomViewModel.lightStates.get(index).set(isEnabled.getValue(false));
-        }, true);
+            if (roomViewModel!=null) {
+                roomViewModel.lightStates.get(index).set(isEnabled.getValue(false));
+            }
+        }, true, () -> { return roomViewModel!=null;});
     }
 
     public RoomFragmentBase withShutter(String shutterValueGroupId, String shutterId, String shutterModeValueGroupId, String shutterModeId) {
@@ -319,11 +331,11 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
 
         shutterMode.addItemChangeListener(item -> {
             roomViewModel.shutterAutoModes.get(index).set(item.getValue(ShutterActor.SHUTTER_OPERATION_MODE_AUTO) == ShutterActor.SHUTTER_OPERATION_MODE_AUTO);
-        }, true);
+        }, true, () -> {return roomViewModel!=null; });
 
         shutterActor.addItemChangeListener(item -> {
             roomViewModel.shutterStates.get(index).set(item.getStateAsString());
-        }, true);
+        }, true, () -> {return roomViewModel!=null; });
 
         modeButton.setAutoClickListener(view -> {
             shutterMode.updateValue(shutterMode.getValue(ShutterActor.SHUTTER_OPERATION_MODE_AUTO) == ShutterActor.SHUTTER_OPERATION_MODE_AUTO ? ShutterActor.SHUTTER_OPERATION_MODE_MANUAL : ShutterActor.SHUTTER_OPERATION_MODE_AUTO);

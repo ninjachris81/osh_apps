@@ -24,9 +24,11 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.osh.activity.MainActivity;
 import com.osh.activity.OshApplication;
 import com.osh.activity.StatisticsActivity;
 import com.osh.databinding.FragmentWbb12Binding;
+import com.osh.service.IServiceContext;
 import com.osh.wbb12.service.IWBB12Service;
 
 import java.util.ArrayList;
@@ -35,23 +37,20 @@ public class WBB12Fragment extends Fragment {
 
     private FragmentWbb12Binding binding;
 
-    private final IWBB12Service wbb12Manager;
-
     private WBB12ViewModel wbb12ViewModel;
+    private IWBB12Service wbb12Service;
 
-    public WBB12Fragment(IWBB12Service wbb12Manager) {
-        this.wbb12Manager = wbb12Manager;
-    }
+    public WBB12Fragment() {
 
-    public static WBB12Fragment newInstance(IWBB12Service wbb12Manager) {
-        return new WBB12Fragment(wbb12Manager);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        wbb12ViewModel = new ViewModelProvider(this, new WBB12ViewModelFactory(wbb12Manager)).get(WBB12ViewModel.class);
+        wbb12Service = ((MainActivity) getActivity()).getWBB12Service();
+
+        wbb12ViewModel = new ViewModelProvider(this, new WBB12ViewModelFactory(wbb12Service)).get(WBB12ViewModel.class);
                 //new ViewModelProvider(this).get(WBB12ViewModel.class);
 
         binding = FragmentWbb12Binding.inflate(inflater, container, false);
@@ -63,7 +62,7 @@ public class WBB12Fragment extends Fragment {
         });
 
         binding.actionButton.setOnClickListener(view -> {
-            wbb12Manager.addWarmwaterPush();
+            wbb12Service.addWarmwaterPush();
         });
 
         View root = binding.getRoot();

@@ -30,8 +30,14 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="33">
         <activity
+            android:name=".activity.CallActivity"
+            android:exported="false"
+            android:label="@string/title_activity_call"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@style/Theme.OSH" />
+        <activity
             android:name=".activity.InitActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
 
@@ -41,6 +47,7 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

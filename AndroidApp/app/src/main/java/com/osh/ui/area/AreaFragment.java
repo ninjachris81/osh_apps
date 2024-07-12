@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.tabs.TabLayout;
 import com.osh.R;
+import com.osh.activity.MainActivity;
 import com.osh.databinding.FragmentAreaBinding;
 import com.osh.service.IActorService;
 import com.osh.service.IAudioActorService;
@@ -49,12 +50,7 @@ public class AreaFragment extends Fragment {
         DEVICES
     }
 
-    public AreaFragment(IServiceContext serviceContext) {
-        this.serviceContext = serviceContext;
-    }
-
-    public static AreaFragment newInstance(IServiceContext serviceContext) {
-        return new AreaFragment(serviceContext);
+    public AreaFragment() {
     }
 
     @Override
@@ -66,6 +62,8 @@ public class AreaFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+
+        serviceContext = ((MainActivity) getActivity()).getServiceContext();
 
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_area, container, false);
 

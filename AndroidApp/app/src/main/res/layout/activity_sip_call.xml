@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:id="@+id/parent">
 
-    <com.google.android.exoplayer2.ui.PlayerView
+    <androidx.media3.ui.PlayerView
         android:id="@+id/video_surface"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -120,7 +120,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <SurfaceView
-            android:id="@+id/svRemote"
+            android:id="@+id/surfaceIncomingVideo"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -129,7 +129,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <SurfaceView
-            android:id="@+id/svLocal"
+            android:id="@+id/surfacePreviewCapture"
             android:layout_width="90dp"
             android:layout_height="160dp"
             android:layout_marginEnd="50dp"

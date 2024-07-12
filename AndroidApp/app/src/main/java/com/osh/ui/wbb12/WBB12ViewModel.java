@@ -40,7 +40,7 @@ public class WBB12ViewModel extends ViewModel {
                 } else {
                     // TODO: error
                 }
-            }, true);
+            }, true, () -> {return liveData!=null;});
 
             data.add(liveData);
             dataLabels.add(wbb12Manager.getWBB12Value(key).getId());
@@ -52,7 +52,7 @@ public class WBB12ViewModel extends ViewModel {
             wbb12Consumption.postValue(cons.getValue(0));
             cons.addItemChangeListener(item -> {
                 wbb12Consumption.postValue(item.getValue(0));
-            }, true);
+            }, true, () -> {return wbb12Consumption!=null;});
         }
     }
 

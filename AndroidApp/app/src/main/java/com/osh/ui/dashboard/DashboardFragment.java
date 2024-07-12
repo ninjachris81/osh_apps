@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.osh.activity.MainActivity;
 import com.osh.databinding.FragmentDashboardBinding;
 import com.osh.service.IDatamodelService;
 import com.osh.service.IServiceContext;
@@ -18,7 +19,10 @@ public class DashboardFragment extends Fragment {
 
     private FragmentDashboardBinding binding;
 
-    private final IServiceContext serviceContext;
+    private IServiceContext serviceContext;
+
+    public DashboardFragment() {
+    }
 
     public DashboardFragment(IServiceContext serviceContext) {
         this.serviceContext = serviceContext;
@@ -30,6 +34,8 @@ public class DashboardFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        serviceContext = ((MainActivity) getActivity()).getServiceContext();
+
         DashboardViewModel dashboardViewModel = new ViewModelProvider(this, new DashboardViewModelFactory(serviceContext.getValueService())).get(DashboardViewModel.class);
 
         binding = FragmentDashboardBinding.inflate(inflater, container, false);

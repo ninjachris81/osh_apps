@@ -3,6 +3,7 @@ package com.osh.value;
 import com.osh.SerializableIdentifyable;
 import com.osh.datamodel.ItemMetaInfo;
 import com.osh.utils.IItemChangeListener;
+import com.osh.utils.IObservableGuard;
 import com.osh.utils.IObservableItem;
 import com.osh.utils.IObservableListenerHolder;
 import com.osh.utils.IObservableManager;
@@ -158,16 +159,31 @@ public abstract class ValueBase<VALUE_TYPE extends ValueBase, NATIVE_TYPE> exten
 	}
 
 	@Override
-	public void addItemChangeListener(IItemChangeListener<VALUE_TYPE> listener) {
-		observableManager.addItemChangeListener(listener);
+	public IItemChangeListener<VALUE_TYPE> addItemChangeListener(IItemChangeListener<VALUE_TYPE> listener) {
+		return observableManager.addItemChangeListener(listener);
 	}
 
 	@Override
-	public void addItemChangeListener(IItemChangeListener<VALUE_TYPE> listener, boolean fireOnConnect) {
-		addItemChangeListener(listener);
+	public IItemChangeListener<VALUE_TYPE> addItemChangeListener(IItemChangeListener<VALUE_TYPE> listener, boolean fireOnConnect) {
+		IItemChangeListener<VALUE_TYPE> returnVal = observableManager.addItemChangeListener(listener, fireOnConnect);
 		if (fireOnConnect) {
 			itemChanged();
 		}
+		return returnVal;
+	}
+
+	@Override
+	public IItemChangeListener<VALUE_TYPE> addItemChangeListener(IItemChangeListener<VALUE_TYPE> listener, boolean fireOnConnect, IObservableGuard guard) {
+		IItemChangeListener<VALUE_TYPE> returnVal = observableManager.addItemChangeListener(listener, fireOnConnect, guard);
+		if (fireOnConnect) {
+			itemChanged();
+		}
+		return returnVal;
+	}
+
+	@Override
+	public void removeItemChangeListener(IItemChangeListener<VALUE_TYPE> listener) {
+		observableManager.removeItemChangeListener(listener);
 	}
 
 	public boolean isPersistValue() {

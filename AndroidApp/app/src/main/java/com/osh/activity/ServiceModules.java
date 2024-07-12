@@ -76,13 +76,17 @@ public class ServiceModules {
     @Singleton
     static IDatamodelService provideDatamodelService(ICommunicationService communicationService, IDatabaseService databaseService, IValueService valueService, IActorService actorService) {
         try {
-            return service.submit(() -> {
+            IDatamodelService returnService = service.submit(() -> {
                 try {
-                    return new DatamodelServiceImpl(communicationService, databaseService, valueService, actorService);
+                    return new DatamodelServiceImpl(databaseService, valueService, actorService);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
             }).get();
+
+            communicationService.datamodelReady();
+
+            return returnService;
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {

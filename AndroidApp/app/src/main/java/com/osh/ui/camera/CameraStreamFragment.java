@@ -9,14 +9,16 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.media3.common.MediaItem;
+import androidx.media3.common.util.UnstableApi;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.rtsp.RtspMediaSource;
+import androidx.media3.exoplayer.source.MediaSource;
 
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.rtsp.RtspMediaSource;
 import com.osh.camera.config.CameraSource;
 import com.osh.databinding.FragmentCameraDetailsBinding;
 
@@ -43,6 +45,7 @@ public class CameraStreamFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    @OptIn(markerClass = UnstableApi.class)
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
