@@ -10,6 +10,12 @@
         app:showAsAction="never"
         android:title="@string/settings" />
 
+    <item
+        android:id="@+id/exitapp"
+        android:title="@string/exitapp"
+        app:materialIcon="exit_to_app"
+        app:showAsAction="never" />
+
     <item android:id="@+id/sip_connected_state_icon"
         android:title=""
         app:materialIcon="phone"

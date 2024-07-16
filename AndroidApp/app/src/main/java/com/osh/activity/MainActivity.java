@@ -455,7 +455,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         }, true, () -> {return dbConnectedStateIcon!=null;});
 
         dbConnectedStateIcon.setOnMenuItemClickListener(item -> {
-            runOnUiThread(() -> {
                 new AlertDialog.Builder(this)
                         .setTitle("Reset database")
                         .setMessage("Reset local database ?")
@@ -466,7 +465,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                         })
                         .setNegativeButton(android.R.string.no, null)
                         .show();
-            });
             return true;
         });
 
@@ -486,6 +484,17 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         if (item.getItemId() == R.id.menu_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
+            return true;
+        } else if (item.getItemId() == R.id.exitapp) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Exit app")
+                    .setMessage("Exit app ?")
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                        finishAndRemoveTask();
+                        System.exit(0);
+                    })
+                    .setNegativeButton(android.R.string.no, null)
+                    .show();
             return true;
         } else {
             return super.onOptionsItemSelected(item);

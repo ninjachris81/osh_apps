@@ -1,245 +1,237 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.home.HomeFragment">
 
-    <GridLayout
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="homeData"
+            type="com.osh.ui.home.HomeViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:columnCount="2"
-        android:rowCount="2">
+        tools:context=".ui.home.HomeFragment">
 
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:columnCount="2"
+            android:rowCount="2">
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:layout_gravity="fill"
-            android:layout_margin="10dp"
-            android:padding="5dp"
-            app:cardBackgroundColor="@color/seek_bar_background"
-            app:cardCornerRadius="4dp"
-            app:cardElevation="6dp">
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <com.ncorti.slidetoact.SlideToActView
-                    android:id="@+id/unlockDoorSlider"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:border_radius="2dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:outer_color="@color/design_default_color_primary"
-                    app:slider_height="50dp"
-                    app:text="Unlock Front Door"
-                    app:text_style="bold" />
-
-                <!--
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnUnlockDoor"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:text="Unlock Front Door"
-                    />
-                    -->
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnFrontCamera"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Front Door Camera"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </androidx.appcompat.widget.LinearLayoutCompat>
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:layout_gravity="fill"
-            android:layout_margin="10dp"
-            app:cardBackgroundColor="@color/seek_bar_background"
-            app:cardCornerRadius="4dp"
-            app:cardElevation="6dp">
-
-            <GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:useDefaultMargins="true"
-                android:padding="1dp"
-                android:columnCount="3"
-                android:rowCount="3">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/currentMode"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_gravity="fill"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    app:icon="@drawable/cloud_question_outline"
-                    app:iconGravity="textTop"
-                    app:iconSize="70dp"
-                    app:iconPadding="0dp"
-                    android:clickable="false"
-                    android:inputType="text"
-                    />
-
-                <androidx.cardview.widget.CardView
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_gravity="fill"
-                    app:cardBackgroundColor="@color/design_default_color_primary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="4dp"
-                    >
-
-
-                    <com.github.mikephil.charting.charts.PieChart
-                        android:id="@+id/batteryState"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                         />
-                </androidx.cardview.widget.CardView>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/currentTrend"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_gravity="fill"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    app:icon="@drawable/cloud_question_outline"
-                    app:iconGravity="textTop"
-                    app:iconSize="70dp"
-                    app:iconPadding="0dp"
-                    android:clickable="false"
-                    android:inputType="text"
-                    />
-
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/powerConsumption"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_gravity="fill"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    app:icon="@drawable/home_lightning_bolt_outline"
-                    app:iconGravity="textTop"
-                    app:iconSize="70dp"
-                    app:iconPadding="0dp"
-                    android:clickable="false"
-                    android:inputType="text"
-                    />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/test2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_gravity="fill"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    app:iconGravity="textStart"
-                    app:iconSize="96dp"
-                    app:iconPadding="0dp"
-                    android:clickable="false"
-                    />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/test3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_gravity="fill"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    app:iconGravity="textStart"
-                    app:iconSize="96dp"
-                    app:iconPadding="0dp"
-                    android:clickable="false"
-                    />
-
-            </GridLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:layout_gravity="fill"
-            android:layout_margin="10dp"
-            app:cardBackgroundColor="@color/seek_bar_background"
-            app:cardCornerRadius="4dp"
-            app:cardElevation="6dp">
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:layout_gravity="fill"
-            android:layout_margin="10dp"
-            app:cardBackgroundColor="@color/seek_bar_background"
-            app:cardCornerRadius="4dp"
-            app:cardElevation="6dp">
-
-
-            <GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:useDefaultMargins="true"
-                android:padding="1dp"
-                android:columnCount="3"
-                android:rowCount="3">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/dishwasherInfos"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                app:icon="@drawable/cloud_question_outline"
-                app:iconGravity="textTop"
-                app:iconSize="70dp"
-                app:iconPadding="0dp"
-                android:clickable="false"
-                android:inputType="text"
-                />
+                android:layout_margin="10dp"
+                android:padding="5dp"
+                app:cardBackgroundColor="@color/seek_bar_background"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="6dp">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <com.ncorti.slidetoact.SlideToActView
+                        android:id="@+id/unlockDoorSlider"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:border_radius="2dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:outer_color="@color/design_default_color_primary"
+                        app:slider_height="50dp"
+                        app:text="Unlock Front Door"
+                        app:text_style="bold" />
+
+                    <!--
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnUnlockDoor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:text="Unlock Front Door"
+                        />
+                        -->
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFrontCamera"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Front Door Camera"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:layout_margin="10dp"
+                app:cardBackgroundColor="@color/seek_bar_background"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="6dp">
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:useDefaultMargins="true"
+                    android:padding="1dp"
+                    android:columnCount="3"
+                    android:rowCount="3">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/currentMode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:icon="@{homeData.currentModeIcon}"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:inputType="text"
+                        android:text="@{homeData.currentModeText}"
+                        />
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        app:cardBackgroundColor="@color/design_default_color_primary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="4dp"
+                        >
+
+
+                        <com.github.mikephil.charting.charts.PieChart
+                            android:id="@+id/batteryState"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                             />
+                    </androidx.cardview.widget.CardView>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/currentTrend"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:icon="@{homeData.currentTrendIcon}"
+                        app:iconTint="@{homeData.currentTrendIconTint}"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:inputType="text"
+
+                        />
+
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/powerConsumption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:icon="@drawable/home_lightning_bolt_outline"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:inputType="text"
+                        android:text="@{homeData.powerConsumptionText}"
+                        />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/test2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:iconGravity="textStart"
+                        app:iconSize="96dp"
+                        app:iconPadding="0dp"
+                        android:clickable="false"
+                        />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/test3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:iconGravity="textStart"
+                        app:iconSize="96dp"
+                        app:iconPadding="0dp"
+                        android:clickable="false"
+                        />
+
+                </GridLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:layout_margin="10dp"
+                app:cardBackgroundColor="@color/seek_bar_background"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="6dp">
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:layout_margin="10dp"
+                app:cardBackgroundColor="@color/seek_bar_background"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="6dp">
+
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:useDefaultMargins="true"
+                    android:padding="1dp"
+                    android:columnCount="3"
+                    android:rowCount="3">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/washingmachine"
+                    android:id="@+id/dishwasherInfos"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_rowWeight="1"
@@ -247,40 +239,9 @@
                     android:layout_gravity="fill"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
-                    app:icon="@drawable/cloud_question_outline"
-                    app:iconGravity="textTop"
-                    app:iconSize="70dp"
-                    app:iconPadding="0dp"
-                    android:clickable="false"
-                    />
-
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/app3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_gravity="fill"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    app:icon="@drawable/cloud_question_outline"
-                    app:iconGravity="textTop"
-                    app:iconSize="70dp"
-                    app:iconPadding="0dp"
-                    android:clickable="false"
-                    />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/washingMachineInfos"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_gravity="fill"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    app:icon="@drawable/cloud_question_outline"
+                    app:icon="@{homeData.homeApplianceIcons[0]}"
+                    app:iconTint="@{homeData.homeApplianceIconTints[0]}"
+                    android:text="@{homeData.homeApplianceTexts[0]}"
                     app:iconGravity="textTop"
                     app:iconSize="70dp"
                     app:iconPadding="0dp"
@@ -288,41 +249,96 @@
                     android:inputType="text"
                     />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/app5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_gravity="fill"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    app:icon="@drawable/cloud_question_outline"
-                    app:iconGravity="textTop"
-                    app:iconSize="70dp"
-                    app:iconPadding="0dp"
-                    android:clickable="false"
-                    />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/washingmachine"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:icon="@{homeData.homeApplianceIcons[1]}"
+                        app:iconTint="@{homeData.homeApplianceIconTints[1]}"
+                        android:text="@{homeData.homeApplianceTexts[1]}"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:clickable="false"
+                        />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/app6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_gravity="fill"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    app:icon="@drawable/cloud_question_outline"
-                    app:iconGravity="textTop"
-                    app:iconSize="70dp"
-                    app:iconPadding="0dp"
-                    android:clickable="false"
-                    />
 
-            </GridLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/app3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:icon="@drawable/cloud_question_outline"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:clickable="false"
+                        />
 
-        </androidx.cardview.widget.CardView>
-    </GridLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/app4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:icon="@drawable/cloud_question_outline"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:clickable="false"
+                        android:inputType="text"
+                        />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/app5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:icon="@drawable/cloud_question_outline"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:clickable="false"
+                        />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/app6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:icon="@drawable/cloud_question_outline"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:clickable="false"
+                        />
+
+                </GridLayout>
+
+            </androidx.cardview.widget.CardView>
+        </GridLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</layout>

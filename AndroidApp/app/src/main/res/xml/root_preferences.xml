@@ -35,7 +35,7 @@
     <PreferenceCategory android:title="Database">
 
         <EditTextPreference
-            android:defaultValue="192.168.177.1"
+            android:defaultValue="localhost"
             android:key="@string/db_host"
             app:useSimpleSummaryProvider="true"
             android:selectAllOnFocus="true"
@@ -134,31 +134,36 @@
             app:title="@string/camera_ftp_host"
             app:useSimpleSummaryProvider="true" />
         <EditTextPreference
-            app:defaultValue="ftp"
+            app:defaultValue="ftp_user"
             app:key="@string/front_door_camera_ftp_username_key"
             app:title="@string/camera_ftp_username"
             app:useSimpleSummaryProvider="true" />
         <EditTextPreference
-            app:defaultValue="ftp"
+            app:defaultValue="test"
             app:key="@string/front_door_camera_ftp_password_key"
             app:title="@string/camera_ftp_password"
             app:useSimpleSummaryProvider="true" />
         <EditTextPreference
-            app:defaultValue="/home/pi"
+            app:defaultValue="/var/ftp_data"
             app:key="@string/front_door_camera_ftp_remote_dir_key"
             app:title="@string/camera_ftp_remote_dir"
             app:useSimpleSummaryProvider="true" />
+        <PreferenceCategory app:title="@string/grafana_settings">
+
+            <EditTextPreference
+                app:defaultValue="http://localhost:3000/grafana"
+                app:key="@string/grafana_wbb12_url_key"
+                app:title="@string/grafana_wbb12_url"
+                app:useSimpleSummaryProvider="true" />
+
+            <EditTextPreference
+                app:defaultValue="http://localhost:3000/grafana"
+                app:key="@string/grafana_energy_url_key"
+                app:title="@string/grafana_energy_url"
+                app:useSimpleSummaryProvider="true" />
+
+        </PreferenceCategory>
     </PreferenceCategory>
-    </PreferenceCategory>
-
-    <PreferenceCategory app:title="@string/grafana_settings">
-
-        <EditTextPreference
-            app:defaultValue="http://localhost:3000/grafana"
-            app:key="@string/grafana_wbb12_url_key"
-            app:title="@string/grafana_wbb12_url"
-            app:useSimpleSummaryProvider="true" />
-
     </PreferenceCategory>
 
 </PreferenceScreen>

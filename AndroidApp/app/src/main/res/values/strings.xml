@@ -179,5 +179,8 @@
     <string name="sip_ring_volume_key">sip_ring_volume_key</string>
     <string name="sip_ring_volume">Ring Volume</string>
     <string name="title_activity_call">CallActivity</string>
+    <string name="exitapp">Exit</string>
+    <string name="grafana_energy_url_key">Energy URL</string>
+    <string name="grafana_energy_url">Energy URL</string>
 
 </resources>
