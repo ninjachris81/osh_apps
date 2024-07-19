@@ -63,10 +63,6 @@
     <string name="user_id_key">user_id_key</string>
     <string name="user_id">User ID</string>
     <string name="user_settings">User Settings</string>
-    <string name="front_door_camera_id_key">front_door_camera_id_key</string>
-    <string name="front_door_stream_uri_key">front_door_stream_uri_key</string>
-    <string name="camera_id">Camera ID</string>
-    <string name="front_door_camera_settings">Front Door</string>
     <string name="camera_settings">Camera Settings</string>
     <string name="camera_stream_url">Stream URI</string>
     <string name="title_activity_camera_details">Front Door Camera</string>
@@ -74,6 +70,39 @@
     <string name="tab_pic_surveillance">Surveillance</string>
     <string name="tab_ring_surveillance">Door Ring</string>
     <string name="title_activity_sip_call">Call</string>
+    <string name="camera_id">Camera ID</string>
+    <string name="camera1_settings">Front Door</string>
+    <string name="camera1_id_key">camera_id_key</string>
+    <string name="camera1_stream_uri_key">camera_stream_uri_key</string>
+    <string name="camera1_ftp_id_key">camera_ftp_id_key</string>
+    <string name="camera1_ftp_host_key">camera_ftp_host_key</string>
+    <string name="camera1_ftp_username_key">camera_ftp_username_key</string>
+    <string name="camera1_ftp_password_key">camera_ftp_password_key</string>
+    <string name="camera1_ftp_remote_dir_key">camera_ftp_remote_dir_key</string>
+    <string name="camera2_settings">Wintergarden</string>
+    <string name="camera2_id_key">camera2_id_key</string>
+    <string name="camera2_stream_uri_key">camera2_stream_uri_key</string>
+    <string name="camera2_ftp_id_key">camera2_ftp_id_key</string>
+    <string name="camera2_ftp_host_key">camera2_ftp_host_key</string>
+    <string name="camera2_ftp_username_key">camera2_ftp_username_key</string>
+    <string name="camera2_ftp_password_key">camera2_ftp_password_key</string>
+    <string name="camera2_ftp_remote_dir_key">camera2_ftp_remote_dir_key</string>
+    <string name="camera_ftp_host">FTP Host</string>
+    <string name="camera_ftp_username">FTP Username</string>
+    <string name="camera_ftp_password">FTP Password</string>
+    <string name="camera_ftp_remote_dir">FTP Remote Dir</string>
+    <string name="title_wbb12">WBB12</string>
+    <string name="grafana_settings">Grafana</string>
+    <string name="grafana_wbb12_url">WBB12 URL</string>
+    <string name="grafana_wbb12_url_key">grafana_wbb12_url_key</string>
+    <string name="sip_ring_volume_key">sip_ring_volume_key</string>
+    <string name="sip_ring_volume">Ring Volume</string>
+    <string name="title_activity_call">CallActivity</string>
+    <string name="exitapp">Exit</string>
+    <string name="grafana_energy_url_key">Energy URL</string>
+    <string name="grafana_energy_url">Energy URL</string>
+
+
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
@@ -163,24 +192,5 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
-    <string name="front_door_camera_ftp_id_key">front_door_camera_ftp_id_key</string>
-    <string name="front_door_camera_ftp_host_key">front_door_camera_ftp_host_key</string>
-    <string name="camera_ftp_host">FTP Host</string>
-    <string name="front_door_camera_ftp_username_key">front_door_camera_ftp_username_key</string>
-    <string name="camera_ftp_username">FTP Username</string>
-    <string name="front_door_camera_ftp_password_key">front_door_camera_ftp_password_key</string>
-    <string name="camera_ftp_password">FTP Password</string>
-    <string name="front_door_camera_ftp_remote_dir_key">front_door_camera_ftp_remote_dir_key</string>
-    <string name="camera_ftp_remote_dir">FTP Remote Dir</string>
-    <string name="title_wbb12">WBB12</string>
-    <string name="grafana_settings">Grafana</string>
-    <string name="grafana_wbb12_url">WBB12 URL</string>
-    <string name="grafana_wbb12_url_key">grafana_wbb12_url_key</string>
-    <string name="sip_ring_volume_key">sip_ring_volume_key</string>
-    <string name="sip_ring_volume">Ring Volume</string>
-    <string name="title_activity_call">CallActivity</string>
-    <string name="exitapp">Exit</string>
-    <string name="grafana_energy_url_key">Energy URL</string>
-    <string name="grafana_energy_url">Energy URL</string>
 
 </resources>

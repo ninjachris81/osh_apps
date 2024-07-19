@@ -28,47 +28,59 @@
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
                 android:layout_margin="10dp"
-                android:padding="5dp"
                 app:cardBackgroundColor="@color/seek_bar_background"
                 app:cardCornerRadius="4dp"
                 app:cardElevation="6dp">
 
-                <androidx.appcompat.widget.LinearLayoutCompat
+                <GridLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="horizontal"
+                    android:useDefaultMargins="true"
+                    android:padding="1dp"
+                    android:columnCount="2"
+                    android:rowCount="2">
+
 
                     <com.ncorti.slidetoact.SlideToActView
                         android:id="@+id/unlockDoorSlider"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:layout_columnSpan="2"
                         app:border_radius="2dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
                         app:outer_color="@color/design_default_color_primary"
-                        app:slider_height="50dp"
                         app:text="Unlock Front Door"
                         app:text_style="bold" />
 
-                    <!--
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnUnlockDoor"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        android:text="Unlock Front Door"
-                        />
-                        -->
-
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnFrontCamera"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Front Door Camera"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-                </androidx.appcompat.widget.LinearLayoutCompat>
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="Front\nDoor"
+                        app:iconSize="70dp"
+                        />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBackCamera"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="Garden"
+                        app:iconSize="70dp"
+                        />
+                </GridLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
@@ -141,7 +153,6 @@
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
                         android:inputType="text"
-
                         />
 
 
@@ -154,7 +165,7 @@
                         android:layout_gravity="fill"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        app:icon="@drawable/home_lightning_bolt_outline"
+                        app:icon="@drawable/ic_home_lightning_bolt_outline"
                         app:iconGravity="textTop"
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
@@ -162,35 +173,75 @@
                         android:text="@{homeData.powerConsumptionText}"
                         />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/test2"
+                    <androidx.cardview.widget.CardView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_rowWeight="1"
                         android:layout_columnWeight="1"
+                        android:layout_columnSpan="2"
                         android:layout_gravity="fill"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        app:iconGravity="textStart"
-                        app:iconSize="96dp"
-                        app:iconPadding="0dp"
-                        android:clickable="false"
-                        />
+                        app:cardBackgroundColor="@color/design_default_color_primary"
+                        app:cardCornerRadius="4dp"
+                        >
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/test3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_rowWeight="1"
-                        android:layout_columnWeight="1"
-                        android:layout_gravity="fill"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        app:iconGravity="textStart"
-                        app:iconSize="96dp"
-                        app:iconPadding="0dp"
-                        android:clickable="false"
-                        />
+                        <LinearLayout
+                            android:id="@+id/weatherForecast"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/weatherToday"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                app:iconGravity="textTop"
+                                app:iconSize="60dp"
+                                app:iconPadding="0dp"
+                                android:clickable="false"
+                                android:inputType="text"
+                                app:icon="@{homeData.weatherTodayIcon}"
+                                android:text="@{homeData.weatherTempToday}"
+                                />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/weatherTomorrow"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                app:iconGravity="textTop"
+                                app:iconSize="60dp"
+                                app:iconPadding="0dp"
+                                android:clickable="false"
+                                android:inputType="text"
+                                app:icon="@{homeData.weatherTomorrowIcon}"
+                                android:text="@{homeData.weatherTempTomorrow}"
+                                />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/weatherTomorrow2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                app:iconGravity="textTop"
+                                app:iconSize="60dp"
+                                app:iconPadding="0dp"
+                                android:clickable="false"
+                                android:inputType="text"
+                                app:icon="@{homeData.weatherTomorrow2Icon}"
+                                android:text="@{homeData.weatherTempTomorrow2}"
+                                />
+
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
 
                 </GridLayout>
 
@@ -265,6 +316,7 @@
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
                         android:clickable="false"
+                        android:inputType="text"
                         />
 
 
@@ -277,11 +329,12 @@
                         android:layout_gravity="fill"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        app:icon="@drawable/cloud_question_outline"
+                        app:icon="@drawable/ic_cloud_question_outline"
                         app:iconGravity="textTop"
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
                         android:clickable="false"
+                        android:inputType="text"
                         />
 
                     <com.google.android.material.button.MaterialButton
@@ -293,7 +346,7 @@
                         android:layout_gravity="fill"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        app:icon="@drawable/cloud_question_outline"
+                        app:icon="@drawable/ic_cloud_question_outline"
                         app:iconGravity="textTop"
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
@@ -310,11 +363,12 @@
                         android:layout_gravity="fill"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        app:icon="@drawable/cloud_question_outline"
+                        app:icon="@drawable/ic_cloud_question_outline"
                         app:iconGravity="textTop"
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
                         android:clickable="false"
+                        android:inputType="text"
                         />
 
                     <com.google.android.material.button.MaterialButton
@@ -326,11 +380,12 @@
                         android:layout_gravity="fill"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        app:icon="@drawable/cloud_question_outline"
+                        app:icon="@drawable/ic_cloud_question_outline"
                         app:iconGravity="textTop"
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
                         android:clickable="false"
+                        android:inputType="text"
                         />
 
                 </GridLayout>

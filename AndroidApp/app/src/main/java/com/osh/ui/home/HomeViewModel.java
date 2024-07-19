@@ -12,6 +12,7 @@ import android.icu.util.MeasureUnit;
 import android.media.MediaPlayer;
 
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.databinding.ObservableDouble;
 import androidx.databinding.ObservableField;
 import androidx.lifecycle.ViewModel;
 
@@ -20,11 +21,13 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.osh.R;
+import com.osh.log.LogFacade;
 import com.osh.service.IServiceContext;
 import com.osh.utils.OshValueFormats;
 import com.osh.value.DoubleValue;
 import com.osh.value.EnumValue;
 import com.osh.value.IntegerValue;
+import com.osh.value.StringValue;
 import com.osh.value.enums.EnergyMode;
 import com.osh.value.enums.EnergyTrend;
 import com.osh.value.enums.HomeConnectOperationalState;
@@ -38,6 +41,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class HomeViewModel extends ViewModel {
+
+    private static final String TAG = HomeViewModel.class.getName();
 
     private final IBatteryDataChangeListener batteryDataChangeListener;
     public String batteryText = "...";
@@ -58,6 +63,14 @@ public class HomeViewModel extends ViewModel {
     public final ObservableField<Drawable> currentTrendIcon = new ObservableField<>();
     public final ObservableField<ColorStateList> currentTrendIconTint = new ObservableField<>();
 
+    public final ObservableField<Drawable> weatherTodayIcon = new ObservableField<>();
+    public final ObservableField<Drawable> weatherTomorrowIcon = new ObservableField<>();
+    public final ObservableField<Drawable> weatherTomorrow2Icon = new ObservableField<>();
+
+    public final ObservableField<String> weatherTempToday = new ObservableField<>();
+    public final ObservableField<String> weatherTempTomorrow = new ObservableField<>();
+    public final ObservableField<String> weatherTempTomorrow2 = new ObservableField<>();
+
     private final MediaPlayer finishedSound;
 
     public final ObservableField<String> powerConsumptionText = new ObservableField<>();
@@ -68,13 +81,12 @@ public class HomeViewModel extends ViewModel {
     private double lastBatteryPower = 0;
     private double lastGeneratorPower = 0;
 
-    private double lastTrendDetail = 0;
-
     private List<Integer> homeAppliances = new ArrayList<>();
     private Map<Integer, Integer> lastRemainingSec = new ConcurrentHashMap<>();
     private Map<Integer, HomeConnectOperationalState> lastOperationState = new ConcurrentHashMap<>();
 
     private static LocalizedNumberFormatter kiloWattsFormatter = NumberFormatter.withLocale(Locale.ENGLISH).unit(MeasureUnit.KILOWATT).notation(Notation.compactShort()).precision(Precision.fixedFraction(1));
+    private static LocalizedNumberFormatter tempFormatter = NumberFormatter.withLocale(Locale.ENGLISH).unit(MeasureUnit.CELSIUS).notation(Notation.compactShort()).precision(Precision.integer());
 
     private static final int COLOR_ORANGE = Color.parseColor("#ffa500");
 
@@ -93,6 +105,108 @@ public class HomeViewModel extends ViewModel {
         setupHomeAppliances();
         setupConsumption();
         setupTrend();
+        setupWeather();
+    }
+
+    private void setupWeather() {
+        StringValue descToday = (StringValue) serviceContext.getValueService().getValue("weather.descToday");
+        descToday.addItemChangeListener(item -> {
+            setWeatherIcon(item.getValue(""), weatherTodayIcon);
+        }, true, () -> {return this!=null;});
+
+        StringValue descTomorrow = (StringValue) serviceContext.getValueService().getValue("weather.descTomorrow");
+        descTomorrow.addItemChangeListener(item -> {
+            setWeatherIcon(item.getValue(""), weatherTomorrowIcon);
+        }, true, () -> {return this!=null;});
+
+        StringValue descTomorrow2 = (StringValue) serviceContext.getValueService().getValue("weather.descTomorrow2");
+        descTomorrow2.addItemChangeListener(item -> {
+            setWeatherIcon(item.getValue(""), weatherTomorrow2Icon);
+        }, true, () -> {return this!=null;});
+
+
+        DoubleValue tempToday = (DoubleValue) serviceContext.getValueService().getValue("weather.tempToday");
+        tempToday.addItemChangeListener(item -> {
+            weatherTempToday.set(tempFormatter.format(item.getValue(Double.valueOf(0))).toString());
+        }, true, () -> {return this!=null;});
+
+        DoubleValue tempTomorrow = (DoubleValue) serviceContext.getValueService().getValue("weather.tempTomorrow");
+        tempTomorrow.addItemChangeListener(item -> {
+            weatherTempTomorrow.set(tempFormatter.format(item.getValue(Double.valueOf(0))).toString());
+        }, true, () -> {return this!=null;});
+
+        DoubleValue tempTomorrow2 = (DoubleValue) serviceContext.getValueService().getValue("weather.tempTomorrow2");
+        tempTomorrow2.addItemChangeListener(item -> {
+            weatherTempTomorrow2.set(tempFormatter.format(item.getValue(Double.valueOf(0))).toString());
+        }, true, () -> {return this!=null;});
+
+    }
+
+    private void setWeatherIcon(String weatherCondition, ObservableField<Drawable> icon) {
+        String desc = weatherCondition.toLowerCase();
+
+        if ((desc.equals("sky clear") || desc.equals("sky is clear"))) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_white_balance_sunny));
+        } else if (desc.equals("few clouds")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_partly_cloudy));
+        } else if (desc.equals("scattered clouds")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_cloudy));
+        } else if (desc.equals("broken clouds") || desc.equals("overcast clouds")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_clouds));
+        } else if (desc.equals("shower rain")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_partly_rainy));
+        } else if (
+                desc.equals("rain") ||
+                desc.equals("light rain") ||
+                desc.equals("moderate rain") ||
+                desc.equals("heavy intensity rain") ||
+                desc.equals("light intensity shower rain") ||
+                desc.equals("shower rain") ||
+                desc.equals("heavy intensity shower rain") ||
+                desc.equals("ragged shower rain") ||
+                desc.contains("drizzle")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_rainy));
+        } else if (desc.equals("very heavy rain") || desc.equals("extreme rain") || desc.equals("moderate rain") || desc.equals("heavy intensity rain")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_pouring));
+        } else if (desc.equals("freezing rain") || desc.equals("light rain and snow") || desc.equals("rain and snow")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_snowflake_melt));
+        } else if (
+                desc.equals("light snow") ||
+                desc.equals("snow") ||
+                desc.equals("sleet") ||
+                desc.equals("light shower sleet") ||
+                desc.equals("shower sleet") ||
+                desc.equals("light shower snow") ||
+                desc.equals("shower snow") ||
+                desc.equals("snow")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_snowy));
+        } else if (desc.equals("heavy snow") || desc.equals("heavy shower snow")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_snowy_heavy));
+        } else if (
+                desc.equals("mist") ||
+                desc.equals("smoke") ||
+                desc.equals("haze") ||
+                desc.equals("sand/dust whirls") ||
+                desc.equals("fog") ||
+                desc.equals("sand") ||
+                desc.equals("sand") ||
+                desc.equals("sand") ||
+                desc.equals("sand") ||
+                desc.equals("sand") ||
+                desc.equals("mist")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_fog));
+        } else if (desc.equals("dust")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_dust));
+        } else if (desc.equals("volcanic ash")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_volcano_outline));
+        } else if (desc.equals("squalls") || desc.equals("tornado")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_tornado));
+        } else if (desc.contains("thunderstorm")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_lightning_rainy));
+        } else {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_cloud_question_outline));
+            LogFacade.w(TAG, "Unknown weather: " + desc);
+        }
     }
 
     private void setupTrend() {
@@ -101,15 +215,15 @@ public class HomeViewModel extends ViewModel {
             EnergyTrend mode = EnergyTrend.values()[item.getValue(0)];
                 switch(mode) {
                     case POSITIVE:
-                        currentTrendIcon.set(AppCompatResources.getDrawable(context, R.drawable.arrow_top_right_thick));
+                        currentTrendIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_arrow_top_right_thick));
                         currentTrendIconTint.set(ColorStateList.valueOf(Color.GREEN));
                         break;
                     case NEUTRAL:
-                        currentTrendIcon.set(AppCompatResources.getDrawable(context, R.drawable.arrow_right_thick));
+                        currentTrendIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_arrow_right_thick));
                         currentTrendIconTint.set(ColorStateList.valueOf(COLOR_ORANGE));
                         break;
                     case NEGATIVE:
-                        currentTrendIcon.set(AppCompatResources.getDrawable(context, R.drawable.arrow_bottom_right_thick));
+                        currentTrendIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_arrow_bottom_right_thick));
                         currentTrendIconTint.set(ColorStateList.valueOf(Color.RED));
                         break;
                 }
@@ -178,7 +292,7 @@ public class HomeViewModel extends ViewModel {
     }
 
     private void setupCurrentMode() {
-        currentModeIcon.set(AppCompatResources.getDrawable(context, R.drawable.cloud_question_outline));
+        currentModeIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_cloud_question_outline));
 
         EnumValue currentModeValue = (EnumValue) serviceContext.getValueService().getValue("energy.currentMode");
         currentModeValue.addItemChangeListener(item -> {
@@ -189,12 +303,12 @@ public class HomeViewModel extends ViewModel {
                         currentModeText.set(kiloWattsFormatter.format(Double.valueOf(lastGeneratorPower / 1000)).toString());
                         break;
                     case MAINLY_GRID:
-                        currentModeIcon.set(AppCompatResources.getDrawable(context, R.drawable.transmission_tower));
+                        currentModeIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_transmission_tower));
                         currentModeText.set(kiloWattsFormatter.format(Double.valueOf(lastGridPower / 1000)).toString());
                         break;
                     case MAINLY_BATTERY:
                         // TODO: change symbol according to state
-                        currentModeIcon.set(AppCompatResources.getDrawable(context, R.drawable.battery_50));
+                        currentModeIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_battery_50));
                         currentModeText.set(kiloWattsFormatter.format(Double.valueOf(lastBatteryPower / 1000)).toString());
                         break;
                 }
@@ -207,15 +321,15 @@ public class HomeViewModel extends ViewModel {
     }
 
     private void setupWashingMachine() {
-        registerHomeAppliance("washingmachine.operationState", "washingmachine.remainingTime", R.drawable.washing_machine, R.drawable.washing_machine_off, R.drawable.washing_machine_alert);
+        registerHomeAppliance("washingmachine.operationState", "washingmachine.remainingTime", R.drawable.ic_washing_machine, R.drawable.ic_washing_machine_off, R.drawable.ic_washing_machine_alert);
     }
 
     private void setupDishwasher() {
-        registerHomeAppliance("dishwasher.operationState", "dishwasher.remainingTime", R.drawable.dishwasher, R.drawable.dishwasher_off, R.drawable.dishwasher_alert);
+        registerHomeAppliance("dishwasher.operationState", "dishwasher.remainingTime", R.drawable.ic_dishwasher, R.drawable.ic_dishwasher_off, R.drawable.ic_dishwasher_alert);
     }
 
     private int registerHomeAppliance(String operationStateFullId, String remainingTimeFullId, int onIcon, int offIcon, int alertIcon) {
-        homeApplianceIcons.add(new ObservableField<>(AppCompatResources.getDrawable(context, R.drawable.cloud_question_outline)));
+        homeApplianceIcons.add(new ObservableField<>(AppCompatResources.getDrawable(context, R.drawable.ic_cloud_question_outline)));
         homeApplianceIconTints.add(new ObservableField<>(ColorStateList.valueOf(Color.WHITE)));
         homeApplianceTexts.add(new ObservableField<>(""));
 
@@ -248,7 +362,7 @@ public class HomeViewModel extends ViewModel {
             String labelText = "";
             switch(state) {
                 case UNKNOWN:
-                    homeApplianceIcons.get(index).set(AppCompatResources.getDrawable(context, R.drawable.cloud_question_outline));
+                    homeApplianceIcons.get(index).set(AppCompatResources.getDrawable(context, R.drawable.ic_cloud_question_outline));
                     homeApplianceIconTints.get(index).set(ColorStateList.valueOf(Color.WHITE));
                     labelText = "";
                     break;

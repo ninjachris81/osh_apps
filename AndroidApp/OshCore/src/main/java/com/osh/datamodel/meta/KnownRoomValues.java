@@ -45,4 +45,10 @@ public class KnownRoomValues {
 
     public KnownRoomValues() {
     }
+
+    public KnownRoomValues(@NotNull String roomId, @NotNull String valueGroupId, @NotNull String valueId) {
+        this.roomId = roomId;
+        this.valueGroupId = valueGroupId;
+        this.valueId = valueId;
+    }
 }

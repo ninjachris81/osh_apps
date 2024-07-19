@@ -49,7 +49,9 @@ public class LocalDatabaseServiceImpl extends DatabaseServiceBaseImpl implements
                 appDB.getActorDao(),
                 appDB.getAudioActorDao(),
                 appDB.getShutterActorDao(),
-                appDB.getAudioPlaybackSourceDao()
+                appDB.getAudioPlaybackSourceDao(),
+                appDB.getKnownRoomValuesDao(),
+                appDB.getKnownRoomActorsDao()
         );
     }
 

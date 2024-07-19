@@ -58,7 +58,7 @@ public class WBB12Fragment extends Fragment {
         OshApplication app = (OshApplication) getActivity().getApplication();
 
         binding.statsButton.setOnClickListener(view -> {
-            StatisticsActivity.invokeActivity(getContext(), app.getApplicationConfig().getGrafana().getWbb12Url());
+            StatisticsActivity.invokeActivity(getContext(), app.getApplicationConfig().getGrafana().getWbb12Url(), "WBB12 Statistics");
         });
 
         binding.actionButton.setOnClickListener(view -> {

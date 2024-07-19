@@ -19,6 +19,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.NotNull;
@@ -105,7 +106,10 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 
 		mqttClient = MqttClient.builder()
 				.identifier(config.getClientId())
-				.automaticReconnectWithDefaultConfig()
+				.automaticReconnect()
+					.initialDelay(5, TimeUnit.SECONDS)
+					.maxDelay(10, TimeUnit.SECONDS)
+					.applyAutomaticReconnect()
 				.serverHost(config.getServerHost())
 				.serverPort(config.getServerPort())
 				.addConnectedListener(listener -> {

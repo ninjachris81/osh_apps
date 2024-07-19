@@ -2,8 +2,10 @@ package com.osh.ui.area;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.lifecycle.Lifecycle;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.osh.datamodel.meta.KnownArea;
 import com.osh.service.IActorService;
@@ -15,63 +17,37 @@ import com.osh.service.IValueService;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AreaPagerAdapter extends FragmentStatePagerAdapter {
+public class AreaPagerAdapter extends FragmentStateAdapter {
 
-    List<Fragment> fragments = new ArrayList<>();
-    List<KnownArea> knownAreas = new ArrayList<>();
-
-    private final AreaViewModel areaViewModel;
-
-    private final IServiceContext serviceContext;
-
-    public AreaPagerAdapter(@NonNull FragmentManager fm, IServiceContext serviceContext, AreaViewModel areaViewModel) {
-        super(fm);
-        this.serviceContext = serviceContext;
-
-        this.areaViewModel = areaViewModel;
-
-        serviceContext.getDatamodelService().loadedState().addItemChangeListener(isLoaded -> {
-            if (isLoaded) {
-                initFragments();
-            }
-        }, true);
-
-        initFragments();
+    public AreaPagerAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
+        super(fragmentManager, lifecycle);
     }
 
-    private void initFragments() {
-        fragments.clear();
-        knownAreas.clear();
-
-        for (KnownArea knownArea : serviceContext.getDatamodelService().getDatamodel().getKnownAreas()) {
-            if (knownArea.getId().equals("basement")) {
-                registerFragment(basementFragment.newInstance(serviceContext, areaViewModel), knownArea);
-            } else if (knownArea.getId().equals("eg")) {
-                registerFragment(egFragment.newInstance(serviceContext, areaViewModel), knownArea);
-            } else if (knownArea.getId().equals("og")) {
-                registerFragment(ogFragment.newInstance(serviceContext, areaViewModel), knownArea);
-            }
+    public String getTitle(int position) {
+        switch (position) {
+            case 0: return "Basement";
+            case 1: return "EG";
+            case 2: return "OG";
+            default: return "Unknown";
         }
-    }
-
-    private void registerFragment(Fragment fragment, KnownArea knownArea) {
-        fragments.add(fragment);
-        knownAreas.add(knownArea);
     }
 
     @NonNull
     @Override
-    public Fragment getItem(int position) {
-        return fragments.get(position);
+    public Fragment createFragment(int position) {
+        if (position == 0) {
+            return new basementFragment();
+        } else if (position == 1) {
+            return new egFragment();
+        } else if (position == 2) {
+            return new ogFragment();
+        } else {
+            throw new RuntimeException("Unknown position");
+        }
     }
 
     @Override
-    public int getCount() {
-        return fragments.size();
-    }
-
-    @Override
-    public CharSequence getPageTitle(int position) {
-        return knownAreas.get(position).getName();
+    public int getItemCount() {
+        return 3;
     }
 }

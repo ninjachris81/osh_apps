@@ -3,6 +3,7 @@ package com.osh.grafana.config;
 public class GrafanaConfig {
 
     String wbb12Url;
+    String energyUrl;
 
     public String getWbb12Url() {
         return wbb12Url;
@@ -10,5 +11,13 @@ public class GrafanaConfig {
 
     public void setWbb12Url(String wbb12Url) {
         this.wbb12Url = wbb12Url;
+    }
+
+    public String getEnergyUrl() {
+        return energyUrl;
+    }
+
+    public void setEnergyUrl(String energyUrl) {
+        this.energyUrl = energyUrl;
     }
 }

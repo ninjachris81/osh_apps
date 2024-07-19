@@ -4,11 +4,13 @@ import android.os.Bundle;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.Observable;
 import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.renderscript.Sampler;
 import android.view.LayoutInflater;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.osh.R;
+import com.osh.activity.MainActivity;
 import com.osh.actor.AudioPlaybackActor;
 import com.osh.ui.dialogs.SelectAudioDialogFragment;
 import com.osh.actor.ActorCmds;
@@ -25,6 +28,8 @@ import com.osh.actor.ShutterActor;
 import com.osh.actor.ToggleActor;
 import com.osh.service.IServiceContext;
 import com.osh.ui.components.ShutterModeButton;
+import com.osh.ui.home.HomeViewModel;
+import com.osh.ui.home.HomeViewModelFactory;
 import com.osh.value.BooleanValue;
 import com.osh.value.DoubleValue;
 import com.osh.value.EnumValue;
@@ -76,6 +81,7 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
     }
 
     protected AreaViewModel areaViewModel;
+    protected AreaOverlayViewModel areaOverlayViewModel;
     protected IServiceContext serviceContext;
     protected BINDING_TYPE binding;
 
@@ -88,21 +94,22 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
     protected final SensorInfo sensorInfos = new SensorInfo();
 
     protected RoomViewModel roomViewModel;
+    protected RoomViewModel.RoomPosition roomPosition;
     private View roomBackground;
 
-    private FragmentManager fragmentManager;
     protected abstract void setBindingData();
+
+    protected String roomId;
+    protected String areaId;
 
     public RoomFragmentBase() {
         // Required empty public constructor
     }
 
-    public RoomFragmentBase(IServiceContext serviceContext, AreaViewModel areaViewModel, String roomId, FragmentManager fragmentManager, RoomViewModel.RoomPosition roomPosition) {
-        this.serviceContext = serviceContext;
-        this.areaViewModel = areaViewModel;
-        this.roomViewModel = new RoomViewModel(serviceContext.getDatamodelService().getDatamodel().getKnownRoom(roomId));
-        this.roomViewModel.roomPosition.set(roomPosition);
-        this.fragmentManager = fragmentManager;
+    public RoomFragmentBase(String roomId, String areaId, RoomViewModel.RoomPosition roomPosition) {
+        this.roomId = roomId;
+        this.areaId = areaId;
+        this.roomPosition = roomPosition;
     }
 
     @Override
@@ -115,9 +122,33 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
     }
 
     @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString("roomId", roomId);
+        outState.putString("areaId", areaId);
+        outState.putString("roomPosition", roomPosition.name());
+        outState.putInt("layout", layout);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        this.serviceContext = ((MainActivity) getActivity()).getServiceContext();
+
+        if (savedInstanceState != null) {
+            this.roomId = savedInstanceState.getString("roomId");
+            this.areaId = savedInstanceState.getString("areaId");
+            this.roomPosition = RoomViewModel.RoomPosition.valueOf(savedInstanceState.getString("roomPosition"));
+            this.layout = savedInstanceState.getInt("layout");
+        }
+
         binding = DataBindingUtil.inflate(inflater, this.layout, container, false);
+
+        roomViewModel = new ViewModelProvider(this, new RoomViewModelFactory(serviceContext)).get(roomId, RoomViewModel.class);
+        roomViewModel.roomPosition.set(roomPosition);
+        areaViewModel = new ViewModelProvider(getParentFragment(), AreaViewModelFactory.getInstance(serviceContext)).get(areaId, AreaViewModel.class);
+        areaOverlayViewModel = new ViewModelProvider(getParentFragment().getParentFragment(), AreaOverlayViewModelFactory.getInstance()).get(AreaOverlayViewModel.class);
 
         setBindingData();
 
@@ -170,7 +201,7 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
     }
 
     protected void handleBackgroundClickEvent() {
-        switch(areaViewModel.currentOverlay.get()) {
+        switch(areaOverlayViewModel.currentOverlay.get()) {
             case LIGHTS:
                 handleBackgroundClickEventLight(0);
                 break;
@@ -201,7 +232,7 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
                 serviceContext.getActorService().publishCmd(actor, ActorCmds.ACTOR_CMD_STOP);
                 //model.activePlayback.set(null);
             });
-            dialog.show(fragmentManager, SelectAudioDialogFragment.TAG);
+            dialog.show(getChildFragmentManager(), SelectAudioDialogFragment.TAG);
         } else {
             Toast.makeText(getContext(),"No audio actor", Toast.LENGTH_SHORT).show();
         }
@@ -295,7 +326,7 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
         if (value != null) {
             value.addItemChangeListener(item -> {
                 if (areaViewModel!=null && roomViewModel!=null) {
-                    if (areaViewModel.currentOverlay.get() == AreaFragment.AreaOverlays.PRESENCE) {
+                    if (areaOverlayViewModel.currentOverlay.get() == AreaFragment.AreaOverlays.PRESENCE) {
                         roomViewModel.roomPresences.get(index).set(item.getValue(false));
                         //roomViewModel.backgroundVisible.set(item.getValue(false));
                     }
@@ -356,7 +387,7 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
     }
 
     protected void setBackgroundForOverlay(View roomBackground) {
-        switch(areaViewModel.currentOverlay.get()) {
+        switch(areaOverlayViewModel.currentOverlay.get()) {
             case LIGHTS:
                 setBackgroundRecursive(roomBackground, R.drawable.light_background);
                 break;

@@ -20,6 +20,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -233,6 +234,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         NavController navController = navHostFragment.getNavController();
         BottomNavigationView bottomNav = binding.bottomNav;
         NavigationUI.setupWithNavController(bottomNav, navController);
+
+        Toolbar myToolbar = binding.myToolbar;
+        setSupportActionBar(myToolbar);
 
         setMaterialIcon(0, MaterialDrawableBuilder.IconValue.HOME);
         setMaterialIcon(1, MaterialDrawableBuilder.IconValue.VIEW_DASHBOARD);

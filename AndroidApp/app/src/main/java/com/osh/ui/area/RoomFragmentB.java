@@ -13,8 +13,8 @@ public class RoomFragmentB extends RoomFragmentBase<FragmentRoomBBinding> {
     public RoomFragmentB() {
     }
 
-    public RoomFragmentB(IServiceContext serviceContext, AreaViewModel areaViewModel, String roomId, FragmentManager fragmentManager, RoomViewModel.RoomPosition roomPosition) {
-        super(serviceContext, areaViewModel, roomId, fragmentManager, roomPosition);
+    public RoomFragmentB(String roomId, String areaId, RoomViewModel.RoomPosition roomPosition) {
+        super(roomId, areaId, roomPosition);
         layout = R.layout.fragment_room_b;
 
         shutterModeButtons = List.of(R.id.shutterModeButtonB0, R.id.shutterModeButtonB1);

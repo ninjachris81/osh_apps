@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.osh.service.IServiceContext;
 import com.osh.ui.dashboard.DashboardViewModel;
 
-public class HomeViewModelFactory  implements ViewModelProvider.Factory {
+public class HomeViewModelFactory implements ViewModelProvider.Factory {
 
     private final Context context;
     private final IServiceContext serviceContext;

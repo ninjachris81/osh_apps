@@ -19,6 +19,8 @@ import com.osh.R;
 import com.osh.activity.CameraDetailsActivity;
 import com.osh.activity.DoorOpenActivity;
 import com.osh.activity.MainActivity;
+import com.osh.activity.OshApplication;
+import com.osh.activity.StatisticsActivity;
 import com.osh.databinding.FragmentHomeBinding;
 import com.osh.service.IServiceContext;
 import com.osh.value.DoubleValue;
@@ -41,6 +43,8 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
+        OshApplication app = (OshApplication) getActivity().getApplication();
+
         serviceContext = ((MainActivity) getActivity()).getServiceContext();
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
 
@@ -62,12 +66,25 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
 
         binding.btnFrontCamera.setIcon(MaterialDrawableBuilder.with(getContext()).setIcon(MaterialDrawableBuilder.IconValue.CCTV).setColor(Color.WHITE).build());
         binding.btnFrontCamera.setOnClickListener(listener -> {
-            CameraDetailsActivity.invokeActivity(getContext());
+            CameraDetailsActivity.invokeActivity(getContext(), "frontDoor.door", "Front Door");
+        });
+
+        binding.btnBackCamera.setIcon(MaterialDrawableBuilder.with(getContext()).setIcon(MaterialDrawableBuilder.IconValue.CCTV).setColor(Color.WHITE).build());
+        binding.btnBackCamera.setOnClickListener(listener -> {
+            CameraDetailsActivity.invokeActivity(getContext(), "wintergarden.door", "Wintergarden");
         });
 
         setupBattery(homeViewModel);
 
+        binding.powerConsumption.setOnClickListener(v -> {openEnergyStatistics(app.getApplicationConfig().getGrafana().getEnergyUrl());});
+        binding.currentMode.setOnClickListener(v -> {openEnergyStatistics(app.getApplicationConfig().getGrafana().getEnergyUrl());});
+        binding.currentTrend.setOnClickListener(v -> {openEnergyStatistics(app.getApplicationConfig().getGrafana().getEnergyUrl());});
+
         return binding.getRoot();
+    }
+
+    private void openEnergyStatistics(String energyUrl) {
+        StatisticsActivity.invokeActivity(getContext(), energyUrl, "Energy Statistics");
     }
 
     private void setupBattery(HomeViewModel homeViewModel) {
@@ -97,9 +114,11 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
 
     @Override
     public void onBatteryDataChanged(String text, PieData data) {
-        binding.batteryState.setCenterText(text);
-        binding.batteryState.setData(data);
-        binding.batteryState.notifyDataSetChanged();
-        binding.batteryState.invalidate();
+        if (binding!=null) {
+            binding.batteryState.setCenterText(text);
+            binding.batteryState.setData(data);
+            binding.batteryState.notifyDataSetChanged();
+            binding.batteryState.invalidate();
+        }
     }
 }

@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.osh.actor.AudioPlaybackActor;
 import com.osh.datamodel.meta.KnownRoom;
+import com.osh.service.IServiceContext;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -43,8 +44,8 @@ public class RoomViewModel extends ViewModel implements Serializable {
 
     public final List<ObservableBoolean> roomPresences = new ArrayList<>();
 
-    public RoomViewModel(KnownRoom room) {
-        this.room = room;
+    public RoomViewModel(IServiceContext serviceContext, String roomId) {
+        this.room = serviceContext.getDatamodelService().getDatamodel().getKnownRoom(roomId);
         this.name.set(room.getName());
     }
 

@@ -1,6 +1,7 @@
 package com.osh.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,11 +16,10 @@ public class StatisticsActivity extends AppCompatActivity {
     private static final String INTENT_PARAM_URL = "url";
     private ActivityStatisticsBinding binding;
 
-    public static void invokeActivity(Context context, String url) {
+    public static void invokeActivity(Context context, String url, String title) {
         Intent mIntent = new Intent(context, StatisticsActivity.class);
-        Bundle mBundle = new Bundle();
-        mBundle.putString(INTENT_PARAM_URL, url);
-        mIntent.putExtras(mBundle);
+        mIntent.putExtra(INTENT_PARAM_URL, url);
+        mIntent.putExtra("title", title);
         context.startActivity(mIntent);
     }
 
@@ -38,6 +38,9 @@ public class StatisticsActivity extends AppCompatActivity {
 
         setContentView(binding.getRoot());
 
+        Toolbar myToolbar = binding.myToolbar;
+        myToolbar.setTitle(getIntent().getStringExtra("title"));
+        setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 

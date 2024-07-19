@@ -29,12 +29,12 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     private List<Fragment> fragmentList = new ArrayList<>();
 
-    public SectionsPagerAdapter(Activity activity, FragmentManager fm) {
+    public SectionsPagerAdapter(Activity activity, FragmentManager fm, String cameraId) {
         super(fm);
         mContext = activity.getApplicationContext();
 
-        CameraSource cameraSource = ((OshApplication) activity.getApplication()).getApplicationConfig().getCamera().getCameraSource("frontDoor.door");
-        CameraFTPSource cameraFTPSource = ((OshApplication) activity.getApplication()).getApplicationConfig().getCamera().getCameraFTPSource("frontDoor.door");
+        CameraSource cameraSource = ((OshApplication) activity.getApplication()).getApplicationConfig().getCamera().getCameraSource(cameraId);
+        CameraFTPSource cameraFTPSource = ((OshApplication) activity.getApplication()).getApplicationConfig().getCamera().getCameraFTPSource(cameraId);
         fragmentList.add(new CameraStreamFragment(cameraSource));
         fragmentList.add(new SurveillancePictureFragment(cameraFTPSource));
         fragmentList.add(new SurveillanceRingFragment(cameraFTPSource));

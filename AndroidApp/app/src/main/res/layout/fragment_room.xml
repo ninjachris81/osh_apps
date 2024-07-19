@@ -13,6 +13,10 @@
         <import type="android.view.View" />
 
         <variable
+            name="areaOverlayData"
+            type="com.osh.ui.area.AreaOverlayViewModel" />
+
+        <variable
             name="areaData"
             type="com.osh.ui.area.AreaViewModel" />
 
@@ -42,8 +46,8 @@
             android:id="@+id/tempLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text='@{(areaData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; !roomData.temperatures.isEmpty()) ? (String.format("%.1f", roomData.temperatures[0]) + "°") : "" }'
-            android:visibility="@{areaData.currentOverlay == AreaOverlays.SENSORS ? View.VISIBLE : View.GONE}"
+            android:text='@{(areaOverlayData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; !roomData.temperatures.isEmpty()) ? (String.format("%.1f", roomData.temperatures[0]) + "°") : "" }'
+            android:visibility="@{areaOverlayData.currentOverlay == AreaOverlays.SENSORS ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toTopOf="@id/roomLabel" />
@@ -52,8 +56,8 @@
             android:id="@+id/brightnessLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text='@{(areaData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; !roomData.brightnesses.isEmpty()) ? (String.format("%.1f", roomData.brightnesses[0]) + "%") : "" }'
-            android:visibility="@{areaData.currentOverlay == AreaOverlays.SENSORS ? View.VISIBLE : View.GONE}"
+            android:text='@{(areaOverlayData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; !roomData.brightnesses.isEmpty()) ? (String.format("%.1f", roomData.brightnesses[0]) + "%") : "" }'
+            android:visibility="@{areaOverlayData.currentOverlay == AreaOverlays.SENSORS ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/roomLabel" />
@@ -63,8 +67,8 @@
             android:id="@+id/humLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text='@{(areaData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; !roomData.humidities.isEmpty()) ? (String.format("%.1f", roomData.humidities[0]) + "%") : "" }'
-            android:visibility="@{areaData.currentOverlay == AreaOverlays.SENSORS ? View.VISIBLE : View.GONE}"
+            android:text='@{(areaOverlayData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; !roomData.humidities.isEmpty()) ? (String.format("%.1f", roomData.humidities[0]) + "%") : "" }'
+            android:visibility="@{areaOverlayData.currentOverlay == AreaOverlays.SENSORS ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/brightnessLabel" />
@@ -73,8 +77,8 @@
             android:id="@+id/roomBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@{areaData.currentOverlay==AreaOverlays.LIGHTS ? @drawable/light_background : areaData.currentOverlay==AreaOverlays.PRESENCE ? @drawable/presence_background : null}"
-            android:alpha="@{(areaData.currentOverlay==AreaOverlays.LIGHTS &amp;&amp; roomData.lightStates[0]) || (areaData.currentOverlay==AreaOverlays.PRESENCE &amp;&amp; roomData.roomPresences[0]) ? 1f : 0f}"
+            android:background="@{areaOverlayData.currentOverlay==AreaOverlays.LIGHTS ? @drawable/light_background : areaOverlayData.currentOverlay==AreaOverlays.PRESENCE ? @drawable/presence_background : null}"
+            android:alpha="@{(areaOverlayData.currentOverlay==AreaOverlays.LIGHTS &amp;&amp; roomData.lightStates[0]) || (areaOverlayData.currentOverlay==AreaOverlays.PRESENCE &amp;&amp; roomData.roomPresences[0]) ? 1f : 0f}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -84,8 +88,8 @@
             android:id="@+id/shutterLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text='@{areaData.currentOverlay == AreaOverlays.SHUTTERS ? roomData.shutterStates[0] : "" }'
-            android:visibility="@{areaData.currentOverlay == AreaOverlays.SHUTTERS ? View.VISIBLE : View.GONE}"
+            android:text='@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS ? roomData.shutterStates[0] : "" }'
+            android:visibility="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/roomLabel" />
@@ -97,8 +101,8 @@
             android:layout_marginBottom="@{roomData.roomPosition == RoomPosition.POSITION_BOTTOM ? @dimen/shutter_mode_button_wall_padding : @dimen/shutter_mode_button_wall_padding_none}"
             android:layout_marginTop="@{roomData.roomPosition == RoomPosition.POSITION_TOP ? @dimen/shutter_mode_button_wall_padding : @dimen/shutter_mode_button_wall_padding_none}"
             android:visibility="gone"
-            android:alpha="@{areaData.currentOverlay == AreaOverlays.SHUTTERS ? 1 : 0 }"
-            clickEnabled="@{areaData.currentOverlay == AreaOverlays.SHUTTERS}"
+            android:alpha="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS ? 1 : 0 }"
+            clickEnabled="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS}"
             app:layout_constraintBottom_toBottomOf='@{roomData.roomPosition == RoomPosition.POSITION_BOTTOM ? "parent" : ""}'
             app:layout_constraintTop_toTopOf='@{roomData.roomPosition == RoomPosition.POSITION_TOP ? "parent" : ""}'
             app:isAuto="@{roomData.shutterAutoModes[0]}"

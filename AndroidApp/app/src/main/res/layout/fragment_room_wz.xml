@@ -12,6 +12,10 @@
         <import type="android.view.View" />
 
         <variable
+            name="areaOverlayData"
+            type="com.osh.ui.area.AreaOverlayViewModel" />
+
+        <variable
             name="areaData"
             type="com.osh.ui.area.AreaViewModel" />
 
@@ -41,8 +45,8 @@
             android:id="@+id/tempLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text='@{(areaData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; !roomData.temperatures.isEmpty()) ? (String.format("%.1f", roomData.temperatures[0]) + "°") : "" }'
-            android:visibility="@{areaData.currentOverlay == AreaOverlays.SENSORS ? View.VISIBLE : View.GONE}"
+            android:text='@{(areaOverlayData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; !roomData.temperatures.isEmpty()) ? (String.format("%.1f", roomData.temperatures[0]) + "°") : "" }'
+            android:visibility="@{areaOverlayData.currentOverlay == AreaOverlays.SENSORS ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/roomLabel" />
@@ -51,8 +55,8 @@
             android:id="@+id/humLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text='@{(areaData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; !roomData.humidities.isEmpty()) ? (String.format("%.1f", roomData.humidities[0]) + "%") : "" }'
-            android:visibility="@{areaData.currentOverlay == AreaOverlays.SENSORS ? View.VISIBLE : View.GONE}"
+            android:text='@{(areaOverlayData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; !roomData.humidities.isEmpty()) ? (String.format("%.1f", roomData.humidities[0]) + "%") : "" }'
+            android:visibility="@{areaOverlayData.currentOverlay == AreaOverlays.SENSORS ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tempLabel" />
@@ -70,8 +74,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:alpha="@{(areaData.currentOverlay==AreaOverlays.LIGHTS &amp;&amp; roomData.lightStates[0]) || (areaData.currentOverlay==AreaOverlays.PRESENCE &amp;&amp; roomData.roomPresences[0]) ? 1f : 0f}"
-                android:background="@{areaData.currentOverlay==AreaOverlays.LIGHTS ? @drawable/light_background : areaData.currentOverlay==AreaOverlays.PRESENCE ? @drawable/presence_background : null}"
+                android:alpha="@{(areaOverlayData.currentOverlay==AreaOverlays.LIGHTS &amp;&amp; roomData.lightStates[0]) || (areaOverlayData.currentOverlay==AreaOverlays.PRESENCE &amp;&amp; roomData.roomPresences[0]) ? 1f : 0f}"
+                android:background="@{areaOverlayData.currentOverlay==AreaOverlays.LIGHTS ? @drawable/light_background : areaOverlayData.currentOverlay==AreaOverlays.PRESENCE ? @drawable/presence_background : null}"
                 />
 
             <ImageView
@@ -83,8 +87,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/lightBackgroundWZ1"
                 app:layout_constraintTop_toTopOf="@id/lightBackgroundWZ1"
-                android:alpha="@{(areaData.currentOverlay==AreaOverlays.LIGHTS &amp;&amp; roomData.lightStates[1]) || (areaData.currentOverlay==AreaOverlays.PRESENCE &amp;&amp; roomData.roomPresences[0]) ? 1f : 0f}"
-                android:background="@{areaData.currentOverlay==AreaOverlays.LIGHTS ? @drawable/light_background : areaData.currentOverlay==AreaOverlays.PRESENCE ? @drawable/presence_background : null}"
+                android:alpha="@{(areaOverlayData.currentOverlay==AreaOverlays.LIGHTS &amp;&amp; roomData.lightStates[1]) || (areaOverlayData.currentOverlay==AreaOverlays.PRESENCE &amp;&amp; roomData.roomPresences[0]) ? 1f : 0f}"
+                android:background="@{areaOverlayData.currentOverlay==AreaOverlays.LIGHTS ? @drawable/light_background : areaOverlayData.currentOverlay==AreaOverlays.PRESENCE ? @drawable/presence_background : null}"
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -93,7 +97,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
-            android:text='@{areaData.currentOverlay == AreaOverlays.SHUTTERS ? roomData.shutterStates[0] : "" }'
+            android:text='@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS ? roomData.shutterStates[0] : "" }'
             app:layout_constraintEnd_toEndOf="@id/shutterModeButtonWz0"
             app:layout_constraintStart_toStartOf="@id/shutterModeButtonWz0"
             app:layout_constraintBottom_toTopOf="@id/shutterModeButtonWz0" />
@@ -105,8 +109,8 @@
             android:layout_marginStart="-200dp"
             android:layout_marginBottom="@dimen/shutter_mode_button_wall_padding"
             android:visibility="gone"
-            android:alpha="@{areaData.currentOverlay == AreaOverlays.SHUTTERS ? 1 : 0 }"
-            clickEnabled="@{areaData.currentOverlay == AreaOverlays.SHUTTERS}"
+            android:alpha="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS ? 1 : 0 }"
+            clickEnabled="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:isAuto="@{roomData.shutterAutoModes[0]}"
             app:layout_constraintEnd_toEndOf="parent"
@@ -118,7 +122,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
-            android:text='@{areaData.currentOverlay == AreaOverlays.SHUTTERS ? roomData.shutterStates[1] : "" }'
+            android:text='@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS ? roomData.shutterStates[1] : "" }'
             app:layout_constraintEnd_toEndOf="@id/shutterModeButtonWz1"
             app:layout_constraintStart_toStartOf="@id/shutterModeButtonWz1"
             app:layout_constraintBottom_toTopOf="@id/shutterModeButtonWz1" />
@@ -130,8 +134,8 @@
             android:layout_marginStart="300dp"
             android:layout_marginBottom="@dimen/shutter_mode_button_wall_padding"
             android:visibility="gone"
-            android:alpha="@{areaData.currentOverlay == AreaOverlays.SHUTTERS ? 1 : 0 }"
-            clickEnabled="@{areaData.currentOverlay == AreaOverlays.SHUTTERS}"
+            android:alpha="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS ? 1 : 0 }"
+            clickEnabled="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:isAuto="@{roomData.shutterAutoModes[1]}"
             app:layout_constraintEnd_toEndOf="parent"

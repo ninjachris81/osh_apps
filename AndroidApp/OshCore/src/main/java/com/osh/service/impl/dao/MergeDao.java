@@ -13,6 +13,8 @@ import com.osh.datamodel.DatamodelBase;
 import com.osh.datamodel.meta.AudioPlaybackSource;
 import com.osh.datamodel.meta.KnownArea;
 import com.osh.datamodel.meta.KnownRoom;
+import com.osh.datamodel.meta.KnownRoomActors;
+import com.osh.datamodel.meta.KnownRoomValues;
 import com.osh.log.LogFacade;
 import com.osh.service.impl.LocalDatabaseServiceImpl;
 import com.osh.value.DBValue;
@@ -34,17 +36,14 @@ public abstract class MergeDao {
                                ActorDao actorDao,
                                AudioActorDao audioActorDao,
                                ShutterActorDao shutterActorDao,
-                               AudioPlaybackSourceDao audioPlaybackSourceDao
+                               AudioPlaybackSourceDao audioPlaybackSourceDao,
+                               KnownRoomValuesDao knownRoomValuesDao,
+                               KnownRoomActorsDao knownRoomActorsDao
                                ) {
 
         for(KnownArea knownArea : datamodel.getKnownAreas()) {
             LogFacade.d(TAG, "Inserting known area " + knownArea.getId());
             knownAreaDao.insert(knownArea);
-        }
-
-        for (KnownRoom knownRoom : datamodel.getKnownRooms().values()) {
-            LogFacade.d(TAG, "Inserting known room " + knownRoom.getId());
-            knownRoomDao.insert(knownRoom);
         }
 
         for (ValueGroup valueGroup : datamodel.getValueGroups().values()) {
@@ -70,11 +69,24 @@ public abstract class MergeDao {
             }
         }
 
+        for (KnownRoom knownRoom : datamodel.getKnownRooms().values()) {
+            LogFacade.d(TAG, "Inserting known room " + knownRoom.getId());
+            knownRoomDao.insert(knownRoom);
+
+            for (ValueBase value : knownRoom.getValues().values()) {
+                LogFacade.d(TAG, "Inserting known room value " + value.getId());
+                knownRoomValuesDao.insert(new KnownRoomValues(knownRoom.getId(), value.getValueGroup().getId(), value.getId()));
+            }
+
+            for (ActorBase actor : knownRoom.getActors().values()) {
+                knownRoomActorsDao.insert(new KnownRoomActors(knownRoom.getId(), actor.getValueGroup().getId(), actor.getId()));
+            }
+        }
+
         for (AudioPlaybackSource audioPlaybackSource : datamodel.getAudioPlaybackSources().values()) {
             LogFacade.d(TAG, "Inserting audio playback source " + audioPlaybackSource.getId());
             audioPlaybackSourceDao.insert(audioPlaybackSource);
         }
-
     }
 
 }

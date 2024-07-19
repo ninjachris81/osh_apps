@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import android.view.ViewGroup;
 
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.osh.R;
 import com.osh.activity.MainActivity;
 import com.osh.databinding.FragmentAreaBinding;
@@ -33,12 +35,13 @@ public class AreaFragment extends Fragment {
 
     private FragmentAreaBinding binding;
 
-    private AreaViewModel areaViewModel;
-    private ViewPager viewPager;
+    private AreaOverlayViewModel areaOverlayViewModel;
+    private ViewPager2 viewPager;
 
     AreaPagerAdapter areaPagerAdapter;
 
     private IServiceContext serviceContext;
+    private Observable.OnPropertyChangedCallback overlayCallback;
 
     public enum AreaOverlays {
         NONE,
@@ -54,20 +57,16 @@ public class AreaFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        areaViewModel = new ViewModelProvider(this).get(AreaViewModel.class);
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
         serviceContext = ((MainActivity) getActivity()).getServiceContext();
 
+        areaOverlayViewModel = new ViewModelProvider(this, AreaOverlayViewModelFactory.getInstance()).get(AreaOverlayViewModel.class);
+
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_area, container, false);
 
-        binding.setAreaData(areaViewModel);
+        binding.setAreaOverlayData(areaOverlayViewModel);
 
         binding.setLifecycleOwner(this);
 
@@ -75,18 +74,22 @@ public class AreaFragment extends Fragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        areaOverlayViewModel.currentOverlay.removeOnPropertyChangedCallback(overlayCallback);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        areaPagerAdapter = new AreaPagerAdapter(getChildFragmentManager(), serviceContext, areaViewModel);
-        viewPager = view.findViewById(R.id.areaViewPager);
+        areaPagerAdapter = new AreaPagerAdapter(getChildFragmentManager(), getLifecycle());
+        viewPager = binding.areaViewPager;
         viewPager.setAdapter(areaPagerAdapter);
 
-        TabLayout tabLayout = view.findViewById(R.id.tab_layout);
-        tabLayout.setupWithViewPager(viewPager);
+        TabLayout tabLayout = binding.tabLayout;
+        new TabLayoutMediator(tabLayout, viewPager,
+                (tab, position) -> tab.setText(areaPagerAdapter.getTitle(position))
+        ).attach();
 
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
 
@@ -110,35 +113,37 @@ public class AreaFragment extends Fragment {
         });
         tabLayout.getTabAt(sharedPref.getInt(getString(R.string.area_last_tab), 0)).select();
 
-        areaViewModel.currentOverlay.set(AreaOverlays.values()[sharedPref.getInt(getString(R.string.area_last_overlay), 0)]);
-        areaViewModel.currentOverlay.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+        areaOverlayViewModel.currentOverlay.set(AreaOverlays.values()[sharedPref.getInt(getString(R.string.area_last_overlay), 0)]);
+        overlayCallback = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                sharedPref.edit().putInt(getString(R.string.area_last_overlay), areaViewModel.currentOverlay.get().ordinal()).commit();
+                sharedPref.edit().putInt(getString(R.string.area_last_overlay), areaOverlayViewModel.currentOverlay.get().ordinal()).commit();
             }
-        });
+        };
 
-        ChipGroup overlaySelection = (ChipGroup) view.findViewById(R.id.overlay_selection_group);
+        areaOverlayViewModel.currentOverlay.addOnPropertyChangedCallback(overlayCallback);
+
+        ChipGroup overlaySelection = binding.overlaySelectionGroup;
         if (overlaySelection != null) {
             overlaySelection.setOnCheckedStateChangeListener((group, checkedIds) -> {
                 if (checkedIds.isEmpty()) {
-                    areaViewModel.currentOverlay.set(AreaOverlays.NONE);
+                    areaOverlayViewModel.currentOverlay.set(AreaOverlays.NONE);
                 } else {
                     switch(checkedIds.get(0)) {
                         case R.id.overlay_lights:
-                            areaViewModel.currentOverlay.set(AreaOverlays.LIGHTS);
+                            areaOverlayViewModel.currentOverlay.set(AreaOverlays.LIGHTS);
                             break;
                         case R.id.overlay_shutters:
-                            areaViewModel.currentOverlay.set(AreaOverlays.SHUTTERS);
+                            areaOverlayViewModel.currentOverlay.set(AreaOverlays.SHUTTERS);
                             break;
                         case R.id.overlay_sensors:
-                            areaViewModel.currentOverlay.set(AreaOverlays.SENSORS);
+                            areaOverlayViewModel.currentOverlay.set(AreaOverlays.SENSORS);
                             break;
                         case R.id.overlay_audio:
-                            areaViewModel.currentOverlay.set(AreaOverlays.AUDIO);
+                            areaOverlayViewModel.currentOverlay.set(AreaOverlays.AUDIO);
                             break;
                         case R.id.overlay_presence:
-                            areaViewModel.currentOverlay.set(AreaOverlays.PRESENCE);
+                            areaOverlayViewModel.currentOverlay.set(AreaOverlays.PRESENCE);
                             break;
                     }
                 }

@@ -2,6 +2,7 @@ package com.osh.ui.area;
 
 import androidx.fragment.app.FragmentManager;
 
+import com.osh.activity.MainActivity;
 import com.osh.databinding.FragmentRoomBinding;
 import com.osh.service.IServiceContext;
 
@@ -9,12 +10,13 @@ public class RoomFragment extends RoomFragmentBase<FragmentRoomBinding> {
     public RoomFragment() {
     }
 
-    public RoomFragment(IServiceContext serviceContext, AreaViewModel areaViewModel, String roomId, FragmentManager fragmentManager, RoomViewModel.RoomPosition roomPosition) {
-        super(serviceContext, areaViewModel, roomId, fragmentManager, roomPosition);
+    public RoomFragment(String roomId, String areaId, RoomViewModel.RoomPosition roomPosition) {
+        super(roomId, areaId, roomPosition);
     }
 
     @Override
     protected void setBindingData() {
+        binding.setAreaOverlayData(areaOverlayViewModel);
         binding.setAreaData(areaViewModel);
         binding.setRoomData(roomViewModel);
         roomViewModel.initLightStates(lightInfos.size());

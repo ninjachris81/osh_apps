@@ -71,8 +71,6 @@ public class DoorOpenActivity extends AppCompatActivity implements IDoorUnlockSe
 
         setContentView(binding.getRoot());
 
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         doorUnlockManager.setCallbackListener(this);
 
         finishTimer = new CountDownTimer(4000, 1000) {

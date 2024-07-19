@@ -15,8 +15,8 @@ public class RoomFragmentWz extends RoomFragmentBase<FragmentRoomWzBinding> {
     public RoomFragmentWz() {
     }
 
-    public RoomFragmentWz(IServiceContext serviceContext, AreaViewModel areaViewModel, String roomId, FragmentManager fragmentManager, RoomViewModel.RoomPosition roomPosition) {
-        super(serviceContext, areaViewModel, roomId, fragmentManager, roomPosition);
+    public RoomFragmentWz(String roomId, String areaId, RoomViewModel.RoomPosition roomPosition) {
+        super(roomId, areaId, roomPosition);
         layout = R.layout.fragment_room_wz;
 
         shutterModeButtons = List.of(R.id.shutterModeButtonWz0, R.id.shutterModeButtonWz1);
@@ -24,6 +24,7 @@ public class RoomFragmentWz extends RoomFragmentBase<FragmentRoomWzBinding> {
 
     @Override
     protected void setBindingData() {
+        binding.setAreaOverlayData(areaOverlayViewModel);
         binding.setAreaData(areaViewModel);
         binding.setRoomData(roomViewModel);
         roomViewModel.initLightStates(lightInfos.size());
@@ -35,7 +36,7 @@ public class RoomFragmentWz extends RoomFragmentBase<FragmentRoomWzBinding> {
     }
 
     protected void handleBackgroundClickEvent() {
-        switch(areaViewModel.currentOverlay.get()) {
+        switch(areaOverlayViewModel.currentOverlay.get()) {
             case LIGHTS:
                 break;
             case AUDIO:
@@ -48,7 +49,7 @@ public class RoomFragmentWz extends RoomFragmentBase<FragmentRoomWzBinding> {
         binding.lightBackgroundWZ1.setOnClickListener(view -> {
             handleBackgroundClickEvent();
 
-            switch(areaViewModel.currentOverlay.get()) {
+            switch(areaOverlayViewModel.currentOverlay.get()) {
                 case LIGHTS:
                     handleBackgroundClickEventLight(0);
                     break;
@@ -57,7 +58,7 @@ public class RoomFragmentWz extends RoomFragmentBase<FragmentRoomWzBinding> {
 
         binding.lightBackgroundWZ2.setOnClickListener(view -> {
             handleBackgroundClickEvent();
-            switch(areaViewModel.currentOverlay.get()) {
+            switch(areaOverlayViewModel.currentOverlay.get()) {
                 case LIGHTS:
                     handleBackgroundClickEventLight(1);
                     break;

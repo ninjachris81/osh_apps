@@ -54,18 +54,32 @@ public class OshApplication extends Application {
         applicationConfig.getSip().setRingVolume(Integer.parseInt(prefs.getString(getString(R.string.sip_ring_volume_key), "80")));
 
         applicationConfig.getCamera().addCameraSource(
-                prefs.getString(getString(R.string.front_door_camera_id_key), "frontDoor.door"),
-                prefs.getString(getString(R.string.front_door_stream_uri_key), "rtsp://localhost")
+                prefs.getString(getString(R.string.camera1_id_key), "frontDoor.door"),
+                prefs.getString(getString(R.string.camera1_stream_uri_key), "rtsp://localhost")
         );
         applicationConfig.getCamera().addCameraFTPSource(
-                prefs.getString(getString(R.string.front_door_camera_ftp_id_key), "frontDoor.door"),
-                prefs.getString(getString(R.string.front_door_camera_ftp_host_key), "localhost"),
-                prefs.getString(getString(R.string.front_door_camera_ftp_username_key), ""),
-                prefs.getString(getString(R.string.front_door_camera_ftp_password_key), ""),
-                prefs.getString(getString(R.string.front_door_camera_ftp_remote_dir_key), "/home/pi")
+                prefs.getString(getString(R.string.camera1_ftp_id_key), "frontDoor.door"),
+                prefs.getString(getString(R.string.camera1_ftp_host_key), "localhost"),
+                prefs.getString(getString(R.string.camera1_ftp_username_key), ""),
+                prefs.getString(getString(R.string.camera1_ftp_password_key), ""),
+                prefs.getString(getString(R.string.camera1_ftp_remote_dir_key), "/var/ftp_data")
             );
 
+        applicationConfig.getCamera().addCameraSource(
+                prefs.getString(getString(R.string.camera2_id_key), "wintergarden.door"),
+                prefs.getString(getString(R.string.camera2_stream_uri_key), "rtsp://localhost")
+        );
+        applicationConfig.getCamera().addCameraFTPSource(
+                prefs.getString(getString(R.string.camera2_ftp_id_key), "wintergarden.door"),
+                prefs.getString(getString(R.string.camera2_ftp_host_key), "localhost"),
+                prefs.getString(getString(R.string.camera2_ftp_username_key), ""),
+                prefs.getString(getString(R.string.camera2_ftp_password_key), ""),
+                prefs.getString(getString(R.string.camera2_ftp_remote_dir_key), "/var/ftp_data")
+        );
+
+
         applicationConfig.getGrafana().setWbb12Url(prefs.getString(getString(R.string.grafana_wbb12_url_key), "http://localhost:3000/grafana"));
+        applicationConfig.getGrafana().setEnergyUrl(prefs.getString(getString(R.string.grafana_energy_url), "http://localhost:3000/grafana"));
     }
 
     public IApplicationConfig getApplicationConfig() {

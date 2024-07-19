@@ -5,7 +5,7 @@
 
     <data>
         <import type="com.osh.ui.area.AreaFragment.AreaOverlays"/>
-        <variable name="areaData" type="com.osh.ui.area.AreaViewModel" />
+        <variable name="areaOverlayData" type="com.osh.ui.area.AreaOverlayViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -59,7 +59,7 @@
                     android:layout_width="170dp"
                     android:layout_height="70dp"
                     android:checkable="true"
-                    android:checked="@{areaData.currentOverlay == AreaOverlays.LIGHTS}"
+                    android:checked="@{areaOverlayData.currentOverlay == AreaOverlays.LIGHTS}"
                     android:text="Lights"
                     android:textAlignment="center" />
 
@@ -68,7 +68,7 @@
                     android:layout_width="170dp"
                     android:layout_height="70dp"
                     android:checkable="true"
-                    android:checked="@{areaData.currentOverlay == AreaOverlays.SHUTTERS}"
+                    android:checked="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS}"
                     android:text="Shutters"
                     android:textAlignment="center" />
 
@@ -78,7 +78,7 @@
                     android:layout_height="70dp"
                     android:checkable="true"
                     android:text="Sensors"
-                    android:checked="@{areaData.currentOverlay == AreaOverlays.SENSORS}"
+                    android:checked="@{areaOverlayData.currentOverlay == AreaOverlays.SENSORS}"
                     android:textAlignment="center" />
 
                 <com.google.android.material.chip.Chip
@@ -87,7 +87,7 @@
                     android:layout_height="70dp"
                     android:checkable="true"
                     android:text="Presence"
-                    android:checked="@{areaData.currentOverlay == AreaOverlays.PRESENCE}"
+                    android:checked="@{areaOverlayData.currentOverlay == AreaOverlays.PRESENCE}"
                     android:textAlignment="center" />
 
                 <com.google.android.material.chip.Chip
@@ -96,7 +96,7 @@
                     android:layout_height="70dp"
                     android:checkable="true"
                     android:text="Audio"
-                    android:checked="@{areaData.currentOverlay == AreaOverlays.AUDIO}"
+                    android:checked="@{areaOverlayData.currentOverlay == AreaOverlays.AUDIO}"
                     android:textAlignment="center" />
 
                 <com.google.android.material.chip.Chip
@@ -105,7 +105,7 @@
                     android:layout_height="70dp"
                     android:checkable="true"
                     android:text="Devices"
-                    android:checked="@{areaData.currentOverlay == AreaOverlays.DEVICES}"
+                    android:checked="@{areaOverlayData.currentOverlay == AreaOverlays.DEVICES}"
                     android:textAlignment="center" />
 
             </com.google.android.material.chip.ChipGroup>
@@ -113,7 +113,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.viewpager.widget.ViewPager
+        <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/areaViewPager"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -125,7 +125,7 @@
             app:layout_constraintStart_toEndOf="@id/tab_layout_wrapper"
             app:layout_constraintTop_toTopOf="parent">
 
-        </androidx.viewpager.widget.ViewPager>
+        </androidx.viewpager2.widget.ViewPager2>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
