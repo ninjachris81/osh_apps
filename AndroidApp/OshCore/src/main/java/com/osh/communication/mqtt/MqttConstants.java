@@ -23,6 +23,7 @@ public class MqttConstants {
 	public static final String MQTT_ACTOR_CMD_ATTR = "c";
 	public static final String MQTT_SENDER_DEVICE_ID_ATTR = "s";
 	public static final String MQTT_TS = "t";
+	public static final String MQTT_HEALTH_STATE = "h";
 
 
 }

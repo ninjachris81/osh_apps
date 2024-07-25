@@ -54,9 +54,9 @@ public class ServiceModules {
             return service.submit(() -> {
                 try {
                     LocalDatabaseServiceImpl localDatabaseService = new LocalDatabaseServiceImpl(context, applicationConfig.getDatabase());
-                    if (localDatabaseService.isEmpty()) {
+                    if (localDatabaseService.isEmpty() || localDatabaseService.canUpdate()) {
                         // if not, connect to real one and copy
-                        DatabaseServiceImpl databaseService = new DatabaseServiceImpl(applicationConfig.getDatabase());
+                        final DatabaseServiceImpl databaseService = new DatabaseServiceImpl(applicationConfig.getDatabase(), true);
                         localDatabaseService.copyData(databaseService);
                     }
 
@@ -138,8 +138,8 @@ public class ServiceModules {
 
     @Provides
     @Singleton
-    static IDeviceDiscoveryService provideDeviceDiscoveryService(ICommunicationService communicationManager, IApplicationConfig applicationConfig) {
-        return new ClientDeviceDiscoveryServiceImpl(communicationManager, applicationConfig.getMqtt().getClientId());
+    static IDeviceDiscoveryService provideDeviceDiscoveryService(ICommunicationService communicationManager, IDatamodelService datamodelService, IApplicationConfig applicationConfig) {
+        return new ClientDeviceDiscoveryServiceImpl(communicationManager, datamodelService, applicationConfig.getMqtt().getClientId());
     }
 
     @Provides

@@ -1,19 +1,43 @@
 package com.osh.device;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+import com.j256.ormlite.field.DatabaseField;
 import com.osh.SerializableIdentifyable;
 
-public class DeviceBase extends SerializableIdentifyable {
+import org.jetbrains.annotations.NotNull;
+
+public class DeviceBase {
 	
 	public static final String DEVICE_FULLID_SEP = ".";
 
-	protected String serviceId;
-	
+	@DatabaseField(id = true)
+	@PrimaryKey
+	@NotNull
+	@ColumnInfo(name = "id")
+	public String id;
+
+	@DatabaseField(columnName = "service_id", canBeNull = false)
+	@NotNull
+	@ColumnInfo(name = "service_id")
+	public String serviceId;
+
+	@Ignore
+	DeviceDiscoveryMessage.DeviceHealthState healthState = DeviceDiscoveryMessage.DeviceHealthState.Unknown;
+
+	@Ignore
 	protected boolean isOnline = false;
-	
+
+	@Ignore
 	protected long lastPing = 0;
+
+	@Ignore
+	protected long upTime = 0;
 	
 	public DeviceBase(String id, String serviceId) {
-		super(id);
+		this.id = id;
 		this.serviceId = serviceId;
 	}
 
@@ -22,15 +46,47 @@ public class DeviceBase extends SerializableIdentifyable {
 	}
 
 	public String getFullId() {
-	    return id + DEVICE_FULLID_SEP + serviceId;
+	    return getFullId(id, serviceId);
 	}
 
-	public String getServiceId() {
+	public static String getFullId(String id, String serviceId) {
+		return id + DEVICE_FULLID_SEP + serviceId;
+	}
+
+	public @NotNull String getServiceId() {
 		return serviceId;
 	}
 
-	public void setServiceId(String serviceId) {
-		this.serviceId = serviceId;
+	public @NotNull String getId() {
+		return id;
 	}
 
+	public boolean isOnline() {
+		return isOnline;
+	}
+
+	public long getLastPing() {
+		return lastPing;
+	}
+
+	public long getUpTime() {
+		return upTime;
+	}
+
+	public void setUpTime(long upTime) {
+		this.upTime = upTime;
+	}
+
+	public void updatePing() {
+		this.lastPing = System.currentTimeMillis();
+		this.isOnline = true;
+	}
+
+	public DeviceDiscoveryMessage.DeviceHealthState getHealthState() {
+		return healthState;
+	}
+
+	public void setHealthState(DeviceDiscoveryMessage.DeviceHealthState healthState) {
+		this.healthState = healthState;
+	}
 }

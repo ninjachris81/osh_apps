@@ -4,30 +4,21 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
-import com.osh.actor.ActorBase;
-import com.osh.actor.AudioPlaybackActor;
 import com.osh.actor.DBActor;
 import com.osh.actor.DBAudioActor;
 import com.osh.actor.DBShutterActor;
 import com.osh.database.config.DatabaseConfig;
-import com.osh.datamodel.DatamodelBase;
-import com.osh.datamodel.DynamicDatamodel;
 import com.osh.datamodel.meta.AudioPlaybackSource;
 import com.osh.datamodel.meta.KnownArea;
 import com.osh.datamodel.meta.KnownRoom;
 import com.osh.datamodel.meta.KnownRoomActors;
 import com.osh.datamodel.meta.KnownRoomValues;
-import com.osh.log.LogFacade;
+import com.osh.device.KnownDevice;
 import com.osh.service.IDatabaseService;
+import com.osh.user.User;
 import com.osh.value.DBValue;
-import com.osh.value.StringValue;
-import com.osh.value.ValueBase;
 import com.osh.value.ValueGroup;
-import com.osh.value.ValueType;
 
-import org.apache.commons.lang3.StringUtils;
-
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
@@ -37,31 +28,40 @@ public class DatabaseServiceImpl extends DatabaseServiceBaseImpl implements IDat
 
     private static final String TAG = DatabaseServiceImpl.class.getName();
 
-    protected final Dao<ValueGroup, String> valueGroupDao;
-    protected final Dao<DBValue, String> valueDao;
+    protected Dao<ValueGroup, String> valueGroupDao;
+    protected Dao<DBValue, String> valueDao;
 
-    protected final Dao<DBActor, String> actorDao;
-    protected final Dao<DBAudioActor, String> audioActorDao;
+    protected Dao<DBActor, String> actorDao;
+    protected Dao<DBAudioActor, String> audioActorDao;
 
-    protected final Dao<AudioPlaybackSource, String> audioPlaybackSourceDao;
-    protected final Dao<DBShutterActor, String> shutterActorDao;
+    protected Dao<AudioPlaybackSource, String> audioPlaybackSourceDao;
+    protected Dao<DBShutterActor, String> shutterActorDao;
 
-    protected final Dao<KnownRoom, String> knownRoomsDao;
+    protected Dao<KnownRoom, String> knownRoomsDao;
 
-    protected final Dao<KnownArea, String> knownAreaDao;
+    protected Dao<KnownArea, String> knownAreaDao;
 
-    protected final Dao<KnownRoomValues, String> knownRoomValuesDao;
+    protected Dao<KnownRoomValues, String> knownRoomValuesDao;
 
-    protected final Dao<KnownRoomActors, String> knownRoomActorsDao;
+    protected Dao<KnownRoomActors, String> knownRoomActorsDao;
 
+    protected Dao<KnownDevice, String> knownDevicesDao;
+
+    protected Dao<User, String> userDao;
 
     private final ConnectionSource connectionSource;
 
-    public DatabaseServiceImpl(DatabaseConfig config) throws SQLException {
+    public DatabaseServiceImpl(DatabaseConfig config, boolean initDao) throws SQLException {
         String databaseUrl = "jdbc:postgresql://" + config.getHost() + ":" + config.getPort() + "/" + config.getName();
         // create a connection source to our database
         connectionSource = new JdbcConnectionSource(databaseUrl, config.getUsername(), config.getPassword());
 
+        if (initDao) {
+            initDao();
+        }
+    }
+
+    private void initDao() throws SQLException {
         valueGroupDao = DaoManager.createDao(connectionSource, ValueGroup.class);
         valueDao = DaoManager.createDao(connectionSource, DBValue.class);
         actorDao = DaoManager.createDao(connectionSource, DBActor.class);
@@ -72,8 +72,23 @@ public class DatabaseServiceImpl extends DatabaseServiceBaseImpl implements IDat
         knownAreaDao = DaoManager.createDao(connectionSource, KnownArea.class);
         knownRoomValuesDao = DaoManager.createDao(connectionSource, KnownRoomValues.class);
         knownRoomActorsDao = DaoManager.createDao(connectionSource, KnownRoomActors.class);
+        knownDevicesDao = DaoManager.createDao(connectionSource, KnownDevice.class);
+        userDao = DaoManager.createDao(connectionSource, User.class);
     }
 
+    @Override
+    public long getVersion() {
+        try {
+            return connectionSource.getReadOnlyConnection("dm_version").queryForLong("SELECT version FROM dm_version");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean canUpdate() {
+        return false;
+    }
 
     @Override
     public boolean isEmpty() {
@@ -174,6 +189,24 @@ public class DatabaseServiceImpl extends DatabaseServiceBaseImpl implements IDat
     protected List<KnownRoomActors> loadKnownRoomActors() {
         try {
             return knownRoomActorsDao.queryForAll();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    protected List<KnownDevice> loadKnownDevices() {
+        try {
+            return knownDevicesDao.queryForAll();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    protected List<User> loadUsers() {
+        try {
+            return userDao.queryForAll();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

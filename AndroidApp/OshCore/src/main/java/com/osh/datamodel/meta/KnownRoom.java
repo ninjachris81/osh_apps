@@ -54,6 +54,7 @@ public class KnownRoom {
 	public KnownRoom() {
 	}
 
+	@Ignore
 	public KnownRoom(String id, String name) {
 		this.id = id;
 		this.name = name;

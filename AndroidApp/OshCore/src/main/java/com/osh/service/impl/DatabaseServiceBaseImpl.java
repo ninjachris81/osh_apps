@@ -14,8 +14,10 @@ import com.osh.datamodel.meta.KnownArea;
 import com.osh.datamodel.meta.KnownRoom;
 import com.osh.datamodel.meta.KnownRoomActors;
 import com.osh.datamodel.meta.KnownRoomValues;
+import com.osh.device.KnownDevice;
 import com.osh.log.LogFacade;
 import com.osh.service.IDatabaseService;
+import com.osh.user.User;
 import com.osh.value.DBValue;
 import com.osh.value.StringValue;
 import com.osh.value.ValueBase;
@@ -42,6 +44,8 @@ public abstract class DatabaseServiceBaseImpl implements IDatabaseService {
     protected abstract List<DBAudioActor> loadAudioActors(String id, String valueGroupId);
     protected abstract List<KnownRoomValues> loadKnownRoomValues();
     protected abstract List<KnownRoomActors> loadKnownRoomActors();
+    protected abstract List<KnownDevice> loadKnownDevices();
+    protected abstract List<User> loadUsers();
 
     @Override
     public final DatamodelBase loadDatamodel() {
@@ -136,6 +140,14 @@ public abstract class DatabaseServiceBaseImpl implements IDatabaseService {
         for (KnownRoom knownRoom : loadKnownRooms()) {
             KnownArea knownArea = datamodel.getKnownArea(knownRoom.getKnownAreaId());
             datamodel.addKnownRoom(knownArea, knownRoom.getId(), knownRoom.getName());
+        }
+
+        for (KnownDevice knownDevice : loadKnownDevices()) {
+            datamodel.addKnownDevice(knownDevice.getId(), knownDevice.getServiceId(), knownDevice.getName());
+        }
+
+        for (User user : loadUsers()) {
+            datamodel.addUser(user.getId(), user.getName(), user.getRights());
         }
     }
 

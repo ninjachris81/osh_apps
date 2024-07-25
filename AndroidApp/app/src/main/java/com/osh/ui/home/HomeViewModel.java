@@ -12,6 +12,7 @@ import android.icu.util.MeasureUnit;
 import android.media.MediaPlayer;
 
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.databinding.ObservableDouble;
 import androidx.databinding.ObservableField;
 import androidx.lifecycle.ViewModel;
@@ -88,7 +89,7 @@ public class HomeViewModel extends ViewModel {
     private static LocalizedNumberFormatter kiloWattsFormatter = NumberFormatter.withLocale(Locale.ENGLISH).unit(MeasureUnit.KILOWATT).notation(Notation.compactShort()).precision(Precision.fixedFraction(1));
     private static LocalizedNumberFormatter tempFormatter = NumberFormatter.withLocale(Locale.ENGLISH).unit(MeasureUnit.CELSIUS).notation(Notation.compactShort()).precision(Precision.integer());
 
-    private static final int COLOR_ORANGE = Color.parseColor("#ffa500");
+    private static int COLOR_ORANGE;
 
     private final Context context;
 
@@ -96,6 +97,8 @@ public class HomeViewModel extends ViewModel {
         this.context = context;
         this.serviceContext = serviceContext;
         this.batteryDataChangeListener = batteryDataChangeListener;
+
+        COLOR_ORANGE = ResourcesCompat.getColor(context.getResources(), R.color.orange, null);
 
         finishedSound = MediaPlayer.create(context, R.raw.success1);
 

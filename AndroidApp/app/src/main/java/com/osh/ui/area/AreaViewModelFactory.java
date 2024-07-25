@@ -15,7 +15,8 @@ public class AreaViewModelFactory implements ViewModelProvider.Factory {
 
     public static AreaViewModelFactory getInstance(IServiceContext serviceContext) {
         if (instance != null) return instance;
-        return new AreaViewModelFactory(serviceContext);
+        instance = new AreaViewModelFactory(serviceContext);
+        return instance;
     }
 
     private AreaViewModelFactory(IServiceContext serviceContext) {

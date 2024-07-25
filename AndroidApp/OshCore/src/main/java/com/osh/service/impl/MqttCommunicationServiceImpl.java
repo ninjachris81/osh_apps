@@ -2,6 +2,7 @@ package com.osh.service.impl;
 
 import static com.osh.communication.mqtt.MqttConstants.MQTT_ACTOR_CMD_ATTR;
 import static com.osh.communication.mqtt.MqttConstants.MQTT_BASE_PATH;
+import static com.osh.communication.mqtt.MqttConstants.MQTT_HEALTH_STATE;
 import static com.osh.communication.mqtt.MqttConstants.MQTT_PATH_SEP;
 import static com.osh.communication.mqtt.MqttConstants.MQTT_SENDER_DEVICE_ID_ATTR;
 import static com.osh.communication.mqtt.MqttConstants.MQTT_SINGLE_VALUE_ATTR;
@@ -243,7 +244,7 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 	    case MESSAGE_TYPE_SYSTEM_WARNING:
 	        return serializeSingleJSONValue(((SystemWarningMessage) msg).getMsg());
 	    case MESSAGE_TYPE_DEVICE_DISCOVERY:
-	    	return serializeSingleJSONValue(((DeviceDiscoveryMessage) msg).getUpTime());
+	    	return serializeJSONMap(((DeviceDiscoveryMessage) msg).getValues());
 	    case MESSAGE_TYPE_CONTROLLER:
 	    	return serializeSingleJSONValue(((ControllerMessage) msg).getData());
 	    case MESSAGE_TYPE_LOG:
@@ -356,7 +357,11 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 					}
 				}
 				case MESSAGE_TYPE_DEVICE_DISCOVERY: {
-					return new DeviceDiscoveryMessage(firstLevelPath.get(0), firstLevelPath.get(1), Long.parseLong(parseSingleValue(rawValue).toString()));
+					DeviceDiscoveryMessage.DeviceHealthState healthState = DeviceDiscoveryMessage.DeviceHealthState.Unknown;
+					if (rawValue.containsKey(MQTT_HEALTH_STATE)) {
+						healthState = DeviceDiscoveryMessage.DeviceHealthState.values()[((Number) rawValue.get(MQTT_HEALTH_STATE)).byteValue()];
+					}
+					return new DeviceDiscoveryMessage(firstLevelPath.get(0), firstLevelPath.get(1), Long.parseLong(parseSingleValue(rawValue).toString()), healthState);
 				}
 				case MESSAGE_TYPE_SYSTEM_TIME: {
 					return new SystemtimeMessage(((Number) parseSingleValue(rawValue)).longValue());

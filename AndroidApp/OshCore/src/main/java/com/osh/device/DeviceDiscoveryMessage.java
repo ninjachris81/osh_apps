@@ -1,18 +1,36 @@
 package com.osh.device;
 
+import android.bluetooth.BluetoothClass;
+
 import com.osh.communication.MessageBase;
+import com.osh.communication.mqtt.MqttConstants;
+
+import java.util.Map;
 
 public class DeviceDiscoveryMessage extends MessageBase {
 	
     private String deviceId;
     private String serviceId;
+	private DeviceHealthState healthState = DeviceHealthState.Unknown;
 
 	private long upTime;
 
-	public DeviceDiscoveryMessage(String deviceId, String serviceId, long upTime) {
+	public Map<String, Object> getValues() {
+		return Map.of(MqttConstants.MQTT_SINGLE_VALUE_ATTR, upTime, MqttConstants.MQTT_HEALTH_STATE, healthState);
+	}
+
+	public enum DeviceHealthState {
+		Unknown,
+		Healthy,
+		HasWarnings,
+		HasErrors;
+	};
+
+	public DeviceDiscoveryMessage(String deviceId, String serviceId, long upTime, DeviceHealthState healthState) {
 		this.deviceId = deviceId;
 		this.serviceId = serviceId;
 		this.upTime = upTime;
+		this.healthState = healthState;
 	}
 
 	@Override
@@ -48,5 +66,9 @@ public class DeviceDiscoveryMessage extends MessageBase {
 
 	public long getUpTime() {
 		return upTime;
+	}
+
+	public DeviceHealthState getHealthState() {
+		return healthState;
 	}
 }

@@ -11,8 +11,13 @@ import com.osh.datamodel.meta.KnownArea;
 import com.osh.datamodel.meta.KnownRoom;
 import com.osh.datamodel.meta.KnownRoomActors;
 import com.osh.datamodel.meta.KnownRoomValues;
+import com.osh.device.KnownDevice;
+import com.osh.service.impl.DatabaseVersion;
+import com.osh.user.User;
 import com.osh.value.DBValue;
 import com.osh.value.ValueGroup;
+
+import org.postgresql.core.Version;
 
 @Database(entities = {
         DBValue.class,
@@ -24,7 +29,10 @@ import com.osh.value.ValueGroup;
         DBShutterActor.class,
         AudioPlaybackSource.class,
         KnownRoomValues.class,
-        KnownRoomActors.class
+        KnownRoomActors.class,
+        KnownDevice.class,
+        User.class,
+        DatabaseVersion.class
 }, version = 1)
 public abstract class LocalAppDatabase extends RoomDatabase {
 
@@ -49,4 +57,11 @@ public abstract class LocalAppDatabase extends RoomDatabase {
     public abstract KnownRoomValuesDao getKnownRoomValuesDao();
 
     public abstract KnownRoomActorsDao getKnownRoomActorsDao();
+
+    public abstract KnownDevicesDao getKnownDevicesDao();
+
+    public abstract VersionDao getVersionDao();
+
+    public abstract UserDao getUserDao();
+
 }

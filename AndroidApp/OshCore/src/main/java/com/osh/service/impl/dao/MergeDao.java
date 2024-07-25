@@ -6,8 +6,6 @@ import androidx.room.Transaction;
 
 import com.osh.actor.ActorBase;
 import com.osh.actor.AudioPlaybackActor;
-import com.osh.actor.DBActor;
-import com.osh.actor.DBShutterActor;
 import com.osh.actor.ShutterActor;
 import com.osh.datamodel.DatamodelBase;
 import com.osh.datamodel.meta.AudioPlaybackSource;
@@ -15,9 +13,11 @@ import com.osh.datamodel.meta.KnownArea;
 import com.osh.datamodel.meta.KnownRoom;
 import com.osh.datamodel.meta.KnownRoomActors;
 import com.osh.datamodel.meta.KnownRoomValues;
+import com.osh.device.KnownDevice;
 import com.osh.log.LogFacade;
+import com.osh.service.impl.DatabaseVersion;
 import com.osh.service.impl.LocalDatabaseServiceImpl;
-import com.osh.value.DBValue;
+import com.osh.user.User;
 import com.osh.value.ValueBase;
 import com.osh.value.ValueGroup;
 
@@ -38,8 +38,11 @@ public abstract class MergeDao {
                                ShutterActorDao shutterActorDao,
                                AudioPlaybackSourceDao audioPlaybackSourceDao,
                                KnownRoomValuesDao knownRoomValuesDao,
-                               KnownRoomActorsDao knownRoomActorsDao
-                               ) {
+                               KnownRoomActorsDao knownRoomActorsDao,
+                               KnownDevicesDao knownDevicesDao,
+                               UserDao userDao,
+                               VersionDao versionDao,
+                               long version) {
 
         for(KnownArea knownArea : datamodel.getKnownAreas()) {
             LogFacade.d(TAG, "Inserting known area " + knownArea.getId());
@@ -87,6 +90,18 @@ public abstract class MergeDao {
             LogFacade.d(TAG, "Inserting audio playback source " + audioPlaybackSource.getId());
             audioPlaybackSourceDao.insert(audioPlaybackSource);
         }
+
+        for (KnownDevice knownDevice : datamodel.getKnownDevices().values()) {
+            LogFacade.d(TAG, "Inserting known device " + knownDevice.getFullId());
+            knownDevicesDao.insert(knownDevice);
+        }
+
+        for (User user : datamodel.getUsers().values()) {
+            LogFacade.d(TAG, "Inserting user " + user.getId());
+            userDao.insert(user);
+        }
+
+        versionDao.setVersion(new DatabaseVersion(version));
     }
 
 }

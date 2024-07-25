@@ -20,6 +20,7 @@ import com.osh.datamodel.meta.KnownArea;
 import com.osh.datamodel.meta.KnownRoom;
 import com.osh.device.KnownDevice;
 import com.osh.processor.ProcessorTask;
+import com.osh.user.User;
 import com.osh.value.BooleanValue;
 import com.osh.value.DoubleValue;
 import com.osh.value.EnumValue;
@@ -46,6 +47,8 @@ public class DatamodelBase extends Identifyable {
 
     protected final Map<String, ProcessorTask> processorTasks = new HashMap<>();
 	protected final Map<String, AudioPlaybackSource> audioPlaybackSources = new HashMap<>();
+
+	protected final Map<String, User> users = new HashMap<>();
 
 	public DatamodelBase(String id) {
 		super(id);
@@ -204,6 +207,12 @@ public class DatamodelBase extends Identifyable {
 		return knownArea;
 	}
 
+	public User addUser(String id, String name, String rights) {
+		User user = new User(id, name, rights);
+		users.put(user.getId(), user);
+		return user;
+	}
+
 	public KnownArea getKnownArea(String knownArea) {
 		return knownAreas.get(knownArea);
 	}
@@ -233,4 +242,7 @@ public class DatamodelBase extends Identifyable {
 		this.audioPlaybackSources.put(audioPlaybackSource.getName(), audioPlaybackSource);
 	}
 
+	public Map<String, User> getUsers() {
+		return this.users;
+	}
 }

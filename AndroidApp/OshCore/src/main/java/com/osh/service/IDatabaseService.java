@@ -5,7 +5,13 @@ import com.osh.datamodel.DatamodelBase;
 import com.osh.utils.IObservableBoolean;
 import com.osh.utils.IObservableListenerHolder;
 
+import java.sql.SQLException;
+
 public interface IDatabaseService {
+
+    long getVersion();
+
+    boolean canUpdate();
 
     boolean isEmpty();
 

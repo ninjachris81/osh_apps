@@ -34,6 +34,7 @@ public class KnownArea {
     @ColumnInfo(name = "name")
     public String name;
 
+
     @DatabaseField(columnName = "display_order")
     @ColumnInfo(name = "display_order")
     public int displayOrder;
@@ -50,6 +51,7 @@ public class KnownArea {
     public KnownArea() {
     }
 
+    @Ignore
     public KnownArea(String id, String name) {
         this.id = id;
         this.name = name;

@@ -1,10 +1,12 @@
 package com.osh;
 
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class Identifyable {
 
+	@Ignore
 	public final String PROPERTY_ID = "id";
 
 	@PrimaryKey

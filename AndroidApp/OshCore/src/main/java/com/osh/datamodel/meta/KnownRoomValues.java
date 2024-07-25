@@ -46,6 +46,7 @@ public class KnownRoomValues {
     public KnownRoomValues() {
     }
 
+    @Ignore
     public KnownRoomValues(@NotNull String roomId, @NotNull String valueGroupId, @NotNull String valueId) {
         this.roomId = roomId;
         this.valueGroupId = valueGroupId;

@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.hardware.camera2.CameraManager;
 import android.nfc.NfcAdapter;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -242,6 +243,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         setMaterialIcon(1, MaterialDrawableBuilder.IconValue.VIEW_DASHBOARD);
         setMaterialIcon(2, MaterialDrawableBuilder.IconValue.LAYERS);
         setMaterialIcon(3, MaterialDrawableBuilder.IconValue.RADIATOR);
+        setMaterialIcon(4, MaterialDrawableBuilder.IconValue.MATRIX);
 
         //binding.navView.setOnItemSelectedListener(navListener);
 
@@ -459,16 +461,31 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         }, true, () -> {return dbConnectedStateIcon!=null;});
 
         dbConnectedStateIcon.setOnMenuItemClickListener(item -> {
-                new AlertDialog.Builder(this)
-                        .setTitle("Reset database")
-                        .setMessage("Reset local database ?")
-                        .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                            serviceContext.getDatabaseService().resetDatabase();
-                            finishAndRemoveTask();
-                            System.exit(0);
-                        })
-                        .setNegativeButton(android.R.string.no, null)
-                        .show();
+            final Context context = this;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    long version = serviceContext.getDatabaseService().getVersion();
+                    boolean canUpdate = serviceContext.getDatabaseService().canUpdate();
+
+                    runOnUiThread(()->{
+                        if (canUpdate) {
+                            new AlertDialog.Builder(context)
+                                    .setTitle("Update database")
+                                    .setMessage("Update local database ?")
+                                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                                        serviceContext.getDatabaseService().resetDatabase();
+                                        finishAndRemoveTask();
+                                        System.exit(0);
+                                    })
+                                    .setNegativeButton(android.R.string.no, null)
+                                    .show();
+                        } else {
+                            Toast.makeText(context, "Database Version: " + version, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }).start();
             return true;
         });
 

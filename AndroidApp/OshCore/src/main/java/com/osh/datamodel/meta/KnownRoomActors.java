@@ -47,6 +47,7 @@ public class KnownRoomActors {
     public KnownRoomActors() {
     }
 
+    @Ignore
     public KnownRoomActors(@NotNull String roomId, @NotNull String valueGroupId, @NotNull String actorId) {
         this.roomId = roomId;
         this.valueGroupId = valueGroupId;

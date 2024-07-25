@@ -13,7 +13,7 @@ public class OshValueFormats {
         } else if (ms < 3600000) {
             return Float.valueOf(ms / 60000).intValue() + " min";
         } else {
-            return DurationFormatUtils.formatDuration(ms, "[HH:]mm");
+            return DurationFormatUtils.formatDuration(ms, "[d'd' HH:]mm");
         }
     }
 

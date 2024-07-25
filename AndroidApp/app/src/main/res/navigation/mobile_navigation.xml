@@ -29,4 +29,12 @@
         android:label="@string/title_wbb12"
         tools:layout="@layout/fragment_wbb12"
         />
+
+    <fragment
+        android:id="@+id/navigation_sysint"
+        android:name="com.osh.ui.sysint.SystemInternalsFragment"
+        android:label="@string/title_sysint"
+        tools:layout="@layout/fragment_system_internals"
+        />
+
 </navigation>

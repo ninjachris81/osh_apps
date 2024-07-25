@@ -57,6 +57,7 @@ public class DBAudioActor {
     public DBAudioActor() {
     }
 
+    @Ignore
     public DBAudioActor(@NotNull String id, @NotNull String valueGroupId, String audioDeviceIds, String audioActivationRelayId, float audioVolume, String audioVolumeId, String audioUrl, String audioUrlId, String audioCurrentTitleId) {
         this.id = id;
         this.valueGroupId = valueGroupId;

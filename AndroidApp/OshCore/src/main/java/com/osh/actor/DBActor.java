@@ -47,6 +47,7 @@ public class DBActor {
     public DBActor() {
     }
 
+    @Ignore
     public DBActor(@NotNull String id, @NotNull String classType, @NotNull String valueGroupId, int valueType, int valueTimeout, boolean isAsync) {
         this.id = id;
         this.classType = classType;

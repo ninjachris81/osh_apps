@@ -1,6 +1,5 @@
 package com.osh.ui.home;
 
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,9 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.databinding.DataBindingUtil;
-import androidx.databinding.Observable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -20,12 +17,9 @@ import com.osh.activity.CameraDetailsActivity;
 import com.osh.activity.DoorOpenActivity;
 import com.osh.activity.MainActivity;
 import com.osh.activity.OshApplication;
-import com.osh.activity.StatisticsActivity;
+import com.osh.activity.WebviewActivity;
 import com.osh.databinding.FragmentHomeBinding;
 import com.osh.service.IServiceContext;
-import com.osh.value.DoubleValue;
-import com.osh.value.enums.EnergyTrend;
-import com.osh.value.EnumValue;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
@@ -80,11 +74,20 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
         binding.currentMode.setOnClickListener(v -> {openEnergyStatistics(app.getApplicationConfig().getGrafana().getEnergyUrl());});
         binding.currentTrend.setOnClickListener(v -> {openEnergyStatistics(app.getApplicationConfig().getGrafana().getEnergyUrl());});
 
+        binding.weatherToday.setOnClickListener(v -> {openWeatherDetails();});
+        binding.weatherTomorrow.setOnClickListener(v -> {openWeatherDetails();});
+        binding.weatherTomorrow2.setOnClickListener(v -> {openWeatherDetails();});
+
         return binding.getRoot();
     }
 
+    private void openWeatherDetails() {
+        WebviewActivity.invokeActivity(getContext(), null, "Current Weather", "<html><head></head><body><a class=\"weatherwidget-io\" href=\"https://forecast7.com/en/48d789d18/stuttgart/\" data-label_1=\"STUTTGART\" data-label_2=\"WEATHER\" data-theme=\"pure\" >STUTTGART WEATHER</a><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');</script></body></html>");
+        //WebviewActivity.invokeActivity(getContext(), null, "Current Weather", "<html><head></head><body><div id=\"openweathermap-widget-11\"></div><script src='//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/d3.min.js'></script><script>window.myWidgetParam ? window.myWidgetParam : window.myWidgetParam = [];  window.myWidgetParam.push({id: 11,cityid: '2825297',appid: '4ee988f21256351a70f3d304d3ea9157',units: 'metric',containerid: 'openweathermap-widget-11',  });  (function() {var script = document.createElement('script');script.async = true;script.charset = \"utf-8\";script.src = \"//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/weather-widget-generator.js\";var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(script, s);  })();</script></body></html>");
+    }
+
     private void openEnergyStatistics(String energyUrl) {
-        StatisticsActivity.invokeActivity(getContext(), energyUrl, "Energy Statistics");
+        WebviewActivity.invokeActivity(getContext(), energyUrl, "Energy Statistics", null);
     }
 
     private void setupBattery(HomeViewModel homeViewModel) {

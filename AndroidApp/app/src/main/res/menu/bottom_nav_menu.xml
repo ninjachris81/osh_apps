@@ -22,4 +22,9 @@
         app:materialIcon="radiator"
         android:title="@string/title_wbb12" />
 
+    <item
+        android:id="@+id/navigation_sysint"
+        app:materialIcon="matrix"
+        android:title="@string/title_sysint" />
+
 </menu>

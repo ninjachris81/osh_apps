@@ -41,6 +41,7 @@ public class DBShutterActor {
     public DBShutterActor() {
     }
 
+    @Ignore
     public DBShutterActor(@NotNull String id, @NotNull String valueGroupId, boolean shutterTiltSupport, long shutterFullCloseDuration, long shutterFullTiltDuration) {
         this.id = id;
         this.valueGroupId = valueGroupId;

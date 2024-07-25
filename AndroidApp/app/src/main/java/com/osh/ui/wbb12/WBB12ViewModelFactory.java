@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.osh.wbb12.service.IWBB12Service;
 
 public class WBB12ViewModelFactory implements ViewModelProvider.Factory {
-    private IWBB12Service wbb12Manager;
+    private final IWBB12Service wbb12Manager;
 
 
     public WBB12ViewModelFactory(IWBB12Service wbb12Manager) {

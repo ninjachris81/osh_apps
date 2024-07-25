@@ -65,10 +65,17 @@ public class AreaFragment extends Fragment {
         areaOverlayViewModel = new ViewModelProvider(this, AreaOverlayViewModelFactory.getInstance()).get(AreaOverlayViewModel.class);
 
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_area, container, false);
-
         binding.setAreaOverlayData(areaOverlayViewModel);
-
         binding.setLifecycleOwner(this);
+
+        areaPagerAdapter = new AreaPagerAdapter(getChildFragmentManager(), getLifecycle());
+        viewPager = binding.areaViewPager;
+        viewPager.setAdapter(areaPagerAdapter);
+
+        TabLayout tabLayout = binding.tabLayout;
+        new TabLayoutMediator(tabLayout, viewPager,
+                (tab, position) -> tab.setText(areaPagerAdapter.getTitle(position))
+        ).attach();
 
         return binding.getRoot();
     }
@@ -81,19 +88,12 @@ public class AreaFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        areaPagerAdapter = new AreaPagerAdapter(getChildFragmentManager(), getLifecycle());
-        viewPager = binding.areaViewPager;
-        viewPager.setAdapter(areaPagerAdapter);
-
-        TabLayout tabLayout = binding.tabLayout;
-        new TabLayoutMediator(tabLayout, viewPager,
-                (tab, position) -> tab.setText(areaPagerAdapter.getTitle(position))
-        ).attach();
+    public void onResume() {
+        super.onResume();
 
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
 
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        binding.tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 SharedPreferences.Editor editor = sharedPref.edit();
@@ -111,8 +111,13 @@ public class AreaFragment extends Fragment {
 
             }
         });
-        tabLayout.getTabAt(sharedPref.getInt(getString(R.string.area_last_tab), 0)).select();
 
+        binding.tabLayout.getTabAt(sharedPref.getInt(getString(R.string.area_last_tab), 0)).select();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         areaOverlayViewModel.currentOverlay.set(AreaOverlays.values()[sharedPref.getInt(getString(R.string.area_last_overlay), 0)]);
         overlayCallback = new Observable.OnPropertyChangedCallback() {
             @Override

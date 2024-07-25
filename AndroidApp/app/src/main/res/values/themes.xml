@@ -15,7 +15,6 @@
         <item name="android:windowFullscreen">true</item>
 
         <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:textColorSecondary">@android:color/white</item>
 
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -24,10 +23,8 @@
     <style name="Theme.OSH.NoActionBar">
     </style>
 
-    <!--
     <style name="Theme.OSH.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.OSH.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-    -->
 
 </resources>
