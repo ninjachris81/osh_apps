@@ -11,15 +11,18 @@ import android.webkit.WebSettings;
 
 import com.osh.databinding.ActivityStatisticsBinding;
 
-public class StatisticsActivity extends AppCompatActivity {
+public class WebviewActivity extends AppCompatActivity {
 
     private static final String INTENT_PARAM_URL = "url";
+    private static final String INTENT_PARAM_TITLE = "title";
+    private static final String INTENT_PARAM_CONTENT = "content";
     private ActivityStatisticsBinding binding;
 
-    public static void invokeActivity(Context context, String url, String title) {
-        Intent mIntent = new Intent(context, StatisticsActivity.class);
-        mIntent.putExtra(INTENT_PARAM_URL, url);
-        mIntent.putExtra("title", title);
+    public static void invokeActivity(Context context, String url, String title, String content) {
+        Intent mIntent = new Intent(context, WebviewActivity.class);
+        if (url != null) mIntent.putExtra(INTENT_PARAM_URL, url);
+        if (title != null) mIntent.putExtra(INTENT_PARAM_TITLE, title);
+        if (content != null) mIntent.putExtra(INTENT_PARAM_CONTENT, content);
         context.startActivity(mIntent);
     }
 
@@ -34,12 +37,18 @@ public class StatisticsActivity extends AppCompatActivity {
         settings.setLoadsImagesAutomatically(true);
         settings.setDomStorageEnabled(true);
 
-        binding.webview.loadUrl(getIntent().getStringExtra(INTENT_PARAM_URL));
+        if (getIntent().hasExtra(INTENT_PARAM_URL)) {
+            binding.webview.loadUrl(getIntent().getStringExtra(INTENT_PARAM_URL));
+        } else if (getIntent().hasExtra(INTENT_PARAM_CONTENT)) {
+            binding.webview.loadData(getIntent().getStringExtra(INTENT_PARAM_CONTENT),"text/html; charset=utf-8", "UTF-8");
+        } else {
+            throw new RuntimeException("Invalid params");
+        }
 
         setContentView(binding.getRoot());
 
         Toolbar myToolbar = binding.myToolbar;
-        myToolbar.setTitle(getIntent().getStringExtra("title"));
+        if (getIntent().hasExtra(INTENT_PARAM_TITLE)) myToolbar.setTitle(getIntent().getStringExtra(INTENT_PARAM_TITLE));
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }

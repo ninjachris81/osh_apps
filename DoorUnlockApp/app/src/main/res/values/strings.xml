@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">DoorUnlockApp</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <string name="user_settings">User ID</string>
+    <string name="user_settings_key">user.id</string>
+
+    <string name="mqtt_settings">MQTT</string>
+
+    <string name="mqtt_client_id">Client ID</string>
+    <string name="mqtt_client_id_key">mqtt_client_id</string>
+
+    <string name="mqtt_host">MQTT Host</string>
+    <string name="mqtt_host_key">mqtt_host_key</string>
+    <string name="mqtt_port">MQTT Port</string>
+    <string name="mqtt_port_key">mqtt_port_key</string>
+    <string name="General">General</string>
+    <string name="device_id">Device ID</string>
+    <string name="device_id_key">device.id</string>
+
+</resources>

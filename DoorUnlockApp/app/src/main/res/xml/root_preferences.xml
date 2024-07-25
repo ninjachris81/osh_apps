@@ -1,0 +1,37 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/General">
+
+        <EditTextPreference
+            app:key="@string/user_settings_key"
+            app:title="@string/user_settings"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="@string/device_id_key"
+            app:title="@string/device_id"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/mqtt_settings">
+
+        <EditTextPreference
+            app:key="@string/mqtt_client_id_key"
+            app:title="@string/mqtt_client_id"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="@string/mqtt_host_key"
+            app:title="@string/mqtt_host"
+            app:defaultValue="localhost"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="@string/mqtt_port_key"
+            app:title="@string/mqtt_port"
+            app:defaultValue="1883"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
