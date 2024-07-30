@@ -71,14 +71,20 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
         setupBattery(homeViewModel);
 
         binding.powerConsumption.setOnClickListener(v -> {openEnergyStatistics(app.getApplicationConfig().getGrafana().getEnergyUrl());});
-        binding.currentMode.setOnClickListener(v -> {openEnergyStatistics(app.getApplicationConfig().getGrafana().getEnergyUrl());});
         binding.currentTrend.setOnClickListener(v -> {openEnergyStatistics(app.getApplicationConfig().getGrafana().getEnergyUrl());});
+        binding.currentMode.setOnClickListener(v -> {openEnergyStatistics(app.getApplicationConfig().getFronius().getInverterUrl());});
 
         binding.weatherToday.setOnClickListener(v -> {openWeatherDetails();});
         binding.weatherTomorrow.setOnClickListener(v -> {openWeatherDetails();});
         binding.weatherTomorrow2.setOnClickListener(v -> {openWeatherDetails();});
 
+        binding.waterInfos.setOnClickListener(v -> {openWaterDetails(app.getApplicationConfig().getGrafana().getWaterUrl());});
+
         return binding.getRoot();
+    }
+
+    private void openWaterDetails(String url) {
+        WebviewActivity.invokeActivity(getContext(), url, "Water Details", null);
     }
 
     private void openWeatherDetails() {

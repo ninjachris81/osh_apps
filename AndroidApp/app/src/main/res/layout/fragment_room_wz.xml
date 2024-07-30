@@ -111,11 +111,25 @@
             android:visibility="gone"
             android:alpha="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS ? 1 : 0 }"
             clickEnabled="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS}"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:isAuto="@{roomData.shutterAutoModes[0]}"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:singleLine="true" />
+
+        <com.osh.ui.components.WindowStateIndicator
+            android:id="@+id/windowStateWz0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="-200dp"
+            android:layout_marginBottom="@dimen/window_state_wall_padding"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:alpha="@{areaOverlayData.currentOverlay == AreaOverlays.SENSORS ? 1.0f : 0 }"
+            state='@{roomData.windowStates[0]}'
+            />
 
         <TextView
             android:id="@+id/shutterLabel1"
@@ -136,11 +150,25 @@
             android:visibility="gone"
             android:alpha="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS ? 1 : 0 }"
             clickEnabled="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS}"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:isAuto="@{roomData.shutterAutoModes[1]}"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:singleLine="true" />
+
+        <com.osh.ui.components.WindowStateIndicator
+            android:id="@+id/windowStateWz1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="300dp"
+            android:layout_marginBottom="@dimen/window_state_wall_padding"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:alpha="@{areaOverlayData.currentOverlay == AreaOverlays.SENSORS ? 1.0f : 0 }"
+            state='@{roomData.windowStates[1]}'
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -4,6 +4,7 @@ public class GrafanaConfig {
 
     String wbb12Url;
     String energyUrl;
+    String waterUrl;
 
     public String getWbb12Url() {
         return wbb12Url;
@@ -19,5 +20,13 @@ public class GrafanaConfig {
 
     public void setEnergyUrl(String energyUrl) {
         this.energyUrl = energyUrl;
+    }
+
+    public String getWaterUrl() {
+        return waterUrl;
+    }
+
+    public void setWaterUrl(String waterUrl) {
+        this.waterUrl = waterUrl;
     }
 }

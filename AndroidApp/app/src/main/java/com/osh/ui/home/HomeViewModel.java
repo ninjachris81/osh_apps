@@ -72,6 +72,9 @@ public class HomeViewModel extends ViewModel {
     public final ObservableField<String> weatherTempTomorrow = new ObservableField<>();
     public final ObservableField<String> weatherTempTomorrow2 = new ObservableField<>();
 
+    public final List<ObservableField<Float>> waterLevels = new ArrayList<>();
+    public final List<ObservableField<Float>> waterFlows = new ArrayList<>();
+
     private final MediaPlayer finishedSound;
 
     public final ObservableField<String> powerConsumptionText = new ObservableField<>();
@@ -109,6 +112,27 @@ public class HomeViewModel extends ViewModel {
         setupConsumption();
         setupTrend();
         setupWeather();
+
+        setupWater();
+    }
+
+    private void setupWater() {
+        registerWaterLevel("waterLevels0.0", "waterFlows0.0");
+        registerWaterLevel("waterLevels0.1", "waterFlows0.1");
+        registerWaterLevel("waterLevels0.2", "waterFlows0.2");
+        registerWaterLevel("waterLevels0.3", "waterFlows0.3");
+    }
+
+    private void registerWaterLevel(String fullIdLevel, String fullIdFlow) {
+        final int index = waterLevels.size();
+        waterLevels.add(new ObservableField<>());
+        DoubleValue valueLevel = (DoubleValue) serviceContext.getValueService().getValue(fullIdLevel);
+        valueLevel.addItemChangeListener(item -> {waterLevels.get(index).set(item.getValue(Double.valueOf(0)).floatValue());}, true, () -> {return this != null;});
+
+        final int index2 = waterFlows.size();
+        waterFlows.add(new ObservableField<>());
+        DoubleValue valueFlow = (DoubleValue) serviceContext.getValueService().getValue(fullIdFlow);
+        valueFlow.addItemChangeListener(item -> {waterFlows.get(index2).set(item.getValue(Double.valueOf(0)).floatValue());}, true, () -> {return this != null;});
     }
 
     private void setupWeather() {

@@ -4,6 +4,7 @@ import com.osh.camera.config.CameraConfig;
 import com.osh.communication.mqtt.config.MqttConfig;
 import com.osh.database.config.DatabaseConfig;
 import com.osh.datamodel.config.DatamodelConfig;
+import com.osh.fronius.config.FroniusConfig;
 import com.osh.grafana.config.GrafanaConfig;
 import com.osh.sip.SipConfig;
 import com.osh.user.config.UserConfig;
@@ -23,6 +24,8 @@ public class ApplicationConfig implements IApplicationConfig {
 	private final CameraConfig camera = new CameraConfig();
 
 	private final GrafanaConfig grafana = new GrafanaConfig();
+
+	private final FroniusConfig fronius = new FroniusConfig();
 
 	@Override
 	public UserConfig getUser() {
@@ -57,5 +60,10 @@ public class ApplicationConfig implements IApplicationConfig {
 	@Override
 	public GrafanaConfig getGrafana() {
 		return grafana;
+	}
+
+	@Override
+	public FroniusConfig getFronius() {
+		return fronius;
 	}
 }

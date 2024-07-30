@@ -189,20 +189,36 @@
         </PreferenceCategory>
 
     </PreferenceCategory>
-        <PreferenceCategory app:title="@string/grafana_settings">
+    <PreferenceCategory app:title="@string/grafana_settings">
 
-            <EditTextPreference
-                app:defaultValue="http://localhost:3000/grafana"
-                app:key="@string/grafana_wbb12_url_key"
-                app:title="@string/grafana_wbb12_url"
-                app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="http://localhost:3000/grafana"
+            app:key="@string/grafana_wbb12_url_key"
+            app:title="@string/grafana_wbb12_url"
+            app:useSimpleSummaryProvider="true" />
 
-            <EditTextPreference
-                app:defaultValue="http://localhost:3000/grafana"
-                app:key="@string/grafana_energy_url_key"
-                app:title="@string/grafana_energy_url"
-                app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="http://localhost:3000/grafana"
+            app:key="@string/grafana_energy_url_key"
+            app:title="@string/grafana_energy_url"
+            app:useSimpleSummaryProvider="true" />
 
-        </PreferenceCategory>
+        <EditTextPreference
+            app:defaultValue="http://localhost:3000/grafana"
+            app:key="@string/grafana_water_url_key"
+            app:title="@string/grafana_water_url"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+    <PreferenceCategory app:title="@string/fronius_settings">
+
+        <EditTextPreference
+            app:defaultValue="http://localhost"
+            app:key="@string/fronius_inverter_url_key"
+            app:title="@string/fronius_inverter_url"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
 
 </PreferenceScreen>

@@ -4,6 +4,7 @@ import com.osh.camera.config.CameraConfig;
 import com.osh.communication.mqtt.config.MqttConfig;
 import com.osh.database.config.DatabaseConfig;
 import com.osh.datamodel.config.DatamodelConfig;
+import com.osh.fronius.config.FroniusConfig;
 import com.osh.grafana.config.GrafanaConfig;
 import com.osh.sip.SipConfig;
 import com.osh.user.config.UserConfig;
@@ -23,5 +24,7 @@ public interface IApplicationConfig {
     CameraConfig getCamera();
 
     GrafanaConfig getGrafana();
+
+    FroniusConfig getFronius();
 
 }

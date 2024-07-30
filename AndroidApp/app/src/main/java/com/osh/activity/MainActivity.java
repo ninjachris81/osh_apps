@@ -434,17 +434,16 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         //getMenuInflater().inflate(R.menu.main_menu, menu);
 
         MaterialMenuInflater.with(this)
-                .setDefaultColor(Color.WHITE)
                 .inflate(R.menu.main_menu, menu);
 
-        Drawable wifiOnIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.WIFI).setColor(Color.WHITE).build();
-        Drawable wifiOffIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.WIFI_OFF).setColor(Color.WHITE).build();
+        Drawable wifiOnIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.WIFI).build();
+        Drawable wifiOffIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.WIFI_OFF).build();
 
-        Drawable dbOnIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.DATABASE).setColor(Color.WHITE).build();
-        Drawable dbOffIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.DATABASE_MINUS).setColor(Color.WHITE).build();
+        Drawable dbOnIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.DATABASE).build();
+        Drawable dbOffIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.DATABASE_MINUS).build();
 
-        Drawable sipOnIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.PHONE).setColor(Color.WHITE).build();
-        Drawable sipOffIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.PHONE_MINUS).setColor(Color.WHITE).build();
+        Drawable sipOnIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.PHONE).build();
+        Drawable sipOffIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.PHONE_MINUS).build();
 
         MenuItem mqttConnectedStateIcon = menu.findItem(R.id.mqtt_connected_state_icon);
         serviceContext.getCommunicationService().connectedState().addItemChangeListener(connectedState -> {

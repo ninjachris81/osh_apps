@@ -79,7 +79,10 @@ public class OshApplication extends Application {
 
 
         applicationConfig.getGrafana().setWbb12Url(prefs.getString(getString(R.string.grafana_wbb12_url_key), "http://localhost:3000/grafana"));
-        applicationConfig.getGrafana().setEnergyUrl(prefs.getString(getString(R.string.grafana_energy_url), "http://localhost:3000/grafana"));
+        applicationConfig.getGrafana().setEnergyUrl(prefs.getString(getString(R.string.grafana_energy_url_key), "http://localhost:3000/grafana"));
+        applicationConfig.getGrafana().setWaterUrl(prefs.getString(getString(R.string.grafana_water_url_key), "http://localhost:3000/grafana"));
+
+        applicationConfig.getFronius().setInverterUrl(prefs.getString(getString(R.string.fronius_inverter_url_key), "http://localhost"));
     }
 
     public IApplicationConfig getApplicationConfig() {

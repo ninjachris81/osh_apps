@@ -24,10 +24,17 @@ public class KnownDevice extends DeviceBase {
 	@ColumnInfo(name = "name")
 	public String name;
 
+	@DatabaseField(canBeNull = false)
+	@ColumnInfo(name = "mandatory")
+	@NotNull
+	public boolean mandatory;
+
+
 	@Ignore
-	public KnownDevice(String id, String serviceId, String name) {
+	public KnownDevice(String id, String serviceId, String name, boolean mandatory) {
 		super(id, serviceId);
 		this.name = name;
+		this.mandatory = mandatory;
 	}
 
 	public KnownDevice() {
@@ -38,4 +45,7 @@ public class KnownDevice extends DeviceBase {
 		return name;
 	}
 
+	public boolean isMandatory() {
+		return mandatory;
+	}
 }

@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.osh.R;
 import com.osh.activity.MainActivity;
 import com.osh.actor.AudioPlaybackActor;
+import com.osh.ui.components.WindowStateIndicator;
 import com.osh.ui.dialogs.SelectAudioDialogFragment;
 import com.osh.actor.ActorCmds;
 import com.osh.actor.DigitalActor;
@@ -39,9 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> extends Fragment {
-
-    @LayoutRes
-    protected int layout = R.layout.fragment_room;
 
     public class ShutterInfo {
         public String shutterValueGroupId;
@@ -87,8 +85,6 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
 
     protected List<ShutterInfo> shutterInfos = new ArrayList<>();
 
-    protected List<Integer> shutterModeButtons = List.of(R.id.shutterModeButton);
-
     protected List<LightInfo> lightInfos = new ArrayList<>();
 
     protected final SensorInfo sensorInfos = new SensorInfo();
@@ -98,6 +94,12 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
     private View roomBackground;
 
     protected abstract void setBindingData();
+
+    @LayoutRes
+    protected abstract int getLayout();
+
+    protected abstract List<Integer> getShutterModeButtons();
+    protected abstract List<Integer> getWindowStateIndicators();
 
     protected String roomId;
     protected String areaId;
@@ -128,7 +130,6 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
         outState.putString("roomId", roomId);
         outState.putString("areaId", areaId);
         outState.putString("roomPosition", roomPosition.name());
-        outState.putInt("layout", layout);
     }
 
     @Override
@@ -140,10 +141,9 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
             this.roomId = savedInstanceState.getString("roomId");
             this.areaId = savedInstanceState.getString("areaId");
             this.roomPosition = RoomViewModel.RoomPosition.valueOf(savedInstanceState.getString("roomPosition"));
-            this.layout = savedInstanceState.getInt("layout");
         }
 
-        binding = DataBindingUtil.inflate(inflater, this.layout, container, false);
+        binding = DataBindingUtil.inflate(inflater, getLayout(), container, false);
 
         roomViewModel = new ViewModelProvider(this, new RoomViewModelFactory(serviceContext)).get(roomId, RoomViewModel.class);
         roomViewModel.roomPosition.set(roomPosition);
@@ -163,12 +163,12 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
             bindLight(lightInfos.get(i), i);
         }
 
-        if (!shutterInfos.isEmpty() && shutterInfos.size() != shutterModeButtons.size()) {
+        if (!shutterInfos.isEmpty() && shutterInfos.size() != getShutterModeButtons().size()) {
             throw new RuntimeException("Shutter info mismatch for room " + this.roomViewModel.getRoom().getId());
         }
 
         for (int i = 0;i<shutterInfos.size();i++) {
-            bindShutter(shutterInfos.get(i), shutterModeButtons.get(i), i);
+            bindShutter(shutterInfos.get(i), getShutterModeButtons().get(i), i);
         }
 
         for (int i = 0;i<sensorInfos.temperatureIds.size();i++) {
@@ -180,7 +180,7 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
         }
 
         for (int i = 0;i<sensorInfos.windowStateIds.size();i++) {
-            bindWindowState(sensorInfos.windowStateIds.get(i), i);
+            bindWindowState(sensorInfos.windowStateIds.get(i), getWindowStateIndicators().get(i), i);
         }
 
         for (int i = 0;i<sensorInfos.brightnessIds.size();i++) {
@@ -294,7 +294,10 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
     }
 
 
-    protected void bindWindowState(String id, int index) {
+    protected void bindWindowState(String id, @IdRes int windowStateIndicator, int index) {
+        WindowStateIndicator stateIndicator = binding.getRoot().findViewById(windowStateIndicator);
+        stateIndicator.setVisibility(View.VISIBLE);
+
         BooleanValue value = (BooleanValue) serviceContext.getValueService().getValue(id);
         if (value != null) {
             value.addItemChangeListener(item -> {

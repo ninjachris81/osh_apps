@@ -99,8 +99,15 @@
     <string name="sip_ring_volume">Ring Volume</string>
     <string name="title_activity_call">CallActivity</string>
     <string name="exitapp">Exit</string>
-    <string name="grafana_energy_url_key">Energy URL</string>
+    <string name="grafana_energy_url_key">grafana_energy_url_key</string>
     <string name="grafana_energy_url">Energy URL</string>
+
+    <string name="grafana_water_url_key">grafana_water_url_key</string>
+    <string name="grafana_water_url">Water URL</string>
+
+    <string name="fronius_settings">Fronius</string>
+    <string name="fronius_inverter_url_key">fronius_inverter_url_key</string>
+    <string name="fronius_inverter_url">Inverter URL</string>
 
 
     <string name="large_text">

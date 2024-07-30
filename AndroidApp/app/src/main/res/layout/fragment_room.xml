@@ -110,6 +110,22 @@
             app:layout_constraintStart_toStartOf="parent"
             app:singleLine="true" />
 
+        <com.osh.ui.components.WindowStateIndicator
+            android:id="@+id/windowState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@{roomData.roomPosition == RoomPosition.POSITION_BOTTOM ? @dimen/window_state_wall_padding : @dimen/window_state_wall_padding_none}"
+            android:layout_marginTop="@{roomData.roomPosition == RoomPosition.POSITION_TOP ? @dimen/window_state_wall_padding : @dimen/window_state_wall_padding_none}"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf='@{roomData.roomPosition == RoomPosition.POSITION_BOTTOM ? "parent" : ""}'
+            app:layout_constraintTop_toTopOf='@{roomData.roomPosition == RoomPosition.POSITION_TOP ? "parent" : ""}'
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:alpha="@{areaOverlayData.currentOverlay == AreaOverlays.SENSORS ? 1.0f : 0 }"
+            state='@{roomData.windowStates[0]}'
+            />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

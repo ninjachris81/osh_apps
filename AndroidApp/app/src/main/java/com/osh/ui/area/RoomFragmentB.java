@@ -6,6 +6,7 @@ import com.osh.R;
 import com.osh.databinding.FragmentRoomBBinding;
 import com.osh.service.IServiceContext;
 
+import java.util.Collections;
 import java.util.List;
 
 public class RoomFragmentB extends RoomFragmentBase<FragmentRoomBBinding> {
@@ -15,13 +16,11 @@ public class RoomFragmentB extends RoomFragmentBase<FragmentRoomBBinding> {
 
     public RoomFragmentB(String roomId, String areaId, RoomViewModel.RoomPosition roomPosition) {
         super(roomId, areaId, roomPosition);
-        layout = R.layout.fragment_room_b;
-
-        shutterModeButtons = List.of(R.id.shutterModeButtonB0, R.id.shutterModeButtonB1);
     }
 
     @Override
     protected void setBindingData() {
+        binding.setAreaOverlayData(areaOverlayViewModel);
         binding.setAreaData(areaViewModel);
         binding.setRoomData(roomViewModel);
         roomViewModel.initLightStates(lightInfos.size());
@@ -31,5 +30,20 @@ public class RoomFragmentB extends RoomFragmentBase<FragmentRoomBBinding> {
         roomViewModel.initHumidities(sensorInfos.humidityIds.size());
         roomViewModel.initWindowStates(sensorInfos.windowStateIds.size());
         roomViewModel.initPresences(sensorInfos.presenceIds.size());
+    }
+
+    @Override
+    protected int getLayout() {
+        return R.layout.fragment_room_b;
+    }
+
+    @Override
+    protected List<Integer> getShutterModeButtons() {
+        return List.of(R.id.shutterModeButtonB0, R.id.shutterModeButtonB1);
+    }
+
+    @Override
+    protected List<Integer> getWindowStateIndicators() {
+        return List.of(R.id.windowStateB0, R.id.windowStateB1);
     }
 }

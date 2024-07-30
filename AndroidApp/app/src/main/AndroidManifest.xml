@@ -79,6 +79,7 @@
             android:name=".activity.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:screenOrientation="landscape"
             android:launchMode="singleTask">
             <intent-filter>
                 <category android:name="android.intent.category.HOME" />

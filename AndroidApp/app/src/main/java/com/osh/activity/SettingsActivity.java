@@ -16,8 +16,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     private ActivitySettingsBinding binding;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

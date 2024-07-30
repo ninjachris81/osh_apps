@@ -258,6 +258,121 @@
                 app:cardCornerRadius="4dp"
                 app:cardElevation="6dp">
 
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:useDefaultMargins="true"
+                    android:padding="1dp"
+                    android:columnCount="3"
+                    android:rowCount="3">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/test21"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        app:icon="@drawable/ic_cloud_question_outline"
+                        android:clickable="false"
+                        android:inputType="text"
+                        />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/test22"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:clickable="false"
+                        app:icon="@drawable/ic_cloud_question_outline"
+                        android:inputType="text"
+                        />
+
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/waterInfos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:textSize="18dp"
+                        android:textAlignment="textStart"
+                        android:text='@{ "WC: " + String.format("%.1f", homeData.waterLevels[0]) + "l " + (homeData.waterFlows[0] > 0 ? "\u2191" : "") + "\nCold: " + String.format("%.1f", homeData.waterLevels[1]) + "l " + (homeData.waterFlows[1] > 0 ? "\u2191" : "") + "\nWarm: " + String.format("%.1f", homeData.waterLevels[2]) + "l " + (homeData.waterFlows[2] > 0 ? "\u2191" : "") + "\nGarden: " + String.format("%.1f", homeData.waterLevels[3]) + "l " + (homeData.waterFlows[3] > 0 ? "\u2191" : "")}'
+                        android:clickable="true"
+                        android:singleLine="false"
+                        android:maxLines="4"
+                        />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/test24"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:clickable="false"
+                        app:icon="@drawable/ic_cloud_question_outline"
+                        android:inputType="text"
+                        />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/test25"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:clickable="false"
+                        app:icon="@drawable/ic_cloud_question_outline"
+                        android:inputType="text"
+                        />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/test26"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:clickable="false"
+                        app:icon="@drawable/ic_cloud_question_outline"
+                        android:inputType="text"
+                        />
+
+                </GridLayout>
+
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
