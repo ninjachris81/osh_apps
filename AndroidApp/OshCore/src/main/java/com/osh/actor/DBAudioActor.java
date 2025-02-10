@@ -54,11 +54,15 @@ public class DBAudioActor {
     @ColumnInfo(name = "audio_current_title_id")
     public String audioCurrentTitleId;
 
+    @DatabaseField(columnName = "audio_name")
+    @ColumnInfo(name = "audio_name")
+    public String audioName;
+
     public DBAudioActor() {
     }
 
     @Ignore
-    public DBAudioActor(@NotNull String id, @NotNull String valueGroupId, String audioDeviceIds, String audioActivationRelayId, float audioVolume, String audioVolumeId, String audioUrl, String audioUrlId, String audioCurrentTitleId) {
+    public DBAudioActor(@NotNull String id, @NotNull String valueGroupId, String audioDeviceIds, String audioActivationRelayId, float audioVolume, String audioVolumeId, String audioUrl, String audioUrlId, String audioCurrentTitleId, String audioName) {
         this.id = id;
         this.valueGroupId = valueGroupId;
         this.audioDeviceIds = audioDeviceIds;
@@ -68,6 +72,7 @@ public class DBAudioActor {
         this.audioUrl = audioUrl;
         this.audioUrlId = audioUrlId;
         this.audioCurrentTitleId = audioCurrentTitleId;
+        this.audioName= audioName;
     }
 
     public String getId() {
@@ -104,5 +109,9 @@ public class DBAudioActor {
 
     public String getAudioCurrentTitleId() {
         return audioCurrentTitleId;
+    }
+
+    public String getAudioName() {
+        return audioName;
     }
 }

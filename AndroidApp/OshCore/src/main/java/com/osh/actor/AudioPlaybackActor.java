@@ -33,7 +33,9 @@ public class AudioPlaybackActor extends ActorBase {
 	private final String audioCurrentTitleId;
 	private final ObservableString audioCurrentTitle;
 
-	public AudioPlaybackActor(ValueGroup valueGroup, String id, ValueType valueType, String audioDeviceIds, String audioActivationRelayId, float audioVolume, String audioVolumeId, String audioUrl, String audioUrlId, String audioCurrentTitleId) {
+	private final String audioName;
+
+	public AudioPlaybackActor(ValueGroup valueGroup, String id, ValueType valueType, String audioDeviceIds, String audioActivationRelayId, float audioVolume, String audioVolumeId, String audioUrl, String audioUrlId, String audioCurrentTitleId, String audioName) {
 		super(valueGroup, id, valueType);
 		this.audioDeviceIds = audioDeviceIds;
 		this.audioActivationRelayId = audioActivationRelayId;
@@ -48,6 +50,8 @@ public class AudioPlaybackActor extends ActorBase {
 
 		this.audioCurrentTitleId = audioCurrentTitleId;
 		this.audioCurrentTitle = new ObservableString("");
+
+		this.audioName = audioName;
 	}
 
 	@Override
@@ -103,6 +107,14 @@ public class AudioPlaybackActor extends ActorBase {
 		return audioCurrentTitleValue;
 	}
 
+	public String getAudioCurrentTitleId() {
+		return audioCurrentTitleId;
+	}
+
+	public String getAudioName() {
+		return audioName;
+	}
+
 	public void setAudioCurrentTitleValue(StringValue audioCurrentTitleValue) {
 		this.audioCurrentTitleValue = audioCurrentTitleValue;
 		audioCurrentTitleValue.addItemChangeListener(item -> {
@@ -125,6 +137,6 @@ public class AudioPlaybackActor extends ActorBase {
 	}
 
 	public DBAudioActor toDBAudioActor() {
-		return new DBAudioActor(id, getValueGroup().getId(), audioDeviceIds, audioActivationRelayId, initialAudioVolume, audioVolumeId, initialAudioUrl, audioUrlId, audioCurrentTitleId);
+		return new DBAudioActor(id, getValueGroup().getId(), audioDeviceIds, audioActivationRelayId, initialAudioVolume, audioVolumeId, initialAudioUrl, audioUrlId, audioCurrentTitleId, audioName);
 	}
 }

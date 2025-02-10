@@ -2,17 +2,20 @@ package com.osh.ui.home;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.databinding.Observable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.github.mikephil.charting.data.PieData;
 import com.osh.R;
+import com.osh.activity.AudioActivity;
 import com.osh.activity.CameraDetailsActivity;
 import com.osh.activity.DoorOpenActivity;
 import com.osh.activity.MainActivity;
@@ -20,14 +23,15 @@ import com.osh.activity.OshApplication;
 import com.osh.activity.WebviewActivity;
 import com.osh.databinding.FragmentHomeBinding;
 import com.osh.service.IServiceContext;
-
-import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
+import com.osh.wbb12.service.IWBB12Service;
 
 public class HomeFragment extends Fragment implements HomeViewModel.IBatteryDataChangeListener {
 
     private FragmentHomeBinding binding;
 
     private IServiceContext serviceContext;
+
+    private IWBB12Service wbb12Service;
 
     private HomeViewModel homeViewModel;
 
@@ -40,9 +44,20 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
         OshApplication app = (OshApplication) getActivity().getApplication();
 
         serviceContext = ((MainActivity) getActivity()).getServiceContext();
+        wbb12Service = ((MainActivity) getActivity()).getWBB12Service();
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
 
-        homeViewModel = new ViewModelProvider(this, new HomeViewModelFactory(getContext(), serviceContext, this)).get(HomeViewModel.class);
+        homeViewModel = new ViewModelProvider(this, new HomeViewModelFactory(getContext(), serviceContext, wbb12Service, this)).get(HomeViewModel.class);
+
+        homeViewModel.windowStateInfoText.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                Message m = new Message();
+                m.what = MainActivity.MSG_TYPE.DIM_DISPLAY;
+                m.arg1 = 0;
+                ((MainActivity)getActivity()).getHandler().sendMessage(m);
+            }
+        });
 
         binding.setHomeData(homeViewModel);
 
@@ -58,14 +73,16 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
         });
          */
 
-        binding.btnFrontCamera.setIcon(MaterialDrawableBuilder.with(getContext()).setIcon(MaterialDrawableBuilder.IconValue.CCTV).setColor(Color.WHITE).build());
         binding.btnFrontCamera.setOnClickListener(listener -> {
             CameraDetailsActivity.invokeActivity(getContext(), "frontDoor.door", "Front Door");
         });
 
-        binding.btnBackCamera.setIcon(MaterialDrawableBuilder.with(getContext()).setIcon(MaterialDrawableBuilder.IconValue.CCTV).setColor(Color.WHITE).build());
         binding.btnBackCamera.setOnClickListener(listener -> {
             CameraDetailsActivity.invokeActivity(getContext(), "wintergarden.door", "Wintergarden");
+        });
+
+        binding.audioInfos.setOnClickListener(listener -> {
+            AudioActivity.invokeActivity(getContext());
         });
 
         setupBattery(homeViewModel);
@@ -79,6 +96,14 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
         binding.weatherTomorrow2.setOnClickListener(v -> {openWeatherDetails();});
 
         binding.waterInfos.setOnClickListener(v -> {openWaterDetails(app.getApplicationConfig().getGrafana().getWaterUrl());});
+
+        binding.windowStateInfos.setOnClickListener(v -> {
+            // TODO
+        });
+
+        binding.wbb12Infos.setOnClickListener(v -> {
+            // TODO
+        });
 
         return binding.getRoot();
     }

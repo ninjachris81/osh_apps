@@ -65,7 +65,9 @@ public class WBB12_Enums {
         BLOCK_WINTER(32),
         LIMIT(33),
         HK_BLOCK(34),
-        REDUCTION(35)
+        REDUCTION(35),
+        SG_READY_WARM_WATER(37),
+        SG_READY_HEATING(43)
         ;
 
 

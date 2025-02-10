@@ -65,6 +65,7 @@
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
                         android:text="Front\nDoor"
+                        app:icon="@drawable/ic_cctv"
                         app:iconSize="70dp"
                         />
 
@@ -78,6 +79,7 @@
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
                         android:text="Garden"
+                        app:icon="@drawable/ic_cctv"
                         app:iconSize="70dp"
                         />
                 </GridLayout>
@@ -269,7 +271,7 @@
                     android:rowCount="3">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/test21"
+                        android:id="@+id/test25"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_rowWeight="1"
@@ -280,13 +282,14 @@
                         app:iconGravity="textTop"
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
-                        app:icon="@drawable/ic_cloud_question_outline"
                         android:clickable="false"
+                        app:icon="@drawable/ic_cloud_question_outline"
                         android:inputType="text"
                         />
 
+
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/test22"
+                        android:id="@+id/windowStateInfos"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_rowWeight="1"
@@ -297,8 +300,8 @@
                         app:iconGravity="textTop"
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
-                        android:clickable="false"
-                        app:icon="@drawable/ic_cloud_question_outline"
+                        app:icon="@{homeData.windowStateInfoIcon}"
+                        android:text="@{homeData.windowStateInfoText}"
                         android:inputType="text"
                         />
 
@@ -321,7 +324,7 @@
                         />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/test24"
+                        android:id="@+id/wbb12WaterInfos"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_rowWeight="1"
@@ -332,13 +335,15 @@
                         app:iconGravity="textTop"
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
-                        android:clickable="false"
-                        app:icon="@drawable/ic_cloud_question_outline"
+                        android:clickable="true"
                         android:inputType="text"
+                        app:iconTint="@{homeData.wbb12RoomIconTint}"
+                        app:icon="@drawable/ic_home_thermometer"
+                        android:text="@{homeData.wbb12RoomInfos}"
                         />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/test25"
+                        android:id="@+id/wbb12Infos"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_rowWeight="1"
@@ -350,12 +355,14 @@
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
                         android:clickable="false"
-                        app:icon="@drawable/ic_cloud_question_outline"
+                        app:icon="@drawable/ic_home_thermometer"
+                        app:iconTint="@{homeData.wbb12WaterIconTint}"
                         android:inputType="text"
+                        android:text="@{homeData.wbb12WaterInfoText}"
                         />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/test26"
+                        android:id="@+id/audioInfos"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_rowWeight="1"
@@ -367,7 +374,7 @@
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
                         android:clickable="false"
-                        app:icon="@drawable/ic_cloud_question_outline"
+                        app:icon="@drawable/ic_music"
                         android:inputType="text"
                         />
 

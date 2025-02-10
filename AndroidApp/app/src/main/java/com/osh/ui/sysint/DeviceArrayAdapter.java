@@ -3,14 +3,12 @@ package com.osh.ui.sysint;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
@@ -22,11 +20,7 @@ import com.osh.device.DeviceBase;
 import com.osh.device.KnownDevice;
 import com.osh.utils.OshValueFormats;
 
-import net.steamcrafted.materialiconlib.MaterialIconView;
-
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class DeviceArrayAdapter extends ArrayAdapter<DeviceBase> {
 

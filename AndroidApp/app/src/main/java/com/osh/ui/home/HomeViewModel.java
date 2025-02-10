@@ -13,7 +13,6 @@ import android.media.MediaPlayer;
 
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.databinding.ObservableDouble;
 import androidx.databinding.ObservableField;
 import androidx.lifecycle.ViewModel;
 
@@ -22,9 +21,11 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.osh.R;
+import com.osh.activity.MainActivity;
 import com.osh.log.LogFacade;
 import com.osh.service.IServiceContext;
 import com.osh.utils.OshValueFormats;
+import com.osh.value.BooleanValue;
 import com.osh.value.DoubleValue;
 import com.osh.value.EnumValue;
 import com.osh.value.IntegerValue;
@@ -32,8 +33,8 @@ import com.osh.value.StringValue;
 import com.osh.value.enums.EnergyMode;
 import com.osh.value.enums.EnergyTrend;
 import com.osh.value.enums.HomeConnectOperationalState;
-
-import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
+import com.osh.wbb12.WBB12_Enums;
+import com.osh.wbb12.service.IWBB12Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,15 +76,28 @@ public class HomeViewModel extends ViewModel {
     public final List<ObservableField<Float>> waterLevels = new ArrayList<>();
     public final List<ObservableField<Float>> waterFlows = new ArrayList<>();
 
+    public final ObservableField<Drawable> windowStateInfoIcon = new ObservableField<>();
+    public final ObservableField<String> windowStateInfoText = new ObservableField<>();
+
     private final MediaPlayer finishedSound;
 
     public final ObservableField<String> powerConsumptionText = new ObservableField<>();
 
+    public final ObservableField<String> wbb12RoomInfos = new ObservableField<>();
+    public final ObservableField<ColorStateList> wbb12RoomIconTint = new ObservableField<>();
+    public final ObservableField<String> wbb12WaterInfoText = new ObservableField<>();
+    public final ObservableField<ColorStateList> wbb12WaterIconTint = new ObservableField<>();
+
     private final IServiceContext serviceContext;
+
+    private final IWBB12Service wbb12Service;
 
     private double lastGridPower = 0;
     private double lastBatteryPower = 0;
     private double lastGeneratorPower = 0;
+
+    private int lastWbb12Consumption = 0;
+    private int lastWbb12OperatingDisplay = 0;
 
     private List<Integer> homeAppliances = new ArrayList<>();
     private Map<Integer, Integer> lastRemainingSec = new ConcurrentHashMap<>();
@@ -92,13 +106,29 @@ public class HomeViewModel extends ViewModel {
     private static LocalizedNumberFormatter kiloWattsFormatter = NumberFormatter.withLocale(Locale.ENGLISH).unit(MeasureUnit.KILOWATT).notation(Notation.compactShort()).precision(Precision.fixedFraction(1));
     private static LocalizedNumberFormatter tempFormatter = NumberFormatter.withLocale(Locale.ENGLISH).unit(MeasureUnit.CELSIUS).notation(Notation.compactShort()).precision(Precision.integer());
 
+    List<String> windows = List.of(
+            "allSwitches1.0",
+            "allSwitches1.1",
+            "allSwitches1.2",
+            "allSwitches1.3",
+            "allSwitches1.4",
+            "allSwitches1.5",
+            "allSwitches1.6",
+            "allSwitches1.7",
+            "allSwitches1.8",
+            "allSwitches1.9",
+            "allSwitches1.10",
+            "allSwitches1.11"
+    );
+
     private static int COLOR_ORANGE;
 
     private final Context context;
 
-    public HomeViewModel(Context context, IServiceContext serviceContext, IBatteryDataChangeListener batteryDataChangeListener) {
+    public HomeViewModel(Context context, IServiceContext serviceContext, IWBB12Service wbb12Service, IBatteryDataChangeListener batteryDataChangeListener) {
         this.context = context;
         this.serviceContext = serviceContext;
+        this.wbb12Service = wbb12Service;
         this.batteryDataChangeListener = batteryDataChangeListener;
 
         COLOR_ORANGE = ResourcesCompat.getColor(context.getResources(), R.color.orange, null);
@@ -106,14 +136,76 @@ public class HomeViewModel extends ViewModel {
         finishedSound = MediaPlayer.create(context, R.raw.success1);
 
         setupCommon();
-        setupBattery();
+        setupBattery(context);
         setupCurrentMode();
         setupHomeAppliances();
         setupConsumption();
         setupTrend();
         setupWeather();
+        setupWindowState();
+        setupWbb12();
 
         setupWater();
+    }
+
+    private void setupWbb12() {
+        IntegerValue wbb12Cons = (IntegerValue) wbb12Service.getWBB12Value("wbb12.heatPumpConsumption");
+        wbb12Cons.addItemChangeListener(item -> {
+            lastWbb12Consumption = item.getValue();
+            refreshWbb12();
+        }, true, () -> { return this != null; });
+
+
+        IntegerValue wbb12Mode = (IntegerValue) wbb12Service.getWBB12Value("wbb12.operatingDisplay");
+        wbb12Mode.addItemChangeListener(item -> {
+            lastWbb12OperatingDisplay = item.getValue();
+            refreshWbb12();
+        }, true, () -> { return this != null; });
+
+        DoubleValue roomTemp = (DoubleValue) wbb12Service.getWBB12Value("wbb12.hk3FlowTemp");
+        roomTemp.addItemChangeListener(item -> {
+            wbb12RoomInfos.set(item.getValue() + "°C");
+        }, true, () -> { return this != null; });
+
+        DoubleValue waterTemp = (DoubleValue) wbb12Service.getWBB12Value("wbb12.warmWaterTemp");
+        waterTemp.addItemChangeListener(item -> {
+            wbb12WaterInfoText.set(item.getValue() + "°C");
+        }, true, () -> { return this != null; });
+    }
+
+    private void refreshWbb12() {
+        wbb12RoomIconTint.set(ColorStateList.valueOf((lastWbb12Consumption > 0 && (lastWbb12OperatingDisplay == WBB12_Enums.Enum_OPERATING_DISPLAY.HEATING.getValue() || lastWbb12OperatingDisplay == WBB12_Enums.Enum_OPERATING_DISPLAY.SG_READY_HEATING.getValue())) ? COLOR_ORANGE : Color.WHITE));
+        wbb12WaterIconTint.set(ColorStateList.valueOf((lastWbb12Consumption > 0 && (lastWbb12OperatingDisplay == WBB12_Enums.Enum_OPERATING_DISPLAY.WARM_WATER.getValue() || lastWbb12OperatingDisplay == WBB12_Enums.Enum_OPERATING_DISPLAY.SG_READY_WARM_WATER.getValue())) ? COLOR_ORANGE : Color.WHITE));
+    }
+
+    private void setupWindowState() {
+        for (String window : windows) {
+            BooleanValue windowState = (BooleanValue) serviceContext.getValueService().getValue(window);
+            windowState.addItemChangeListener(item -> {
+                recalculateWindowStates();
+            }, true, () -> {return this != null;});
+        }
+    }
+
+    private void recalculateWindowStates() {
+        List<String> openWindows = new ArrayList<>();
+
+        for (String window : windows) {
+            BooleanValue windowState = (BooleanValue) serviceContext.getValueService().getValue(window);
+            if (!windowState.getValue()) {
+                openWindows.add(windowState.getKnownRoomName());
+            }
+        }
+
+        if (openWindows.isEmpty()) {
+            windowStateInfoText.set("All closed");
+        } else if (openWindows.size() == 1) {
+            windowStateInfoText.set(openWindows.get(0) +  " open");
+        } else {
+            windowStateInfoText.set(openWindows.size() + " open");
+        }
+
+        windowStateInfoIcon.set(AppCompatResources.getDrawable(context, openWindows.isEmpty() ? R.drawable.ic_window_closed : R.drawable.ic_window_open));
     }
 
     private void setupWater() {
@@ -281,9 +373,9 @@ public class HomeViewModel extends ViewModel {
         });
     }
 
-    private void setupBattery() {
+    private void setupBattery(Context context) {
         batteryData.setValueFormatter(new PercentFormatter());
-        batteryData.setDataSet(getDataset(0));
+        batteryData.setDataSet(getDataset(context, 0));
         batteryData.setDrawValues(false);
         batteryData.setValueTextSize(0);
 
@@ -296,19 +388,19 @@ public class HomeViewModel extends ViewModel {
                 batteryText = "\uD83D\uDD0B";
             }
 
-            batteryData.setDataSet(getDataset(newValue.floatValue()));
+            batteryData.setDataSet(getDataset(context, newValue.floatValue()));
             batteryData.setValueTextSize(0);
 
             batteryDataChangeListener.onBatteryDataChanged(batteryText, batteryData);
         }, true, () -> { return this!=null; });
     }
 
-    private PieDataSet getDataset(float value) {
+    private PieDataSet getDataset(Context context, float value) {
         PieEntry e = new PieEntry(value);
         if (lastBatteryPower < 0 && value < 0.99) {
-            e.setIcon(MaterialDrawableBuilder.with(context).setIcon(MaterialDrawableBuilder.IconValue.ARROW_UP_BOLD).setColor(Color.BLACK).build());
+            e.setIcon(AppCompatResources.getDrawable(context, R.drawable.ic_arrow_up_bold));
         } else if (lastBatteryPower > 0 && value < 0.99) {
-            e.setIcon(MaterialDrawableBuilder.with(context).setIcon(MaterialDrawableBuilder.IconValue.ARROW_DOWN_BOLD).setColor(Color.BLACK).build());
+            e.setIcon(AppCompatResources.getDrawable(context, R.drawable.ic_arrow_down_bold));
         } else {
             e.setIcon(null);
         }

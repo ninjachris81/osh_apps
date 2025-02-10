@@ -44,7 +44,7 @@ public class AudioActorServiceImpl implements IAudioActorService {
         this.datamodelService = datamodelService;
 
         datamodelService.loadedState().addItemChangeListener(item -> {
-            if (item.booleanValue()) {
+            if (item) {
                 registerAudioActors();
             }
         }, true);
@@ -60,8 +60,7 @@ public class AudioActorServiceImpl implements IAudioActorService {
         if (!StringUtils.isEmpty(audioPlaybackActor.getAudioVolumeId())) {
             ValueBase value = datamodelService.getDatamodel().getValue(audioPlaybackActor.getAudioVolumeId());
             if (value instanceof DoubleValue) {
-                DoubleValue volume = (DoubleValue) value;
-                audioPlaybackActor.setVolumeValue(volume);
+                audioPlaybackActor.setVolumeValue((DoubleValue) value);
             } else {
                 throw new RuntimeException("Unexpected value type: " + value);
             }
@@ -70,8 +69,16 @@ public class AudioActorServiceImpl implements IAudioActorService {
         if (!StringUtils.isEmpty(audioPlaybackActor.getAudioUrlId())) {
             ValueBase value = datamodelService.getDatamodel().getValue(audioPlaybackActor.getAudioUrlId());
             if (value instanceof StringValue) {
-                StringValue url = (StringValue) value;
-                audioPlaybackActor.setUrlValue(url);
+                audioPlaybackActor.setUrlValue((StringValue) value);
+            } else {
+                throw new RuntimeException("Unexpected value type: " + value);
+            }
+        }
+
+        if (!StringUtils.isEmpty(audioPlaybackActor.getAudioCurrentTitleId())) {
+            ValueBase value = datamodelService.getDatamodel().getValue(audioPlaybackActor.getAudioCurrentTitleId());
+            if (value instanceof StringValue) {
+                audioPlaybackActor.setAudioCurrentTitleValue((StringValue) value);
             } else {
                 throw new RuntimeException("Unexpected value type: " + value);
             }

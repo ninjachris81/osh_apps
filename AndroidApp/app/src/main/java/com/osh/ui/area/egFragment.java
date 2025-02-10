@@ -46,8 +46,8 @@ public class egFragment extends AreaFragmentBase {
         String toggleValueGroupId = "lightToggles0";
         String shutterValueGroupId = "allShutters0";
         String shutterModeValueGroupId = "shutterModes0";
-        String tempValueGroupId = "temps";
-        String humsValueGroupId = "hums";
+        String tempValueGroupId = "temps0";
+        String humsValueGroupId = "hums0";
         String brightnessValueGroupId = "brightnesses";
         String windowStateGroupId = "allSwitches1";
         String presenceGroupdId = "presence";

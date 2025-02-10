@@ -1,6 +1,7 @@
 package com.osh.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,29 +10,34 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.hardware.camera2.CameraManager;
-import android.nfc.NfcAdapter;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
+import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.badge.BadgeUtils;
+import com.google.android.material.badge.ExperimentalBadgeUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
-import com.google.android.material.navigation.NavigationView;
 import com.osh.R;
 import com.osh.databinding.ActivityMainBinding;
 import com.osh.service.IServiceContext;
@@ -41,21 +47,12 @@ import com.osh.sip.MyAppObserver;
 import com.osh.sip.MyBuddy;
 import com.osh.sip.MyCall;
 import com.osh.sip.OshAccount;
-import com.osh.ui.area.AreaFragment;
-import com.osh.ui.dashboard.DashboardFragment;
-import com.osh.ui.home.HomeFragment;
-import com.osh.ui.wbb12.WBB12Fragment;
 import com.osh.utils.ObservableBoolean;
 import com.osh.wbb12.service.IWBB12Service;
-
-import net.gotev.sipservice.SipCall;
-import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
-import net.steamcrafted.materialiconlib.MaterialMenuInflater;
 
 import org.pjsip.PjCameraInfo2;
 import org.pjsip.pjsua2.AccountConfig;
 import org.pjsip.pjsua2.AuthCredInfo;
-import org.pjsip.pjsua2.AuthCredInfoVector;
 import org.pjsip.pjsua2.CallInfo;
 import org.pjsip.pjsua2.CallOpParam;
 import org.pjsip.pjsua2.OnCallMediaEventParam;
@@ -80,19 +77,33 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     public static AccountConfig accCfg = null;
     private String lastRegStatus = "";
 
+    public class MSG_TYPE
+    {
+        public final static int INCOMING_CALL = 1;
+        public final static int CALL_STATE = 2;
+        public final static int REG_STATE = 3;
+        public final static int BUDDY_STATE = 4;
+        public final static int CALL_MEDIA_STATE = 5;
+        public final static int CHANGE_NETWORK = 6;
+        public final static int CALL_MEDIA_EVENT = 7;
+
+        public final static int DIM_DISPLAY = 100;
+    }
+
     ArrayList<Map<String, String>> buddyList;
 
+    public Handler getHandler() {
+        return handler;
+    }
+
     private final Handler handler = new Handler(this);
+
+    private CountDownTimer dimTimer;
 
     @Override
     public boolean handleMessage(@NonNull Message m) {
         if (m.what == 0) {
-            /*
-            app.deinit();
-            finish();
-            Runtime.getRuntime().gc();
-            android.os.Process.killProcess(android.os.Process.myPid());
-             */
+            // error
         } else if (m.what == MSG_TYPE.CALL_STATE) {
 
             CallInfo ci = (CallInfo) m.obj;
@@ -176,8 +187,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
         } else if (m.what == MSG_TYPE.CHANGE_NETWORK) {
             app.handleNetworkChange();
+        } else if (m.what == MSG_TYPE.DIM_DISPLAY) {
+            dimScreen(m.arg1 != 0);
         } else {
-
             /* Message not handled */
             return false;
 
@@ -186,23 +198,14 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         return true;
     }
 
-    public class MSG_TYPE
-    {
-        public final static int INCOMING_CALL = 1;
-        public final static int CALL_STATE = 2;
-        public final static int REG_STATE = 3;
-        public final static int BUDDY_STATE = 4;
-        public final static int CALL_MEDIA_STATE = 5;
-        public final static int CHANGE_NETWORK = 6;
-        public final static int CALL_MEDIA_EVENT = 7;
-    }
-
 
     @Inject
     Lazy<IWBB12Service> wbb12Service;
 
     @Inject
     IServiceContext serviceContext;
+
+    private BadgeDrawable sysintBadge;
 
     private OshAccount sipAccount;
     private ObservableBoolean sipConnectedState = new ObservableBoolean(false);
@@ -223,9 +226,34 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         context.startActivity(intent);
     }
 
+    private void dimScreen(boolean dim) {
+        WindowManager.LayoutParams params = this.getWindow().getAttributes();
+        params.screenBrightness = dim ? 0.0f : 0.8f;
+        this.getWindow().setAttributes(params);
+
+        binding.blackOverlay.setVisibility(dim ? View.VISIBLE : View.INVISIBLE);
+        binding.bottomNav.setVisibility(dim ? View.INVISIBLE : View.VISIBLE);
+        dimTimer.start();
+    }
+
+    @OptIn(markerClass = ExperimentalBadgeUtils.class)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setShowWhenLocked(true);
+        setTurnScreenOn(true);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        /*
+        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock  wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK |
+                PowerManager.ACQUIRE_CAUSES_WAKEUP |
+                PowerManager.ON_AFTER_RELEASE, "appname::WakeLock");
+
+        //acquire will turn on the display
+        wakeLock.acquire();
+         */
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
 
@@ -235,15 +263,22 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         NavController navController = navHostFragment.getNavController();
         BottomNavigationView bottomNav = binding.bottomNav;
         NavigationUI.setupWithNavController(bottomNav, navController);
+        sysintBadge = bottomNav.getOrCreateBadge(R.id.navigation_sysint);
+
+        getServiceContext().getDeviceDiscoveryService().errorCount().addItemChangeListener(item -> {
+            runOnUiThread(() -> {
+                if (item == 0) {
+                    sysintBadge.setVisible(false);
+                    sysintBadge.clearNumber();
+                } else {
+                    sysintBadge.setVisible(true);
+                    sysintBadge.setNumber(item);
+                }
+            });
+        }, true, () -> {return true;});
 
         Toolbar myToolbar = binding.myToolbar;
         setSupportActionBar(myToolbar);
-
-        setMaterialIcon(0, MaterialDrawableBuilder.IconValue.HOME);
-        setMaterialIcon(1, MaterialDrawableBuilder.IconValue.VIEW_DASHBOARD);
-        setMaterialIcon(2, MaterialDrawableBuilder.IconValue.LAYERS);
-        setMaterialIcon(3, MaterialDrawableBuilder.IconValue.RADIATOR);
-        setMaterialIcon(4, MaterialDrawableBuilder.IconValue.MATRIX);
 
         //binding.navView.setOnItemSelectedListener(navListener);
 
@@ -278,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             app.init(this, getFilesDir().getAbsolutePath());
         }
 
-        if (app.accList.size() == 0) {
+        if (app.accList.isEmpty()) {
             accCfg = new AccountConfig();
             accCfg.setIdUri("sip:" + ((OshApplication) getApplication()).getApplicationConfig().getSip().getUsername() + "@" + ((OshApplication) getApplication()).getApplicationConfig().getSip().getHost());
             accCfg.getRegConfig().setRegistrarUri("sip:" + ((OshApplication) getApplication()).getApplicationConfig().getSip().getHost());
@@ -336,6 +371,29 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
 
         requestPermissions();
+
+        dimTimer = new CountDownTimer(5 * 60000, 10000) {
+            @Override
+            public void onTick(long l) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                dimScreen(true);
+            }
+        };
+
+        binding.blackOverlay.setOnClickListener(view -> {
+            dimScreen(false);
+        });
+        dimScreen(false);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        dimScreen(false);
     }
 
     private HashMap<String, String> putData(String uri, String status)
@@ -348,15 +406,17 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     private void showCallActivity()
     {
+        dimScreen(false);
         Intent intent = new Intent(this, SipCallActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
 
+    /*
     private void setMaterialIcon(int i, MaterialDrawableBuilder.IconValue icon) {
         MenuItem item = binding.bottomNav.getMenu().getItem(i);
         item.setIcon(MaterialDrawableBuilder.with(this).setIcon(icon).setColor(Color.BLACK).build());
-    }
+    }*/
 
     private void requestPermissions() {
         String[] permissions = {
@@ -431,19 +491,16 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.main_menu, menu);
+        getMenuInflater().inflate(R.menu.main_menu, menu);
 
-        MaterialMenuInflater.with(this)
-                .inflate(R.menu.main_menu, menu);
+        Drawable wifiOnIcon = AppCompatResources.getDrawable(this, R.drawable.ic_wifi);
+        Drawable wifiOffIcon = AppCompatResources.getDrawable(this, R.drawable.ic_wifi_off);
 
-        Drawable wifiOnIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.WIFI).build();
-        Drawable wifiOffIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.WIFI_OFF).build();
+        Drawable dbOnIcon = AppCompatResources.getDrawable(this, R.drawable.ic_database);
+        Drawable dbOffIcon = AppCompatResources.getDrawable(this, R.drawable.ic_database_off);
 
-        Drawable dbOnIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.DATABASE).build();
-        Drawable dbOffIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.DATABASE_MINUS).build();
-
-        Drawable sipOnIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.PHONE).build();
-        Drawable sipOffIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.PHONE_MINUS).build();
+        Drawable sipOnIcon = AppCompatResources.getDrawable(this, R.drawable.ic_phone);
+        Drawable sipOffIcon = AppCompatResources.getDrawable(this, R.drawable.ic_phone_off);
 
         MenuItem mqttConnectedStateIcon = menu.findItem(R.id.mqtt_connected_state_icon);
         serviceContext.getCommunicationService().connectedState().addItemChangeListener(connectedState -> {

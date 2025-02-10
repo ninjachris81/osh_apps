@@ -200,5 +200,6 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="title_sysint">System</string>
-
+    <string name="toolbar_time_str">h:mm a</string>
+    <string name="toolbar_date_str">MM-dd</string>
 </resources>

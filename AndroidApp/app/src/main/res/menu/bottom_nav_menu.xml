@@ -4,27 +4,27 @@
 
     <item
         android:id="@+id/navigation_home"
-        app:materialIcon="home"
+        android:icon="@drawable/ic_home"
         android:title="@string/title_home" />
 
     <item
         android:id="@+id/navigation_dashboard"
-        app:materialIcon="view_dashboard"
+        android:icon="@drawable/ic_view_dashboard"
         android:title="@string/title_dashboard" />
 
     <item
         android:id="@+id/navigation_area"
-        app:materialIcon="layers"
+        android:icon="@drawable/ic_layers"
         android:title="@string/title_area" />
 
     <item
         android:id="@+id/navigation_wbb12"
-        app:materialIcon="radiator"
+        android:icon="@drawable/ic_home_thermometer"
         android:title="@string/title_wbb12" />
 
     <item
         android:id="@+id/navigation_sysint"
-        app:materialIcon="matrix"
+        android:icon="@drawable/ic_matrix"
         android:title="@string/title_sysint" />
 
 </menu>

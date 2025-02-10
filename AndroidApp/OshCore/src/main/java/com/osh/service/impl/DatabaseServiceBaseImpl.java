@@ -113,7 +113,7 @@ public abstract class DatabaseServiceBaseImpl implements IDatabaseService {
                 List<DBAudioActor> matchList = loadAudioActors(actor.getId(), valueGroup.getId());
                 if (matchList.size() == 1) {
                     DBAudioActor audioActor = matchList.get(0);
-                    act = datamodel.addAudioPlaybackActor(valueGroup, actor.getId(), ValueType.of(actor.getValueType()), actor.getValueTimeout(), audioActor.getAudioDeviceIds(), audioActor.getAudioActivationRelayId(), audioActor.getAudioVolume(), audioActor.getAudioVolumeId(), audioActor.getAudioUrl(), audioActor.getAudioUrlId(), audioActor.getAudioCurrentTitleId());
+                    act = datamodel.addAudioPlaybackActor(valueGroup, actor.getId(), ValueType.of(actor.getValueType()), actor.getValueTimeout(), audioActor.getAudioDeviceIds(), audioActor.getAudioActivationRelayId(), audioActor.getAudioVolume(), audioActor.getAudioVolumeId(), audioActor.getAudioUrl(), audioActor.getAudioUrlId(), audioActor.getAudioCurrentTitleId(), audioActor.getAudioName());
                     if (!StringUtils.isEmpty(audioActor.getAudioCurrentTitleId())) {
                         ((AudioPlaybackActor) act).setAudioCurrentTitleValue((StringValue) datamodel.getValue(audioActor.getAudioCurrentTitleId()));
                     }
@@ -143,7 +143,7 @@ public abstract class DatabaseServiceBaseImpl implements IDatabaseService {
         }
 
         for (KnownDevice knownDevice : loadKnownDevices()) {
-            datamodel.addKnownDevice(knownDevice.getId(), knownDevice.getServiceId(), knownDevice.getName());
+            datamodel.addKnownDevice(knownDevice.getId(), knownDevice.getServiceId(), knownDevice.getName(), knownDevice.isMandatory());
         }
 
         for (User user : loadUsers()) {
@@ -156,6 +156,7 @@ public abstract class DatabaseServiceBaseImpl implements IDatabaseService {
             KnownRoom knownRoom = datamodel.getKnownRoom(knownRoomsValue.getRoomId());
             ValueBase value = datamodel.getValue(knownRoomsValue.getValueId(), knownRoomsValue.getValueGroupId());
             knownRoom.addValue(value);
+            value.setKnownRoom(knownRoom);
         }
 
         for (KnownRoomActors knownRoomActor : loadKnownRoomActors()) {

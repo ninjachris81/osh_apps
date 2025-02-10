@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.databinding.BindingAdapter;
@@ -15,62 +16,45 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.osh.R;
 
-import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
-
 public class ShutterModeButton extends ChipGroup {
 
     public ShutterModeButton(Context context) {
         super(context);
-        setup();
+        setup(context);
     }
 
     public ShutterModeButton(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setup();
+        setup(context);
     }
 
     public ShutterModeButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        setup();
+        setup(context);
     }
 
     protected Chip autoSelection;
     protected Chip upSelection;
     protected Chip downSelection;
 
-    protected void setup() {
+    protected void setup(Context context) {
 
-        autoSelection = new Chip(getContext());
+        autoSelection = new Chip(context);
         //autoSelection.setId(R.id.shutter_mode_button_auto_id);
         //autoSelection.setText(getResources().getString(R.string.shutter_mode_auto));
 
-        Drawable autoIcon = MaterialDrawableBuilder.with(getContext()) // provide a context
-                .setIcon(MaterialDrawableBuilder.IconValue.CALENDAR_CLOCK) // provide an icon
-                .setColor(Color.BLACK) // set the icon color
-                .setToActionbarSize() // set the icon size
-                .build(); // Finally call build
-
+        Drawable autoIcon = AppCompatResources.getDrawable(context, R.drawable.ic_calendar_clock);
         autoSelection.setChipIcon(autoIcon);
         autoSelection.setEnsureMinTouchTargetSize(false);
         autoSelection.setCheckable(true);
         //autoSelection.setCheckedIconVisible(false);
 
-        Drawable upIcon = MaterialDrawableBuilder.with(getContext()) // provide a context
-                .setIcon(MaterialDrawableBuilder.IconValue.CHEVRON_UP) // provide an icon
-                .setColor(Color.BLACK) // set the icon color
-                .setToActionbarSize() // set the icon size
-                .build(); // Finally call build
-
+        Drawable upIcon = AppCompatResources.getDrawable(context, R.drawable.ic_chevron_up);
         upSelection = new Chip(getContext());
         upSelection.setChipIcon(upIcon);
         upSelection.setEnsureMinTouchTargetSize(false);
 
-        Drawable downIcon = MaterialDrawableBuilder.with(getContext()) // provide a context
-                .setIcon(MaterialDrawableBuilder.IconValue.CHEVRON_DOWN) // provide an icon
-                .setColor(Color.BLACK) // set the icon color
-                .setToActionbarSize() // set the icon size
-                .build(); // Finally call build
-
+        Drawable downIcon = AppCompatResources.getDrawable(context, R.drawable.ic_chevron_down);
         downSelection = new Chip(getContext());
         downSelection.setChipIcon(downIcon);
         downSelection.setEnsureMinTouchTargetSize(false);
@@ -118,7 +102,7 @@ public class ShutterModeButton extends ChipGroup {
         }
     }
 
-    @BindingAdapter("app:layout_constraintBottom_toBottomOf")
+    @BindingAdapter("android:layout_constraintBottom_toBottomOf")
     public static void setContraintBottom(ShutterModeButton view, String constraint) {
         if (!constraint.isEmpty()) {
             ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
@@ -128,7 +112,7 @@ public class ShutterModeButton extends ChipGroup {
                 constraintSet.clone(parentLayout);
 
                 if (constraint.equals("parent")) {
-                    constraintSet.connect(view.getId(), ConstraintSet.BOTTOM, parentLayout.getId(), constraintSet.BOTTOM);
+                    constraintSet.connect(view.getId(), ConstraintSet.BOTTOM, parentLayout.getId(), ConstraintSet.BOTTOM);
                 }
 
                 constraintSet.applyToLayoutParams(view.getId(), (ConstraintLayout.LayoutParams) layoutParams);
@@ -137,7 +121,7 @@ public class ShutterModeButton extends ChipGroup {
         }
     }
 
-    @BindingAdapter("app:layout_constraintTop_toTopOf")
+    @BindingAdapter("android:layout_constraintTop_toTopOf")
     public static void setContraintTop(ShutterModeButton view, String constraint) {
         if (!constraint.isEmpty()) {
             ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
@@ -147,7 +131,7 @@ public class ShutterModeButton extends ChipGroup {
                 constraintSet.clone(parentLayout);
 
                 if (constraint.equals("parent")) {
-                    constraintSet.connect(view.getId(), ConstraintSet.TOP, parentLayout.getId(), constraintSet.TOP);
+                    constraintSet.connect(view.getId(), ConstraintSet.TOP, parentLayout.getId(), ConstraintSet.TOP);
                 }
 
                 constraintSet.applyToLayoutParams(view.getId(), (ConstraintLayout.LayoutParams) layoutParams);

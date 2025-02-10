@@ -8,7 +8,6 @@ import androidx.room.PrimaryKey;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import com.osh.actor.ActorBase;
-import com.osh.datamodel.ItemMetaInfo;
 import com.osh.value.ValueBase;
 
 import org.jetbrains.annotations.NotNull;
@@ -44,9 +43,6 @@ public class KnownArea {
 
     @Ignore
     private Map<String, ValueBase> values = new HashMap<>();
-
-    @Ignore
-    private ItemMetaInfo meta = new ItemMetaInfo();
 
     public KnownArea() {
     }

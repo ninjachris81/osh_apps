@@ -103,8 +103,8 @@
             android:visibility="gone"
             android:alpha="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS ? 1 : 0 }"
             clickEnabled="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS}"
-            app:layout_constraintBottom_toBottomOf='@{roomData.roomPosition == RoomPosition.POSITION_BOTTOM ? "parent" : ""}'
-            app:layout_constraintTop_toTopOf='@{roomData.roomPosition == RoomPosition.POSITION_TOP ? "parent" : ""}'
+            android:layout_constraintBottom_toBottomOf='@{roomData.roomPosition == RoomPosition.POSITION_BOTTOM ? "parent" : ""}'
+            android:layout_constraintTop_toTopOf='@{roomData.roomPosition == RoomPosition.POSITION_TOP ? "parent" : ""}'
             app:isAuto="@{roomData.shutterAutoModes[0]}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -117,8 +117,8 @@
             android:layout_marginBottom="@{roomData.roomPosition == RoomPosition.POSITION_BOTTOM ? @dimen/window_state_wall_padding : @dimen/window_state_wall_padding_none}"
             android:layout_marginTop="@{roomData.roomPosition == RoomPosition.POSITION_TOP ? @dimen/window_state_wall_padding : @dimen/window_state_wall_padding_none}"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf='@{roomData.roomPosition == RoomPosition.POSITION_BOTTOM ? "parent" : ""}'
-            app:layout_constraintTop_toTopOf='@{roomData.roomPosition == RoomPosition.POSITION_TOP ? "parent" : ""}'
+            android:layout_constraintBottom_toBottomOf='@{roomData.roomPosition == RoomPosition.POSITION_BOTTOM ? "parent" : ""}'
+            android:layout_constraintTop_toTopOf='@{roomData.roomPosition == RoomPosition.POSITION_TOP ? "parent" : ""}'
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:alpha="@{areaOverlayData.currentOverlay == AreaOverlays.SENSORS ? 1.0f : 0 }"

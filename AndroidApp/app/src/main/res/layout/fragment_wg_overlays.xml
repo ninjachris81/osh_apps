@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.osh.ui.area.AreaFragment.AreaOverlays" />
+
+        <import type="android.view.View" />
+
+        <variable
+            name="areaData"
+            type="com.osh.ui.area.AreaViewModel" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/base_layout_wg" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:id="@+id/roomWG1"
+                android:layout_width="0dp"
+                android:layout_height="178dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginStart="20dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/roomWG2"
+                app:layout_constraintStart_toStartOf="parent">
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/roomWG2"
+                android:layout_width="190dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginEnd="19dp"
+                android:layout_marginBottom="19dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/roomWG1">
+            </FrameLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </FrameLayout>
+
+</layout>

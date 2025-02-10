@@ -39,6 +39,7 @@ public class User {
     public User() {
     }
 
+    @Ignore
     public User(@NotNull String id, @NotNull String name, String rights) {
         this.id = id;
         this.name = name;

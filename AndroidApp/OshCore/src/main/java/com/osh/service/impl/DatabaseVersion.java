@@ -23,7 +23,7 @@ public class DatabaseVersion {
     public DatabaseVersion() {
     }
 
-
+    @Ignore
     public DatabaseVersion(long version) {
         this.version = version;
     }

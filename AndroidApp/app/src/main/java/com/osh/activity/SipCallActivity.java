@@ -1,5 +1,7 @@
 package com.osh.activity;
 
+import android.app.ComponentCaller;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
@@ -17,6 +19,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
@@ -28,7 +31,6 @@ import com.osh.camera.config.CameraSource;
 import com.osh.databinding.ActivitySipCallBinding;
 
 import net.gotev.sipservice.SipServiceCommand;
-import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 import org.pjsip.pjsua2.CallInfo;
 import org.pjsip.pjsua2.CallMediaInfo;
@@ -118,7 +120,10 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         binding = ActivitySipCallBinding.inflate(getLayoutInflater());
+
+        ringToneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, getIntent().getIntExtra("ringVolume", 80));
 
         SurfaceView surfaceInVideo = binding.surfaceIncomingVideo;
         SurfaceView surfacePreview = binding.surfaceIncomingVideo;
@@ -147,18 +152,20 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
             updateCallState(lastCallInfo);
         }
 
+        /*
         binding.buttonAccept.setOnClickListener(v -> {
             acceptCall(v);
         });
 
         binding.buttonHangup.setOnClickListener(v -> {
             hangupCall(v);
-            finish();
         });
+
         binding.btnCancel.setOnClickListener(v -> {
             hangupCall(v);
-            finish();
         });
+         */
+
         binding.btnMuteMic.setOnClickListener(v -> {
             micMute = !micMute;
             SipServiceCommand.setCallMute(this, mAccountID, mCallID, micMute);
@@ -167,7 +174,6 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
         });
         binding.btnHangUp.setOnClickListener(v -> {
             hangupCall(v);
-            finish();
         });
         binding.btnSwitchCamera.setOnClickListener(v -> {
             // TODO
@@ -175,13 +181,10 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
 
         binding.unlockDoor.setOnClickListener(view -> {
             SipServiceCommand.hangUpActiveCalls(this, mAccountID);
-            finish();
             DoorOpenActivity.invokeActivity(view.getContext(), DoorOpenActivity.FRONT_DOOR_ID);
         });
 
         setContentView(binding.getRoot());
-
-        ringToneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, getIntent().getIntExtra("ringVolume", 80));
 
         initData();
 
@@ -195,6 +198,24 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
         player.setMediaSource(mediaSource);
         player.setPlayWhenReady(true);
         player.prepare();
+    }
+
+    @Override
+    public void onNewIntent(Intent newIntent) {
+        super.onNewIntent(newIntent);
+
+        if (newIntent.getIntExtra("msgType", 0) == MainActivity.MSG_TYPE.CALL_STATE) {
+            int state = newIntent.getIntExtra("state", 0);
+
+            if (state == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
+                try {
+                    ringToneGenerator.stopTone();
+                    finish();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
 
     }
 
@@ -216,7 +237,7 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
         localVideoHandler.resetVideoWindow();
         remoteVideoHandler.resetVideoWindow();
 
-        finish();
+        ringToneGenerator.stopTone();
 
         if (MainActivity.currentCall != null) {
             CallOpParam prm = new CallOpParam();
@@ -256,20 +277,13 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
          */
 
         //showLayout(mType);
-        binding.textViewPeer.setText(String.format("%s", mDisplayName));
-        binding.tvOutCallInfo.setText(String.format("You are calling %s", mNumber));
+        //binding.textViewPeer.setText(String.format("%s", mDisplayName));
+        //binding.tvOutCallInfo.setText(String.format("You are calling %s", mNumber));
 
-        binding.buttonAccept.setIcon(MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.CHECK).setColor(Color.WHITE).build());
-        binding.buttonHangup.setIcon(MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.CANCEL).setColor(Color.WHITE).build());
-
-        binding.btnCancel.setIcon(MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.CANCEL).setColor(Color.WHITE).build());
-
-        micOnIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.MICROPHONE).setColor(Color.WHITE).build();
-        micOffIcon = MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.MICROPHONE_OFF).setColor(Color.WHITE).build();
+        micOnIcon = AppCompatResources.getDrawable(this, R.drawable.ic_microphone);
+        micOffIcon = AppCompatResources.getDrawable(this, R.drawable.ic_microphone_off);
 
         binding.btnMuteMic.setIcon(micOnIcon);
-        binding.btnHangUp.setIcon(MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.PHONE_HANGUP).setColor(Color.WHITE).build());
-        binding.btnSwitchCamera.setIcon(MaterialDrawableBuilder.with(this).setIcon(MaterialDrawableBuilder.IconValue.CAMERA_SWITCH).setColor(Color.WHITE).build());
         binding.btnSwitchCamera.setVisibility(mIsVideo ? View.VISIBLE : View.GONE);
 
         /*
@@ -406,45 +420,11 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
 
 
     private void updateCallState(CallInfo ci) {
-        TextView tvPeer = (TextView) findViewById(R.id.textViewPeer);
-        TextView tvState = (TextView) findViewById(R.id.textViewCallState);
-        Button buttonHangup = (Button) findViewById(R.id.buttonHangup);
-        Button buttonAccept = (Button) findViewById(R.id.buttonAccept);
-        String call_state = "";
-
-        if (ci == null) {
-            buttonAccept.setVisibility(View.GONE);
-            buttonHangup.setText("OK");
-            tvState.setText("Call disconnected");
-            return;
-        }
-
-        if (ci.getRole() == pjsip_role_e.PJSIP_ROLE_UAC) {
-            buttonAccept.setVisibility(View.GONE);
-        }
-
         if (ci.getState() < pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
             ringToneGenerator.startTone(ToneGenerator.TONE_SUP_RINGTONE);
 
-            if (ci.getRole() == pjsip_role_e.PJSIP_ROLE_UAS) {
-                call_state = "Incoming call..";
-                /* Default button texts are already 'Accept' & 'Reject' */
-            } else {
-                buttonHangup.setText("Cancel");
-                call_state = ci.getStateText();
-            }
         } else if (ci.getState() >= pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
             ringToneGenerator.stopTone();
-
-            buttonAccept.setVisibility(View.GONE);
-            call_state = ci.getStateText();
-            if (ci.getState() == pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
-                buttonHangup.setText("Hangup");
-            } else if (ci.getState() ==
-                    pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
-                buttonHangup.setText("OK");
-                call_state = "Call disconnected: " + ci.getLastReason();
-            }
         }
     }
 

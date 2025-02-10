@@ -61,7 +61,7 @@ public class WBB12Fragment extends Fragment {
         });
 
         binding.actionButton.setOnClickListener(view -> {
-            wbb12Service.addWarmwaterPush();
+            wbb12Service.addWarmwaterPush(15);
         });
 
         View root = binding.getRoot();

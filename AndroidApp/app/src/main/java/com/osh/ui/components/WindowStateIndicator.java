@@ -1,24 +1,16 @@
 package com.osh.ui.components;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.databinding.BindingAdapter;
-import androidx.databinding.InverseBindingAdapter;
 
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
 import com.osh.R;
-
-import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
 public class WindowStateIndicator extends androidx.appcompat.widget.AppCompatImageView {
 
@@ -67,7 +59,7 @@ public class WindowStateIndicator extends androidx.appcompat.widget.AppCompatIma
         }
     }
 
-    @BindingAdapter("app:layout_constraintBottom_toBottomOf")
+    @BindingAdapter("android:layout_constraintBottom_toBottomOf")
     public static void setContraintBottom(WindowStateIndicator view, String constraint) {
         if (!constraint.isEmpty()) {
             ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
@@ -86,7 +78,7 @@ public class WindowStateIndicator extends androidx.appcompat.widget.AppCompatIma
         }
     }
 
-    @BindingAdapter("app:layout_constraintTop_toTopOf")
+    @BindingAdapter("android:layout_constraintTop_toTopOf")
     public static void setContraintTop(WindowStateIndicator view, String constraint) {
         if (!constraint.isEmpty()) {
             ViewGroup.LayoutParams layoutParams = view.getLayoutParams();

@@ -45,7 +45,7 @@ public class ogFragment extends AreaFragmentBase {
         String shutterValueGroupId = "allShutters0";
         String shutterModeValueGroupId = "shutterModes0";
         String windowStateGroupId = "allSwitches1";
-        String tempValueGroupId = "temps";
+        String tempValueGroupId = "temps0";
 
         getChildFragmentManager().beginTransaction().replace(R.id.roomSZ, new RoomFragment("sz", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
                 .withLight(relayValueGroupId, "16", toggleValueGroupId, "lightSZ")

@@ -308,11 +308,11 @@ public class WBB12ServiceImpl implements IWBB12Service {
     }
 
     @Override
-    public void addWarmwaterPush() {
+    public void addWarmwaterPush(int minutes) {
         String mqttName = getMqttName(WBB12_Holding_Registers.WARM_WATER_PUSH);
 
         ActorBase actor = actorService.getActor(ValueBase.getFullId(wbb12ValueGroup.getId(), mqttName));
-        actor.updateValue(10);
+        actor.updateValue(minutes);
         actorService.publishCmd(actor, ActorCmds.ACTOR_CMD_SET_VALUE);
     }
 }

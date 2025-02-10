@@ -6,13 +6,11 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.hardware.Camera;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.view.LayoutInflater;
@@ -25,11 +23,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import com.osh.R;
 import com.osh.activity.MainActivity;
 import com.osh.databinding.FragmentAreaBinding;
-import com.osh.service.IActorService;
-import com.osh.service.IAudioActorService;
-import com.osh.service.IDatamodelService;
 import com.osh.service.IServiceContext;
-import com.osh.service.IValueService;
 
 public class AreaFragment extends Fragment {
 

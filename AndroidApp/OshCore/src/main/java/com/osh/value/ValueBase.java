@@ -1,20 +1,16 @@
 package com.osh.value;
 
 import com.osh.SerializableIdentifyable;
-import com.osh.datamodel.ItemMetaInfo;
+import com.osh.datamodel.meta.KnownRoom;
 import com.osh.utils.IItemChangeListener;
 import com.osh.utils.IObservableGuard;
 import com.osh.utils.IObservableItem;
 import com.osh.utils.IObservableListenerHolder;
-import com.osh.utils.IObservableManager;
 import com.osh.utils.ObservableManagerImpl;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public abstract class ValueBase<VALUE_TYPE extends ValueBase, NATIVE_TYPE> extends SerializableIdentifyable implements IObservableItem<VALUE_TYPE>, IObservableListenerHolder<VALUE_TYPE> {
 
@@ -33,13 +29,13 @@ public abstract class ValueBase<VALUE_TYPE extends ValueBase, NATIVE_TYPE> exten
 
 	private ValueType valueType;
 
-	private ItemMetaInfo meta = new ItemMetaInfo();
-
 	private ValueGroup valueGroup;
 
 	private boolean persistValue;
 
 	protected NATIVE_TYPE value;
+
+	protected KnownRoom knownRoom;
 	
     double signalRate = 0;
     int signalCount = 0;
@@ -127,14 +123,6 @@ public abstract class ValueBase<VALUE_TYPE extends ValueBase, NATIVE_TYPE> exten
 		return valueGroupId + VALUE_SEPARATOR + valueId;
 	}
 
-	public ItemMetaInfo getMeta() {
-		return meta;
-	}
-
-	public void setMeta(ItemMetaInfo meta) {
-		this.meta = meta;
-	}
-
 	public boolean updateValue(Object newValue) {
 		return updateValue(newValue, true);
 	}
@@ -142,14 +130,18 @@ public abstract class ValueBase<VALUE_TYPE extends ValueBase, NATIVE_TYPE> exten
 	public boolean updateValue(Object newValue, boolean invokeListeners) {
 	    currentSignalCount++;
 
-	    boolean isDifferent = Objects.equals(value, newValue);
-	    value = _updateValue(newValue);
+	    boolean isDifferent = !Objects.equals(value, newValue);
 
-		if (invokeListeners) {
-			itemChanged();
+		if (isDifferent) {
+			value = _updateValue(newValue);
+
+			if (invokeListeners) {
+				itemChanged();
+			}
 		}
-	    //bool newValueApplied = m_value == newValue;
-	    lastUpdate = System.currentTimeMillis();
+		//bool newValueApplied = m_value == newValue;
+		lastUpdate = System.currentTimeMillis();
+
 	    return isDifferent;
 	}
 
@@ -193,5 +185,20 @@ public abstract class ValueBase<VALUE_TYPE extends ValueBase, NATIVE_TYPE> exten
 	public void setPersistValue(boolean persistValue) {
 		this.persistValue = persistValue;
 	}
-	
+
+	public void setKnownRoom(KnownRoom knownRoom) {
+		this.knownRoom = knownRoom;
+	}
+
+	public KnownRoom getKnownRoom() {
+		return knownRoom;
+	}
+
+	public String getKnownRoomName() {
+		if (knownRoom!=null) {
+			return knownRoom.getName();
+		} else {
+			return "";
+		}
+	}
 }

@@ -12,5 +12,5 @@ public interface IWBB12Service extends IMqttSupport {
     ValueBase getWBB12Value(String fullId);
     WBB12ServiceImpl.WBB12Format getWBB12InputFormat(String fullId);
 
-    void addWarmwaterPush();
+    void addWarmwaterPush(int minutes);
 }

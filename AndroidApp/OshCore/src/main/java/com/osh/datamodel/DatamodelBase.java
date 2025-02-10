@@ -82,8 +82,8 @@ public class DatamodelBase extends Identifyable {
 		return audioPlaybackSources;
 	}
 
-	public KnownDevice addKnownDevice(String id, String serviceId, String name) {
-	    KnownDevice device = new KnownDevice(id, serviceId, name);
+	public KnownDevice addKnownDevice(String id, String serviceId, String name, boolean mandatory) {
+	    KnownDevice device = new KnownDevice(id, serviceId, name, mandatory);
 	    knownDevices.put(device.getFullId(), device);
 	    return device;
 	}
@@ -120,8 +120,8 @@ public class DatamodelBase extends Identifyable {
 		return actor;
 	}
 
-	public ActorBase addAudioPlaybackActor(ValueGroup valueGroup, String id, ValueType valueType, int timeout, String audioDeviceIds, String audioActivationRelayId, float audioVolume, String audioVolumeId, String audioUrl, String audioUrlId, String audioCurrentTitleId) {
-		AudioPlaybackActor actor = new AudioPlaybackActor(valueGroup, id, valueType, audioDeviceIds, audioActivationRelayId, audioVolume, audioVolumeId, audioUrl, audioUrlId, audioCurrentTitleId);
+	public ActorBase addAudioPlaybackActor(ValueGroup valueGroup, String id, ValueType valueType, int timeout, String audioDeviceIds, String audioActivationRelayId, float audioVolume, String audioVolumeId, String audioUrl, String audioUrlId, String audioCurrentTitleId, String audioName) {
+		AudioPlaybackActor actor = new AudioPlaybackActor(valueGroup, id, valueType, audioDeviceIds, audioActivationRelayId, audioVolume, audioVolumeId, audioUrl, audioUrlId, audioCurrentTitleId, audioName);
 		actor.withValueTimeout(timeout);
 		actors.put(actor.getFullId(), actor);
 		return actor;

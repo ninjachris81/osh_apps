@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.osh.ui.area.AreaFragment.AreaOverlays" />
+
+        <import type="android.view.View" />
+
+        <variable
+            name="areaData"
+            type="com.osh.ui.area.AreaViewModel" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/base_layout_basement" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:id="@+id/roomWS"
+                android:layout_width="320dp"
+                android:layout_height="229dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginBottom="40dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/roomL3"
+                android:layout_width="273dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="42dp"
+                android:layout_marginBottom="20dp"
+                app:layout_constraintBottom_toTopOf="@id/roomWS"
+                app:layout_constraintStart_toStartOf="@id/roomWS"
+                app:layout_constraintTop_toTopOf="parent">
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/roomL2"
+                android:layout_width="226dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="19dp"
+                android:layout_marginStart="19dp"
+                android:layout_marginBottom="0dp"
+                app:layout_constraintTop_toBottomOf="@id/roomFB"
+                app:layout_constraintBottom_toBottomOf="@id/roomWS"
+                app:layout_constraintStart_toEndOf="@id/roomWS">
+            </FrameLayout>
+
+
+            <FrameLayout
+                android:id="@+id/roomHW"
+                android:layout_width="268dp"
+                android:layout_height="226dp"
+                android:layout_marginStart="20dp"
+                app:layout_constraintStart_toEndOf="@id/roomL3"
+                app:layout_constraintTop_toTopOf="@+id/roomL3">
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/roomFB"
+                android:layout_width="340dp"
+                android:layout_height="60dp"
+                app:layout_constraintStart_toEndOf="@id/roomWS"
+                app:layout_constraintTop_toTopOf="@id/roomWS">
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/roomHFB"
+                android:layout_height="66dp"
+                android:layout_width="0dp"
+                android:layout_marginEnd="19dp"
+                android:layout_marginStart="19dp"
+                app:layout_constraintStart_toEndOf="@id/roomHW"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/roomHW">
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/roomL1"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="19dp"
+                android:layout_marginEnd="19dp"
+                android:layout_marginTop="-19dp"
+                app:layout_constraintBottom_toBottomOf="@id/roomL2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/roomL2"
+                app:layout_constraintTop_toTopOf="@id/roomL2">
+            </FrameLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </FrameLayout>
+
+</layout>

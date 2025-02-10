@@ -6,29 +6,29 @@
 
     <item
         android:id="@+id/menu_settings"
-        app:materialIcon="settings"
+        android:icon="@drawable/ic_settings_helper"
         app:showAsAction="never"
         android:title="@string/settings" />
 
     <item
         android:id="@+id/exitapp"
         android:title="@string/exitapp"
-        app:materialIcon="exit_to_app"
+        android:icon="@drawable/ic_exit_to_app"
         app:showAsAction="never" />
 
     <item android:id="@+id/sip_connected_state_icon"
         android:title=""
-        app:materialIcon="phone"
+        android:icon="@drawable/ic_phone_off"
         app:showAsAction="always"/>
 
     <item android:id="@+id/db_connected_state_icon"
         android:title=""
-        app:materialIcon="database"
+        android:icon="@drawable/ic_database_off"
         app:showAsAction="always"/>
 
     <item android:id="@+id/mqtt_connected_state_icon"
         android:title=""
-        app:materialIcon="wifi_off"
+        android:icon="@drawable/ic_wifi_off"
         app:showAsAction="always"/>
 
 
