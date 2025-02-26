@@ -76,6 +76,8 @@ public class SelectAudioDialogFragment extends DialogFragment {
                              Bundle savedInstanceState) {
 
         View returnView = inflater.inflate(R.layout.fragment_select_audio_dialog, container, false);
+
+        /*
         audioActorSpinner = (AutoCompleteTextView) returnView.findViewById(R.id.audio_actors);
         audioSourceSpinner = (AutoCompleteTextView) returnView.findViewById(R.id.audio_sources);
 
@@ -98,8 +100,10 @@ public class SelectAudioDialogFragment extends DialogFragment {
                 stopAudioCallbackhandler.stopPlayback(actor);
             }
         });
+         */
 
         return returnView;
+
     }
 
     @Override
@@ -113,8 +117,10 @@ public class SelectAudioDialogFragment extends DialogFragment {
         params.height = (int) getResources().getDimension(R.dimen.audio_dialog_height);
         window.setAttributes(params);
 
+        /*
         audioActorArrayAdapter = new AudioPlaybackActorArrayAdapter(view.getContext(), R.layout.spinner_dropdown_item, audioActors, audioActorSpinner, true);
         audioSourceArrayAdapter = new AudioPlaybackSourceArrayAdapter(view.getContext(), R.layout.spinner_dropdown_item_with_image, audioPlaybackSources, audioSourceSpinner, true);
+         */
     }
 
     public void setAudioActors(List<AudioPlaybackActor> audioActors) {

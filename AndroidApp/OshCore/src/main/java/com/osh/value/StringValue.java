@@ -1,8 +1,6 @@
 package com.osh.value;
 
-import com.osh.SerializationSupport;
-
-public class StringValue extends ValueBase<StringValue, String> implements SerializationSupport {
+public class StringValue extends ValueBase<StringValue, String> {
 
 	@Override
 	protected String _updateValue(Object newValue) {

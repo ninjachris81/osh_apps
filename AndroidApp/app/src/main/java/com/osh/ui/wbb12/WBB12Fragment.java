@@ -28,6 +28,7 @@ import com.osh.activity.MainActivity;
 import com.osh.activity.OshApplication;
 import com.osh.activity.WebviewActivity;
 import com.osh.databinding.FragmentWbb12Binding;
+import com.osh.service.IServiceContext;
 import com.osh.wbb12.service.IWBB12Service;
 
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public class WBB12Fragment extends Fragment {
 
     private WBB12ViewModel wbb12ViewModel;
     private IWBB12Service wbb12Service;
+    private IServiceContext serviceContext;
 
     public WBB12Fragment() {
 
@@ -48,11 +50,13 @@ public class WBB12Fragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
         wbb12Service = ((MainActivity) getActivity()).getWBB12Service();
+        serviceContext = ((MainActivity) getActivity()).getServiceContext();
 
-        wbb12ViewModel = new ViewModelProvider(this, new WBB12ViewModelFactory(wbb12Service)).get(WBB12ViewModel.class);
-                //new ViewModelProvider(this).get(WBB12ViewModel.class);
+        wbb12ViewModel = new ViewModelProvider(this, new WBB12ViewModelFactory(wbb12Service, serviceContext)).get(WBB12ViewModel.class);
 
         binding = FragmentWbb12Binding.inflate(inflater, container, false);
+
+        binding.setWbb12Data(wbb12ViewModel);
 
         OshApplication app = (OshApplication) getActivity().getApplication();
 
@@ -70,6 +74,7 @@ public class WBB12Fragment extends Fragment {
         xVals.add("Consumption");
 
         //binding.wbb12Consumption.setVisibleXRange(0, 100);
+        /*
         XAxis axisX = binding.wbb12Consumption.getXAxis();
         //axisX.setAxisMinimum(0);
         //axisX.setAxisMaximum(100);
@@ -105,6 +110,7 @@ public class WBB12Fragment extends Fragment {
             binding.wbb12Consumption.notifyDataSetChanged();
             binding.wbb12Consumption.invalidate();
         });
+         */
 
         TableLayout wbb12Container = binding.wbb12Container;
 
@@ -127,6 +133,8 @@ public class WBB12Fragment extends Fragment {
 
             wbb12Container.addView(row);
         }
+
+
 
         return root;
     }

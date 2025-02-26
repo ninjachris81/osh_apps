@@ -1,9 +1,8 @@
 package com.osh.processor;
 
 import com.osh.SerializableIdentifyable;
-import com.osh.SerializationSupport;
 
-public class ProcessorTask extends SerializableIdentifyable implements SerializationSupport {
+public class ProcessorTask extends SerializableIdentifyable {
 	
     public enum ProcessorTaskType {
         PTT_INTERVAL,

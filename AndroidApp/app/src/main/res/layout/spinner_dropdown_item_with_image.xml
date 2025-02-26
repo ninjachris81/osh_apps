@@ -6,11 +6,18 @@
 
     <TableRow
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:padding="8dp"
+        >
+
+        <ImageView
+            android:id="@+id/spinner_dropdown__item_with_text_image"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/app_name"/>
 
         <TextView
             android:id="@+id/spinner_dropdown__item_with_text_text"
-            xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp"
@@ -19,11 +26,6 @@
             android:textAppearance="?attr/textAppearanceSubtitle1"
             />
 
-        <ImageView
-            android:id="@+id/spinner_dropdown__item_with_text_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/app_name"/>"
     </TableRow>
 
 </TableLayout>

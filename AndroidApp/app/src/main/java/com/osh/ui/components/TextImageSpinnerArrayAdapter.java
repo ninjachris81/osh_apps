@@ -9,11 +9,11 @@ import androidx.annotation.NonNull;
 import java.util.List;
 
 public class TextImageSpinnerArrayAdapter extends ArrayAdapterBase<String>  {
-    public TextImageSpinnerArrayAdapter(@NonNull Context context, int resource, AutoCompleteTextView view, boolean selectFirst) {
-        super(context, resource, view, selectFirst);
+    public TextImageSpinnerArrayAdapter(@NonNull Context context, int resource) {
+        super(context, resource);
     }
 
-    public TextImageSpinnerArrayAdapter(@NonNull Context context, int resource, @NonNull List<String> objects, AutoCompleteTextView view, boolean selectFirst) {
-        super(context, resource, objects, view, selectFirst);
+    public TextImageSpinnerArrayAdapter(@NonNull Context context, int resource, @NonNull List<String> objects) {
+        super(context, resource, objects);
     }
 }

@@ -155,7 +155,8 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 	}
 	
 	private void onMessage(@NotNull MqttTopic topic, @NotNull Optional<ByteBuffer> payload, boolean retain) {
-		LogFacade.d(TAG, "Msg arrived " + topic.toString());
+		LogFacade.d(TAG, "Msg arrived " + topic.toString() + (retain ? " retained" : ""));
+
 
 		try {
 			MessageBase msg = getMessage(topic.toString(), payload);

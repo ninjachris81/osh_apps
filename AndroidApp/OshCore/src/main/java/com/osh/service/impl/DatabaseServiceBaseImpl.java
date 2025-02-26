@@ -19,6 +19,7 @@ import com.osh.log.LogFacade;
 import com.osh.service.IDatabaseService;
 import com.osh.user.User;
 import com.osh.value.DBValue;
+import com.osh.value.DoubleValue;
 import com.osh.value.StringValue;
 import com.osh.value.ValueBase;
 import com.osh.value.ValueGroup;
@@ -114,6 +115,12 @@ public abstract class DatabaseServiceBaseImpl implements IDatabaseService {
                 if (matchList.size() == 1) {
                     DBAudioActor audioActor = matchList.get(0);
                     act = datamodel.addAudioPlaybackActor(valueGroup, actor.getId(), ValueType.of(actor.getValueType()), actor.getValueTimeout(), audioActor.getAudioDeviceIds(), audioActor.getAudioActivationRelayId(), audioActor.getAudioVolume(), audioActor.getAudioVolumeId(), audioActor.getAudioUrl(), audioActor.getAudioUrlId(), audioActor.getAudioCurrentTitleId(), audioActor.getAudioName());
+                    if (!StringUtils.isEmpty(audioActor.getAudioUrlId())) {
+                        ((AudioPlaybackActor) act).setUrlValue((StringValue) datamodel.getValue(audioActor.getAudioUrlId()));
+                    }
+                    if (!StringUtils.isEmpty(audioActor.getAudioVolumeId())) {
+                        ((AudioPlaybackActor) act).setVolumeValue((DoubleValue) datamodel.getValue(audioActor.getAudioVolumeId()));
+                    }
                     if (!StringUtils.isEmpty(audioActor.getAudioCurrentTitleId())) {
                         ((AudioPlaybackActor) act).setAudioCurrentTitleValue((StringValue) datamodel.getValue(audioActor.getAudioCurrentTitleId()));
                     }

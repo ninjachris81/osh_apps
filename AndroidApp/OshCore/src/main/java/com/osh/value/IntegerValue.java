@@ -1,8 +1,6 @@
 package com.osh.value;
 
-import com.osh.SerializationSupport;
-
-public class IntegerValue extends ValueBase<IntegerValue, Integer> implements SerializationSupport {
+public class IntegerValue extends ValueBase<IntegerValue, Integer> {
 
 	@Override
 	protected Integer _updateValue(Object newValue) {

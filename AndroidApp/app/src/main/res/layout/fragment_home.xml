@@ -262,6 +262,7 @@
 
 
                 <GridLayout
+                    android:id="@+id/bottomLeftTile"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal"
@@ -323,27 +324,9 @@
                         android:maxLines="4"
                         />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/wbb12WaterInfos"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_rowWeight="1"
-                        android:layout_columnWeight="1"
-                        android:layout_gravity="fill"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        app:iconGravity="textTop"
-                        app:iconSize="70dp"
-                        app:iconPadding="0dp"
-                        android:clickable="true"
-                        android:inputType="text"
-                        app:iconTint="@{homeData.wbb12RoomIconTint}"
-                        app:icon="@drawable/ic_home_thermometer"
-                        android:text="@{homeData.wbb12RoomInfos}"
-                        />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/wbb12Infos"
+                        android:id="@+id/app5"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_rowWeight="1"
@@ -351,18 +334,16 @@
                         android:layout_gravity="fill"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
+                        app:icon="@drawable/ic_cloud_question_outline"
                         app:iconGravity="textTop"
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
                         android:clickable="false"
-                        app:icon="@drawable/ic_home_thermometer"
-                        app:iconTint="@{homeData.wbb12WaterIconTint}"
                         android:inputType="text"
-                        android:text="@{homeData.wbb12WaterInfoText}"
                         />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/audioInfos"
+                        android:id="@+id/app6"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_rowWeight="1"
@@ -370,13 +351,42 @@
                         android:layout_gravity="fill"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
+                        app:icon="@drawable/ic_cloud_question_outline"
                         app:iconGravity="textTop"
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
                         android:clickable="false"
-                        app:icon="@drawable/ic_music"
                         android:inputType="text"
                         />
+
+                    <FrameLayout
+                        android:id="@+id/audioInfosLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        >
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/audioInfos"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            app:iconGravity="textTop"
+                            app:iconSize="70dp"
+                            app:iconPadding="0dp"
+                            android:clickable="false"
+                            app:icon="@drawable/ic_music"
+                            android:inputType="text"
+                            />
+
+
+                    </FrameLayout>
+
 
                 </GridLayout>
 
@@ -402,6 +412,65 @@
                     android:padding="1dp"
                     android:columnCount="3"
                     android:rowCount="3">
+
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/wbb12WaterInfos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:clickable="true"
+                        android:inputType="text"
+                        app:iconTint="@{homeData.wbb12RoomIconTint}"
+                        app:icon="@{homeData.wbb12RoomIcon}"
+                        android:text="@{homeData.wbb12RoomInfos}"
+                        />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/wbb12Infos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:clickable="false"
+                        app:icon="@drawable/ic_thermometer_water"
+                        app:iconTint="@{homeData.wbb12WaterIconTint}"
+                        android:inputType="text"
+                        android:text="@{homeData.wbb12WaterInfoText}"
+                        />
+
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/exceedInfos0"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:icon="@drawable/ic_heat_pump_outline"
+                        android:text="@{homeData.exceedText0}"
+                        app:iconTint="@{homeData.exceedIconTint0}"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:clickable="true"
+                        android:inputType="text"
+                        />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/dishwasherInfos"
@@ -441,9 +510,8 @@
                         android:inputType="text"
                         />
 
-
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/app3"
+                        android:id="@+id/exceedInfos1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_rowWeight="1"
@@ -451,62 +519,13 @@
                         android:layout_gravity="fill"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        app:icon="@drawable/ic_cloud_question_outline"
+                        app:icon="@drawable/ic_shower_head"
+                        android:text="@{homeData.exceedText1}"
+                        app:iconTint="@{homeData.exceedIconTint1}"
                         app:iconGravity="textTop"
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
-                        android:clickable="false"
-                        android:inputType="text"
-                        />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/app4"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_rowWeight="1"
-                        android:layout_columnWeight="1"
-                        android:layout_gravity="fill"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        app:icon="@drawable/ic_cloud_question_outline"
-                        app:iconGravity="textTop"
-                        app:iconSize="70dp"
-                        app:iconPadding="0dp"
-                        android:clickable="false"
-                        android:inputType="text"
-                        />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/app5"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_rowWeight="1"
-                        android:layout_columnWeight="1"
-                        android:layout_gravity="fill"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        app:icon="@drawable/ic_cloud_question_outline"
-                        app:iconGravity="textTop"
-                        app:iconSize="70dp"
-                        app:iconPadding="0dp"
-                        android:clickable="false"
-                        android:inputType="text"
-                        />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/app6"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_rowWeight="1"
-                        android:layout_columnWeight="1"
-                        android:layout_gravity="fill"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        app:icon="@drawable/ic_cloud_question_outline"
-                        app:iconGravity="textTop"
-                        app:iconSize="70dp"
-                        app:iconPadding="0dp"
-                        android:clickable="false"
+                        android:clickable="true"
                         android:inputType="text"
                         />
 

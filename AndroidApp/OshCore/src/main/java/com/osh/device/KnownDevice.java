@@ -3,12 +3,9 @@ package com.osh.device;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import com.osh.SerializationSupport;
-import com.osh.datamodel.meta.KnownArea;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -66,8 +66,8 @@ public class WBB12_Enums {
         LIMIT(33),
         HK_BLOCK(34),
         REDUCTION(35),
-        SG_READY_WARM_WATER(37),
-        SG_READY_HEATING(43)
+        SG_READY_HEATING(37),
+        SG_READY_WARM_WATER(39)
         ;
 
 
@@ -76,9 +76,20 @@ public class WBB12_Enums {
             this.value = value;
         }
 
+        public static Enum_OPERATING_DISPLAY get(int value) {
+            for (Enum_OPERATING_DISPLAY v : Enum_OPERATING_DISPLAY.values()) {
+                if (v.getValue() == value) return v;
+            }
+            return UNDEFINED;
+        }
+
         @Override
         public int getValue() {
             return value;
+        }
+
+        public String getShortName() {
+            return this.toString().replaceAll("_", " ").replaceAll("SG READY", "SGR").replaceAll("WARM WATER", "WW");
         }
     }
 

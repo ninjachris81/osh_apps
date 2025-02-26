@@ -14,6 +14,7 @@ import android.media.MediaPlayer;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.databinding.ObservableField;
+import androidx.databinding.ObservableInt;
 import androidx.lifecycle.ViewModel;
 
 import com.github.mikephil.charting.data.PieData;
@@ -21,7 +22,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.osh.R;
-import com.osh.activity.MainActivity;
+import com.osh.actor.DigitalActor;
 import com.osh.log.LogFacade;
 import com.osh.service.IServiceContext;
 import com.osh.utils.OshValueFormats;
@@ -84,14 +85,23 @@ public class HomeViewModel extends ViewModel {
     public final ObservableField<String> powerConsumptionText = new ObservableField<>();
 
     public final ObservableField<String> wbb12RoomInfos = new ObservableField<>();
+    public final ObservableField<Drawable> wbb12RoomIcon = new ObservableField<>();
     public final ObservableField<ColorStateList> wbb12RoomIconTint = new ObservableField<>();
     public final ObservableField<String> wbb12WaterInfoText = new ObservableField<>();
     public final ObservableField<ColorStateList> wbb12WaterIconTint = new ObservableField<>();
+
+    public final ObservableInt musicPlayingCount = new ObservableInt();
+
+    public final ObservableField<String> exceedText0 = new ObservableField<>("");
+    public final ObservableField<String> exceedText1 = new ObservableField<>("");
+    public final ObservableField<ColorStateList> exceedIconTint0 = new ObservableField<>();
+    public final ObservableField<ColorStateList> exceedIconTint1 = new ObservableField<>();
 
     private final IServiceContext serviceContext;
 
     private final IWBB12Service wbb12Service;
 
+    private EnergyMode lastEnergyMode = EnergyMode.UNKNOWN;
     private double lastGridPower = 0;
     private double lastBatteryPower = 0;
     private double lastGeneratorPower = 0;
@@ -144,8 +154,31 @@ public class HomeViewModel extends ViewModel {
         setupWeather();
         setupWindowState();
         setupWbb12();
-
+        setupMusic();
         setupWater();
+        setupExceed();
+    }
+
+    private void setupExceed() {
+        ((EnumValue) serviceContext.getValueService().getValue("energy.excessEnergyMode0")).addItemChangeListener(item -> {
+            exceedText0.set(item.getValue(0) == 0 ? "AUTO" : "MANUAL");
+        }, true, () -> {return this != null; });
+
+        ((DigitalActor) serviceContext.getActorService().getActor("energy.excessEnergyTarget0")).addItemChangeListener(item -> {
+            exceedIconTint0.set(ColorStateList.valueOf(item.getValue(false) ? COLOR_ORANGE : Color.WHITE));
+        }, true, () -> {return this != null; });
+
+        ((EnumValue) serviceContext.getValueService().getValue("energy.excessEnergyMode1")).addItemChangeListener(item -> {
+            exceedText1.set(item.getValue(0) == 0 ? "AUTO" : "MANUAL");
+        }, true, () -> {return this != null; });
+
+        ((DigitalActor) serviceContext.getActorService().getActor("energy.excessEnergyTarget1")).addItemChangeListener(item -> {
+            exceedIconTint1.set(ColorStateList.valueOf(item.getValue(false) ? COLOR_ORANGE : Color.WHITE));
+        }, true, () -> {return this != null; });
+    }
+
+    private void setupMusic() {
+        serviceContext.getAudioActorService().getPlayingMusicCount().addItemChangeListener(musicPlayingCount::set, true, () -> { return this != null; });
     }
 
     private void setupWbb12() {
@@ -174,7 +207,13 @@ public class HomeViewModel extends ViewModel {
     }
 
     private void refreshWbb12() {
-        wbb12RoomIconTint.set(ColorStateList.valueOf((lastWbb12Consumption > 0 && (lastWbb12OperatingDisplay == WBB12_Enums.Enum_OPERATING_DISPLAY.HEATING.getValue() || lastWbb12OperatingDisplay == WBB12_Enums.Enum_OPERATING_DISPLAY.SG_READY_HEATING.getValue())) ? COLOR_ORANGE : Color.WHITE));
+        if (lastWbb12OperatingDisplay ==  WBB12_Enums.Enum_OPERATING_DISPLAY.DEICE.getValue()) {
+            wbb12RoomIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_snowflake_melt));
+            wbb12RoomIconTint.set(ColorStateList.valueOf(Color.WHITE));
+        } else {
+            wbb12RoomIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_home_thermometer));
+            wbb12RoomIconTint.set(ColorStateList.valueOf((lastWbb12Consumption > 0 && (lastWbb12OperatingDisplay == WBB12_Enums.Enum_OPERATING_DISPLAY.HEATING.getValue() || lastWbb12OperatingDisplay == WBB12_Enums.Enum_OPERATING_DISPLAY.SG_READY_HEATING.getValue())) ? COLOR_ORANGE : Color.WHITE));
+        }
         wbb12WaterIconTint.set(ColorStateList.valueOf((lastWbb12Consumption > 0 && (lastWbb12OperatingDisplay == WBB12_Enums.Enum_OPERATING_DISPLAY.WARM_WATER.getValue() || lastWbb12OperatingDisplay == WBB12_Enums.Enum_OPERATING_DISPLAY.SG_READY_WARM_WATER.getValue())) ? COLOR_ORANGE : Color.WHITE));
     }
 
@@ -360,16 +399,19 @@ public class HomeViewModel extends ViewModel {
         DoubleValue batteryPower = (DoubleValue) serviceContext.getValueService().getValue("energy.batteryPower");
         batteryPower.addItemChangeListener(item -> {
             lastBatteryPower = batteryPower.getValue(Double.valueOf(0)).doubleValue();
+            refreshCurrentMode();
         });
 
         DoubleValue gridPower = (DoubleValue) serviceContext.getValueService().getValue("energy.gridPower");
         gridPower.addItemChangeListener(item -> {
             lastGridPower = gridPower.getValue(Double.valueOf(0)).doubleValue();
+            refreshCurrentMode();
         });
 
         DoubleValue generatorPower = (DoubleValue) serviceContext.getValueService().getValue("energy.generatorPower");
         generatorPower.addItemChangeListener(item -> {
             lastGeneratorPower = generatorPower.getValue(Double.valueOf(0)).doubleValue();
+            refreshCurrentMode();
         });
     }
 
@@ -415,23 +457,27 @@ public class HomeViewModel extends ViewModel {
 
         EnumValue currentModeValue = (EnumValue) serviceContext.getValueService().getValue("energy.currentMode");
         currentModeValue.addItemChangeListener(item -> {
-            EnergyMode mode = EnergyMode.values()[item.getValue(0)];
-                switch(mode) {
-                    case MAINLY_PV:
-                        currentModeIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_solar_panel));
-                        currentModeText.set(kiloWattsFormatter.format(Double.valueOf(lastGeneratorPower / 1000)).toString());
-                        break;
-                    case MAINLY_GRID:
-                        currentModeIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_transmission_tower));
-                        currentModeText.set(kiloWattsFormatter.format(Double.valueOf(lastGridPower / 1000)).toString());
-                        break;
-                    case MAINLY_BATTERY:
-                        // TODO: change symbol according to state
-                        currentModeIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_battery_50));
-                        currentModeText.set(kiloWattsFormatter.format(Double.valueOf(lastBatteryPower / 1000)).toString());
-                        break;
-                }
-        }, true, () -> { return this != null; });
+            lastEnergyMode = EnergyMode.values()[item.getValue(0)];
+            refreshCurrentMode();
+        }, true, () -> this != null);
+    }
+
+    private void refreshCurrentMode() {
+        switch(lastEnergyMode) {
+            case MAINLY_PV:
+                currentModeIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_solar_panel));
+                currentModeText.set(kiloWattsFormatter.format(Double.valueOf(lastGeneratorPower / 1000)).toString());
+                break;
+            case MAINLY_GRID:
+                currentModeIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_transmission_tower));
+                currentModeText.set(kiloWattsFormatter.format(Double.valueOf(lastGridPower / 1000)).toString());
+                break;
+            case MAINLY_BATTERY:
+                // TODO: change symbol according to state
+                currentModeIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_battery_50));
+                currentModeText.set(kiloWattsFormatter.format(Double.valueOf(lastBatteryPower / 1000)).toString());
+                break;
+        }
     }
 
     private void setupHomeAppliances() {
@@ -460,12 +506,12 @@ public class HomeViewModel extends ViewModel {
         EnumValue operationState = (EnumValue) serviceContext.getValueService().getValue(operationStateFullId);
         operationState.addItemChangeListener(item -> {
             refreshHomeAppliance(index, HomeConnectOperationalState.values()[item.getValue(0)], lastRemainingSec.get(index), onIcon, offIcon, alertIcon);
-        }, true, () -> { return this != null; });
+        }, true, () -> this != null);
 
         IntegerValue remainingTime = (IntegerValue) serviceContext.getValueService().getValue(remainingTimeFullId);
         remainingTime.addItemChangeListener(item -> {
             refreshHomeAppliance(index, lastOperationState.get(index), item.getValue(Integer.valueOf(0)), onIcon, offIcon, alertIcon);
-        }, true, () -> { return this != null; });
+        }, true, () -> this != null);
 
         return index;
     }

@@ -13,10 +13,10 @@ import java.util.List;
 
 public class AudioPlaybackActorArrayAdapter extends TextSpinnerArrayAdapter {
 
-    public AudioPlaybackActorArrayAdapter(@NonNull Context context, int resource, @NonNull List<AudioPlaybackActor> audioPlaybackActors, AutoCompleteTextView view, boolean selectFirst) {
-        super(context, resource, view, selectFirst);
+    public AudioPlaybackActorArrayAdapter(@NonNull Context context, int resource, @NonNull List<AudioPlaybackActor> audioPlaybackActors) {
+        super(context, resource);
         for (AudioPlaybackActor actor : audioPlaybackActors) {
-            super.add(actor.getId());;
+            super.add(actor.getAudioName());;
         }
     }
 

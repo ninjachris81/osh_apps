@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.hardware.camera2.CameraManager;
@@ -15,6 +16,7 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -188,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         } else if (m.what == MSG_TYPE.CHANGE_NETWORK) {
             app.handleNetworkChange();
         } else if (m.what == MSG_TYPE.DIM_DISPLAY) {
-            dimScreen(m.arg1 != 0);
+            standbyScreen(m.arg1 != 0, true);
         } else {
             /* Message not handled */
             return false;
@@ -198,6 +200,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         return true;
     }
 
+    private Context context;
 
     @Inject
     Lazy<IWBB12Service> wbb12Service;
@@ -227,19 +230,42 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     private void dimScreen(boolean dim) {
+        /*
         WindowManager.LayoutParams params = this.getWindow().getAttributes();
         params.screenBrightness = dim ? 0.0f : 0.8f;
         this.getWindow().setAttributes(params);
+         */
 
         binding.blackOverlay.setVisibility(dim ? View.VISIBLE : View.INVISIBLE);
         binding.bottomNav.setVisibility(dim ? View.INVISIBLE : View.VISIBLE);
-        dimTimer.start();
+    }
+
+    private void standbyScreen(boolean standby, boolean restartTimer) {
+        if (Settings.System.canWrite(context)) {
+            dimScreen(standby);
+            if (standby) {
+                Settings.System.putInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+                Settings.System.putInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, 0);
+            } else {
+                Settings.System.putInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
+            }
+        } else {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+            context.startActivity(intent);
+        }
+
+        if (!standby && restartTimer) {
+            dimTimer.cancel();
+            dimTimer.start();
+        }
     }
 
     @OptIn(markerClass = ExperimentalBadgeUtils.class)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        this.context = this;
 
         setShowWhenLocked(true);
         setTurnScreenOn(true);
@@ -380,21 +406,30 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
             @Override
             public void onFinish() {
-                dimScreen(true);
+                standbyScreen(true, false);
             }
         };
 
         binding.blackOverlay.setOnClickListener(view -> {
-            dimScreen(false);
+            standbyScreen(false, true);
         });
-        dimScreen(false);
+        standbyScreen(false, true);
+
+        binding.stationName.setText(((OshApplication) getApplication()).getApplicationConfig().getUser().getUserId());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        dimScreen(false);
+        standbyScreen(false, true);
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        standbyScreen(false, false);
+    }
+
 
     private HashMap<String, String> putData(String uri, String status)
     {
@@ -406,7 +441,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     private void showCallActivity()
     {
-        dimScreen(false);
+        standbyScreen(false, true);
         Intent intent = new Intent(this, SipCallActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
@@ -426,6 +461,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 Manifest.permission.NFC,
                 Manifest.permission.INTERNET,
                 Manifest.permission.ACCESS_NETWORK_STATE,
+                Manifest.permission.WRITE_SETTINGS
         };
         if (!checkPermissionAllGranted(permissions)) {
             ActivityCompat.requestPermissions(this, permissions, REQUEST_PERMISSIONS_APP);
@@ -516,6 +552,10 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             });
         }, true, () -> {return dbConnectedStateIcon!=null;});
 
+        if (ServiceModules.updatedDBVersion > 0) {
+            dbConnectedStateIcon.getIcon().setTintList(ColorStateList.valueOf(Color.GREEN));
+        }
+
         dbConnectedStateIcon.setOnMenuItemClickListener(item -> {
             final Context context = this;
             new Thread(new Runnable() {
@@ -537,7 +577,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                                     .setNegativeButton(android.R.string.no, null)
                                     .show();
                         } else {
-                            Toast.makeText(context, "Database Version: " + version, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Database Version: " + version + (ServiceModules.updatedDBVersion > 0 ? " [updated]" : ""), Toast.LENGTH_SHORT).show();
+                            item.getIcon().setTintList(ColorStateList.valueOf(Color.BLACK));
                         }
                     });
                 }

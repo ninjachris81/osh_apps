@@ -22,8 +22,8 @@ public class AudioPlaybackSourceArrayAdapter extends TextImageSpinnerArrayAdapte
 
     private final List<Bitmap> bitmaps = new ArrayList<>();
 
-    public AudioPlaybackSourceArrayAdapter(@NonNull Context context, int resource, List<AudioPlaybackSource> audioPlaybackSources, AutoCompleteTextView view, boolean selectFirst) {
-        super(context, resource, view, selectFirst);
+    public AudioPlaybackSourceArrayAdapter(@NonNull Context context, int resource, List<AudioPlaybackSource> audioPlaybackSources) {
+        super(context, resource);
 
         for (AudioPlaybackSource source : audioPlaybackSources) {
             super.add(source.getName());

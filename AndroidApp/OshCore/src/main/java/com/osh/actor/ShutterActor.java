@@ -1,10 +1,9 @@
 package com.osh.actor;
 
-import com.osh.SerializationSupport;
 import com.osh.value.ValueGroup;
 import com.osh.value.ValueType;
 
-public class ShutterActor extends ActorBase<ShutterActor, Integer> implements SerializationSupport {
+public class ShutterActor extends ActorBase<ShutterActor, Integer> {
 
     public static final int SHUTTER_OPERATION_MODE_AUTO = 0;
     public static final int SHUTTER_OPERATION_MODE_MANUAL = 1;

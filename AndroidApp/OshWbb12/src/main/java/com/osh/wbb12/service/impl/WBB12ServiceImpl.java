@@ -176,6 +176,7 @@ public class WBB12ServiceImpl implements IWBB12Service {
         registerInputRegister(WBB12_Input_Registers.HEAT_PUMP_RETURN_FLOW_TEMP, WBB12Unit.Temperature, true);
 
         registerInputRegister(WBB12_Input_Registers.HEAT_COIL_STATUS, WBB12Unit.Enum, false, WBB12_Enums.Enum_STATUS.class);
+        registerInputRegister(WBB12_Input_Registers.HEAT_COIL_WORKING_HOURS, WBB12Unit.PlainInt, false);
         registerInputRegister(WBB12_Input_Registers.HEAT_COIL_STATUS_COIL1, WBB12Unit.Enum, false, WBB12_Enums.Enum_STATUS.class);
         registerInputRegister(WBB12_Input_Registers.HEAT_COIL_STATUS_COIL2, WBB12Unit.Enum, false, WBB12_Enums.Enum_STATUS.class);
 
@@ -260,10 +261,10 @@ public class WBB12ServiceImpl implements IWBB12Service {
             wbb12Formats.put(val.getFullId(), new WBB12Format(false, unit, enumType));
 
             val.addItemChangeListener(item -> {
-                log.debug("WBB12 Value changed: " + item);
+                log.debug("WBB12 Value changed: {}", item);
             });
         } else {
-            log.warn("Unable to find value in datamodel: " + mqttName);
+            log.warn("Unable to find value in datamodel: {}", mqttName);
         }
     }
 
@@ -277,7 +278,7 @@ public class WBB12ServiceImpl implements IWBB12Service {
     private void registerHoldingRegister(WBB12_Holding_Registers reg, WBB12Unit unit, boolean isDouble, boolean canWrite, Class<? extends Enum> enumType) {
         String mqttName = getMqttName(reg);
 
-        log.info("Registering WBB12 holding " + mqttName);
+        log.info("Registering WBB12 holding {}", mqttName);
 
         ValueBase val = null;
         
@@ -293,12 +294,8 @@ public class WBB12ServiceImpl implements IWBB12Service {
             }
 
             wbb12Formats.put(val.getFullId(), new WBB12Format(canWrite, unit, enumType));
-
-            val.addItemChangeListener(item -> {
-                log.debug("WBB12 Value changed: " + item);
-            });
         } else {
-            log.warn("Unable to find actor/value in datamodel: " + mqttName);
+            log.warn("Unable to find actor/value in datamodel: {}", mqttName);
         }
     }
 

@@ -1,8 +1,6 @@
 package com.osh.value;
 
-import com.osh.SerializationSupport;
-
-public class LongValue extends ValueBase<LongValue, Long> implements SerializationSupport {
+public class LongValue extends ValueBase<LongValue, Long> {
 
 	@Override
 	protected Long _updateValue(Object newValue) {

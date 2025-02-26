@@ -1,10 +1,9 @@
 package com.osh.actor;
 
-import com.osh.SerializationSupport;
 import com.osh.value.ValueGroup;
 import com.osh.value.ValueType;
 
-public class DigitalActor extends ActorBase<DigitalActor, Boolean> implements SerializationSupport {
+public class DigitalActor extends ActorBase<DigitalActor, Boolean> {
 	
 	protected boolean isAsync;
 

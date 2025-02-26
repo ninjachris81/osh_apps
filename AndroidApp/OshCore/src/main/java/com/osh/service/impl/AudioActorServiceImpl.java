@@ -1,16 +1,16 @@
 package com.osh.service.impl;
 
-import android.provider.MediaStore;
-
 import com.osh.Identifyable;
 import com.osh.actor.ActorBase;
+import com.osh.actor.ActorCmds;
 import com.osh.actor.AudioPlaybackActor;
+import com.osh.datamodel.meta.AudioPlaybackSource;
 import com.osh.datamodel.meta.KnownRoom;
 import com.osh.service.IActorService;
 import com.osh.service.IAudioActorService;
-import com.osh.service.ICommunicationService;
-import com.osh.service.IDatabaseService;
 import com.osh.service.IDatamodelService;
+import com.osh.service.IValueService;
+import com.osh.utils.ObservableInt;
 import com.osh.value.DoubleValue;
 import com.osh.value.StringValue;
 import com.osh.value.ValueBase;
@@ -19,10 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -32,14 +30,16 @@ import java.util.stream.Collectors;
 public class AudioActorServiceImpl implements IAudioActorService {
 
     private static final Logger log = LoggerFactory.getLogger(AudioActorServiceImpl.class);
-    private final ICommunicationService communicationService;
+    private final IValueService valueService;
     private final IActorService actorService;
     private final IDatamodelService datamodelService;
 
     protected Map<String, AudioPlaybackActor> audioActors = new HashMap<>();
 
-    public AudioActorServiceImpl(ICommunicationService communicationService, IActorService actorService, IDatamodelService datamodelService) {
-        this.communicationService = communicationService;
+    protected ObservableInt playingMusicActors = new ObservableInt(0);
+
+    public AudioActorServiceImpl(IValueService valueService, IActorService actorService, IDatamodelService datamodelService) {
+        this.valueService = valueService;
         this.actorService = actorService;
         this.datamodelService = datamodelService;
 
@@ -57,6 +57,12 @@ public class AudioActorServiceImpl implements IAudioActorService {
     }
 
     private void registerAudioActor(AudioPlaybackActor audioPlaybackActor) {
+        audioPlaybackActor.addItemChangeListener(item -> {
+            if (item.isMusicActor()) {
+                playingMusicActors.changeValue(getCount(List.of(AudioPlaybackActor.PLAYBACK_STATE.PLAYING), true));
+            }
+        }, true);
+
         if (!StringUtils.isEmpty(audioPlaybackActor.getAudioVolumeId())) {
             ValueBase value = datamodelService.getDatamodel().getValue(audioPlaybackActor.getAudioVolumeId());
             if (value instanceof DoubleValue) {
@@ -88,9 +94,16 @@ public class AudioActorServiceImpl implements IAudioActorService {
     }
 
     @Override
-    public List<AudioPlaybackActor> getAudioActors() {
-        List<AudioPlaybackActor> returnList = new ArrayList<AudioPlaybackActor>(audioActors.values());
-        Collections.sort(returnList, Comparator.comparing(Identifyable::getId));
+    public List<AudioPlaybackSource> getAudioPlaybackSources() {
+        List<AudioPlaybackSource> returnList = new ArrayList<>(datamodelService.getDatamodel().getAudioPlaybackSources().values());
+        returnList.sort(Comparator.comparing(AudioPlaybackSource::getName));
+        return returnList;
+    }
+
+    @Override
+    public Collection<AudioPlaybackActor> getAudioActors() {
+        List<AudioPlaybackActor> returnList = new ArrayList<>(audioActors.values());
+        returnList.sort(Comparator.comparing(AudioPlaybackActor::getId));
         return returnList;
     }
 
@@ -100,9 +113,46 @@ public class AudioActorServiceImpl implements IAudioActorService {
         List<AudioPlaybackActor> returnList = room.getActors().values().stream()
                 .filter(actorBase -> actorBase instanceof AudioPlaybackActor)
                 .map(actorBase -> ((AudioPlaybackActor) actorBase))
-                .filter(audioPlaybackActor -> (onlyDynamic && audioPlaybackActor.getAudioUrlId() != null || !onlyDynamic))
+                .filter(audioPlaybackActor -> (!onlyDynamic || audioPlaybackActor.isDynamic()))
                 .sorted(Comparator.comparing(Identifyable::getId))
                 .collect(Collectors.toList());
         return returnList;
+    }
+
+    @Override
+    public void startPlayback(AudioPlaybackActor actor, AudioPlaybackSource source) {
+        stopPlayback(actor);
+        actor.getAudioUrlValue().updateValue(source.getSourceUrl(), false);
+        valueService.publishValue(actor.getAudioUrlValue());
+        actorService.publishCmd(actor, ActorCmds.ACTOR_CMD_START);
+    }
+
+    @Override
+    public void stopPlayback(AudioPlaybackActor actor) {
+        actorService.publishCmd(actor, ActorCmds.ACTOR_CMD_STOP);
+    }
+
+    @Override
+    public ObservableInt getPlayingMusicCount() {
+        return playingMusicActors;
+    }
+
+    @Override
+    public int getCount(List<AudioPlaybackActor.PLAYBACK_STATE> stateFilter, boolean onlyMusic) {
+        return (int) audioActors.values().stream().filter(audioPlaybackActor -> (!onlyMusic || audioPlaybackActor.isMusicActor()) && stateFilter.contains(audioPlaybackActor.getPlaybackState())).count();
+    }
+
+    @Override
+    public AudioPlaybackSource getCurrentSource(AudioPlaybackActor audioPlaybackActor) {
+        if (!StringUtils.isEmpty(audioPlaybackActor.getAudioUrlId())) {
+            return datamodelService.getDatamodel().getAudioPlaybackSources().values().stream().filter(audioPlaybackSource -> audioPlaybackSource.getSourceUrl().equals(audioPlaybackActor.getAudioUrlValue().getValue())).findFirst().orElse(null);
+        }
+        return null;
+    }
+
+    @Override
+    public void updateAudioVolume(AudioPlaybackActor actor, double value) {
+        actor.getAudioVolumeValue().updateValue(value);
+        valueService.publishValue(actor.getAudioVolumeValue());
     }
 }

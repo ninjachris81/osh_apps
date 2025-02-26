@@ -1,10 +1,9 @@
 package com.osh.actor;
 
-import com.osh.SerializationSupport;
 import com.osh.value.ValueGroup;
 import com.osh.value.ValueType;
 
-public class DoorActor extends ActorBase<DoorActor, Boolean> implements SerializationSupport {
+public class DoorActor extends ActorBase<DoorActor, Boolean> {
 
     public DoorActor(ValueGroup valueGroup, String id, ValueType valueType) {
         super(valueGroup, id, valueType);

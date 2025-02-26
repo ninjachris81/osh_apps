@@ -1,69 +1,333 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_weight="1"
-    android:orientation="vertical"
-    tools:context=".ui.wbb12.WBB12Fragment">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/actionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="120dp"
-        android:clickable="true"
-        android:src="@android:drawable/ic_menu_send"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+    <data>
+        <variable
+            name="wbb12Data"
+            type="com.osh.ui.wbb12.WBB12ViewModel" />
+    </data>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/statsButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="40dp"
-        android:layout_marginBottom="0dp"
-        android:clickable="true"
-        android:src="@android:drawable/ic_menu_sort_by_size"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".ui.wbb12.WBB12Fragment">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/wbb12CardView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/design_default_color_secondary"
-        app:cardCornerRadius="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.github.mikephil.charting.charts.HorizontalBarChart
-            android:id="@+id/wbb12Consumption"
-            android:layout_width="match_parent"
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/actionButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp" />
-    </androidx.cardview.widget.CardView>
+            android:layout_marginEnd="120dp"
+            android:clickable="true"
+            android:src="@android:drawable/ic_menu_send"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <ScrollView
-        android:id="@+id/scrollView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:scrollbars="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/wbb12CardView">
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/statsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="40dp"
+            android:layout_marginBottom="0dp"
+            android:clickable="true"
+            android:src="@android:drawable/ic_menu_sort_by_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-        <TableLayout
-            android:id="@+id/wbb12Container"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:isScrollContainer="true"
-            android:stretchColumns="*" />
-    </ScrollView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <GridLayout
+            android:id="@+id/mainTile"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            android:useDefaultMargins="true"
+            android:padding="1dp"
+            android:columnCount="7"
+            android:rowCount="2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/bottomLine"
+            app:layout_constraintEnd_toEndOf="parent"
+            >
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_cog"
+                android:inputType="text"
+                android:text="@{wbb12Data.mode}"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/consumption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_heat_pump_outline"
+                android:inputType="text"
+                android:text='@{ String.format("%d", wbb12Data.consumption) + "%"}'
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/outsideTemp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_thermometer_auto"
+                android:inputType="text"
+                android:text='@{ String.format("%.1f", wbb12Data.outsideTemp) + "°"}'
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/roomTemp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_home_thermometer"
+                android:inputType="text"
+                android:text='@{ String.format("%.1f", wbb12Data.roomTemp) + "°"}'
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/waterTemp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_thermometer_water"
+                android:inputType="text"
+                android:text='@{ String.format("%.1f", wbb12Data.waterTemp) + "°"}'
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/heatCoil"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_heating_coil"
+                android:inputType="text"
+                android:text="@{wbb12Data.heatCoil}"
+                />
+
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/energyStats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                android:inputType="text"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/flowOut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_call_made"
+                android:inputType="text"
+                android:text='@{ String.format("%.1f", wbb12Data.flowTempOut) + "°"}'
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/flowIn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_call_received"
+                android:inputType="text"
+                android:text='@{ String.format("%.1f", wbb12Data.flowTempIn) + "°"}'
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/electricPower"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_transmission_tower"
+                android:inputType="text"
+                android:text='@{ String.format("%.1f", wbb12Data.electricPower) + " kW"}'
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/electricPowerTotal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_sigma"
+                android:inputType="text"
+                android:text='@{ String.format("%.1f", wbb12Data.electricPowerTotal) + " kWh"}'
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/test24"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_cloud_question_outline"
+                android:inputType="text"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/test25"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_cloud_question_outline"
+                android:inputType="text"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/test26"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_cloud_question_outline"
+                android:inputType="text"
+                />
+        </GridLayout>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/bottomLine"
+            app:layout_constraintGuide_begin="320dp"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scrollbars="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/mainTile">
+
+            <TableLayout
+                android:id="@+id/wbb12Container"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:isScrollContainer="true"
+                android:stretchColumns="*" />
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

@@ -202,4 +202,5 @@
     <string name="title_sysint">System</string>
     <string name="toolbar_time_str">h:mm a</string>
     <string name="toolbar_date_str">MM-dd</string>
+    <string name="volume_label">Volume:</string>
 </resources>

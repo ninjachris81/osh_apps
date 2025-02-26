@@ -1,10 +1,6 @@
 package com.osh.value;
 
-import com.osh.SerializationSupport;
-
-import org.apache.commons.lang3.math.NumberUtils;
-
-public class DoubleValue extends ValueBase<DoubleValue, Double> implements SerializationSupport {
+public class DoubleValue extends ValueBase<DoubleValue, Double> {
 
 	@Override
 	protected Double _updateValue(Object newValue) {

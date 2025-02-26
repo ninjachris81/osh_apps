@@ -1,8 +1,6 @@
 package com.osh.value;
 
-import com.osh.SerializationSupport;
-
-public class BooleanValue extends ValueBase<BooleanValue, Boolean> implements SerializationSupport {
+public class BooleanValue extends ValueBase<BooleanValue, Boolean> {
 
 	@Override
 	protected Boolean _updateValue(Object newValue) {

@@ -132,7 +132,7 @@ public abstract class ValueBase<VALUE_TYPE extends ValueBase, NATIVE_TYPE> exten
 
 	    boolean isDifferent = !Objects.equals(value, newValue);
 
-		if (isDifferent) {
+		if (lastUpdate == 0 || isDifferent) {
 			value = _updateValue(newValue);
 
 			if (invokeListeners) {

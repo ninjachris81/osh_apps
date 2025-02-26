@@ -47,6 +47,8 @@ public class ServiceModules {
 
     static ExecutorService service = Executors.newFixedThreadPool(2);
 
+    public static long updatedDBVersion = -1;
+
     @Provides
     @Singleton
     static IDatabaseService provideDatabaseService(@ApplicationContext Context context, IApplicationConfig applicationConfig) {
@@ -58,6 +60,7 @@ public class ServiceModules {
                         // if not, connect to real one and copy
                         final DatabaseServiceImpl databaseService = new DatabaseServiceImpl(applicationConfig.getDatabase(), true);
                         localDatabaseService.copyData(databaseService);
+                        updatedDBVersion = databaseService.getVersion();
                     }
 
                     return localDatabaseService;
@@ -102,8 +105,8 @@ public class ServiceModules {
 
     @Provides
     @Singleton
-    static IAudioActorService provideAudioActorService(ICommunicationService communicationService, IActorService actorService, IDatamodelService datamodelService) {
-        return new AudioActorServiceImpl(communicationService, actorService, datamodelService);
+    static IAudioActorService provideAudioActorService(IValueService valueService, IActorService actorService, IDatamodelService datamodelService) {
+        return new AudioActorServiceImpl(valueService, actorService, datamodelService);
     }
 
     @Provides
