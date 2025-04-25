@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class MyApp extends pjsua2 {
     public static Endpoint ep = new Endpoint();
     public static MyAppObserver observer;
-    public ArrayList<MyAccount> accList = new ArrayList<MyAccount>();
+    public ArrayList<OshAccount> accList = new ArrayList<>();
 
     private ArrayList<MyAccountConfig> accCfgs =
             new ArrayList<MyAccountConfig>();
@@ -166,9 +166,9 @@ public class MyApp extends pjsua2 {
         }
     }
 
-    public MyAccount addAcc(AccountConfig cfg)
+    public OshAccount addAcc(AccountConfig cfg)
     {
-        MyAccount acc = new MyAccount(cfg);
+        OshAccount acc = new OshAccount(cfg);
         try {
             acc.create(cfg);
         } catch (Exception e) {

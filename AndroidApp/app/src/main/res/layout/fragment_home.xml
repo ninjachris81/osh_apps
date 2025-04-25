@@ -44,43 +44,49 @@
 
                     <com.ncorti.slidetoact.SlideToActView
                         android:id="@+id/unlockDoorSlider"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_rowWeight="1"
-                        android:layout_columnWeight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
                         android:layout_gravity="fill"
                         android:layout_columnSpan="2"
+                        android:layout_columnWeight="1"
+                        android:layout_rowWeight="0.6"
                         app:border_radius="2dp"
                         app:outer_color="@color/design_default_color_primary"
                         app:text="Unlock Front Door"
                         app:text_style="bold" />
 
-                    <com.google.android.material.button.MaterialButton
+                    <com.osh.ui.components.CameraButton
                         android:id="@+id/btnFrontCamera"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_rowWeight="1"
-                        android:layout_columnWeight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
                         android:layout_gravity="fill"
+                        android:layout_columnWeight="1"
+                        android:layout_rowWeight="1"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        android:text="Front\nDoor"
-                        app:icon="@drawable/ic_cctv"
-                        app:iconSize="70dp"
+                        app:buttonLabelTitle="Front\nDoor"
+                        app:buttonLabelColor="@color/white"
+                        app:buttonLabelSize="8dp"
+                        app:buttonIcon="@drawable/ic_cctv"
+                        app:buttonIconColor="@color/white"
+                        app:buttonIconSize="50dp"
                         />
 
-                    <com.google.android.material.button.MaterialButton
+                    <com.osh.ui.components.CameraButton
                         android:id="@+id/btnBackCamera"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_rowWeight="1"
-                        android:layout_columnWeight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
                         android:layout_gravity="fill"
+                        android:layout_columnWeight="1"
+                        android:layout_rowWeight="1"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        android:text="Garden"
-                        app:icon="@drawable/ic_cctv"
-                        app:iconSize="70dp"
+                        app:buttonLabelTitle="Garden"
+                        app:buttonLabelColor="@color/white"
+                        app:buttonLabelSize="8dp"
+                        app:buttonIcon="@drawable/ic_cctv"
+                        app:buttonIconColor="@color/white"
+                        app:buttonIconSize="50dp"
                         />
                 </GridLayout>
             </androidx.cardview.widget.CardView>

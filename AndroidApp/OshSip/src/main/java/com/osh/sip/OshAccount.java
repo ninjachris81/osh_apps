@@ -19,7 +19,7 @@ import org.pjsip.pjsua2.OnIncomingCallParam;
 import org.pjsip.pjsua2.OnRegStateParam;
 import org.pjsip.pjsua2.pjsip_status_code;
 
-public class OshAccount extends Account {
+public class OshAccount extends MyAccount {
 
 
 
@@ -34,7 +34,7 @@ public class OshAccount extends Account {
 
 
 
-    private final CallbackReceiver callbackReceiver;
+    private CallbackReceiver callbackReceiver;
 
     public interface CallbackReceiver {
 
@@ -52,7 +52,11 @@ public class OshAccount extends Account {
 
     private Context context;
 
-    public OshAccount(CallbackReceiver callbackReceiver) {
+    public OshAccount(AccountConfig config) {
+        super(config);
+    }
+
+    public void setCallbackReceiver(CallbackReceiver callbackReceiver) {
         this.callbackReceiver = callbackReceiver;
     }
 

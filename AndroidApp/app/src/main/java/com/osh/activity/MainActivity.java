@@ -1,7 +1,6 @@
 package com.osh.activity;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,12 +14,10 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
-import android.os.PowerManager;
 import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -32,16 +29,17 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.badge.BadgeDrawable;
-import com.google.android.material.badge.BadgeUtils;
 import com.google.android.material.badge.ExperimentalBadgeUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.osh.R;
 import com.osh.databinding.ActivityMainBinding;
+import com.osh.log.LogFacade;
 import com.osh.service.IServiceContext;
 import com.osh.sip.MyAccount;
 import com.osh.sip.MyApp;
@@ -52,6 +50,7 @@ import com.osh.sip.OshAccount;
 import com.osh.utils.ObservableBoolean;
 import com.osh.wbb12.service.IWBB12Service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.pjsip.PjCameraInfo2;
 import org.pjsip.pjsua2.AccountConfig;
 import org.pjsip.pjsua2.AuthCredInfo;
@@ -64,6 +63,7 @@ import org.pjsip.pjsua2.pjsip_status_code;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -73,9 +73,14 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity implements Handler.Callback, MyAppObserver {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
+    public static final String STANDBY_STATE_CHANGED = "standbyStateChanged";
+    public static final String STANDBY_STATE_CHANGED_VALUE = "standby";
+
+    final int REQUEST_OVERLAY_PERMISSION = 666;
+
     public static MyApp app = null;
     public static MyCall currentCall = null;
-    public static MyAccount account = null;
     public static AccountConfig accCfg = null;
     private String lastRegStatus = "";
 
@@ -115,10 +120,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 return true;
             }
 
-            Intent intent = new Intent(this, SipCallActivity.class);
-            intent.putExtra("msgType", MSG_TYPE.CALL_STATE);
-            intent.putExtra("state", ci.getState());
-            startActivity(intent);
+            startCallActivity(MSG_TYPE.CALL_STATE, null, null, ci.getState());
 
             if (ci.getState() == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED)
             {
@@ -127,20 +129,16 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             }
 
         } else if (m.what == MSG_TYPE.CALL_MEDIA_STATE) {
-
-            Intent intent = new Intent(this, SipCallActivity.class);
-            intent.putExtra("msgType", MSG_TYPE.CALL_MEDIA_STATE);
-            startActivity(intent);
-
+            startCallActivity(MSG_TYPE.CALL_MEDIA_STATE, null, null, null);
         } else if (m.what == MSG_TYPE.BUDDY_STATE) {
 
             MyBuddy buddy = (MyBuddy) m.obj;
-            int idx = account.buddyList.indexOf(buddy);
+            int idx = sipAccount.buddyList.indexOf(buddy);
 
             /* Update buddy status text, if buddy is valid and
              * the buddy lists in account and UI are sync-ed.
              */
-            if (idx >= 0 && account.buddyList.size() == buddyList.size())
+            if (idx >= 0 && sipAccount.buddyList.size() == buddyList.size())
             {
                 //buddyList.get(idx).put("status", buddy.getStatusText());
                 //buddyListAdapter.notifyDataSetChanged();
@@ -185,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             } catch (Exception e) {}
 
             currentCall = call;
-            showCallActivity();
+            startCallActivity(MSG_TYPE.INCOMING_CALL, null, null, null);
 
         } else if (m.what == MSG_TYPE.CHANGE_NETWORK) {
             app.handleNetworkChange();
@@ -224,10 +222,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         return wbb12Service.get();
     }
 
-    public static void invokeActivity(Context context) {
-        Intent intent = new Intent(context, MainActivity.class);
-        context.startActivity(intent);
-    }
+    private Boolean currentStandbyState;
 
     private void dimScreen(boolean dim) {
         /*
@@ -241,17 +236,24 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     private void standbyScreen(boolean standby, boolean restartTimer) {
-        if (Settings.System.canWrite(context)) {
-            dimScreen(standby);
-            if (standby) {
-                Settings.System.putInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-                Settings.System.putInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, 0);
+        if (currentStandbyState == null || standby != currentStandbyState) {
+            if (Settings.System.canWrite(context)) {
+                dimScreen(standby);
+                if (standby) {
+                    Settings.System.putInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+                    Settings.System.putInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, 0);
+                } else {
+                    Settings.System.putInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
+                }
             } else {
-                Settings.System.putInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                context.startActivity(intent);
             }
-        } else {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-            context.startActivity(intent);
+            currentStandbyState = standby;
+
+            Intent intent = new Intent(MainActivity.STANDBY_STATE_CHANGED);
+            intent.putExtra(MainActivity.STANDBY_STATE_CHANGED_VALUE, currentStandbyState);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         }
 
         if (!standby && restartTimer) {
@@ -340,29 +342,30 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         }
 
         if (app.accList.isEmpty()) {
+            String sipUsername = ((OshApplication) getApplication()).getApplicationConfig().getSip().getUsername();
+
             accCfg = new AccountConfig();
-            accCfg.setIdUri("sip:" + ((OshApplication) getApplication()).getApplicationConfig().getSip().getUsername() + "@" + ((OshApplication) getApplication()).getApplicationConfig().getSip().getHost());
+            accCfg.setIdUri("sip:" + (sipUsername + "@" + ((OshApplication) getApplication()).getApplicationConfig().getSip().getHost()));
             accCfg.getRegConfig().setRegistrarUri("sip:" + ((OshApplication) getApplication()).getApplicationConfig().getSip().getHost());
             accCfg.getSipConfig().getAuthCreds().clear();
             accCfg.getSipConfig().getAuthCreds().add(new AuthCredInfo("Digest", ((OshApplication) getApplication()).getApplicationConfig().getSip().getRealm(), ((OshApplication) getApplication()).getApplicationConfig().getSip().getUsername(), 0, ((OshApplication) getApplication()).getApplicationConfig().getSip().getPassword()));
             accCfg.getNatConfig().setIceEnabled(true);
             accCfg.getVideoConfig().setAutoTransmitOutgoing(true);
             accCfg.getVideoConfig().setAutoShowIncoming(true);
-            account = app.addAcc(accCfg);
+            sipAccount = app.addAcc(accCfg);
         } else {
-            account = app.accList.get(0);
-            accCfg = account.cfg;
+            sipAccount = app.accList.get(0);
+            accCfg = sipAccount.cfg;
         }
 
-        buddyList = new ArrayList<Map<String, String>>();
-        for (int i = 0; i < account.buddyList.size(); i++) {
-            buddyList.add(putData(account.buddyList.get(i).cfg.getUri(),
-                    account.buddyList.get(i).getStatusText()));
+        buddyList = new ArrayList<>();
+        for (int i = 0; i < sipAccount.buddyList.size(); i++) {
+            buddyList.add(putData(sipAccount.buddyList.get(i).cfg.getUri(),
+                    sipAccount.buddyList.get(i).getStatusText()));
         }
 
 
-        /*
-        sipAccount = new OshAccount(new OshAccount.CallbackReceiver() {
+        sipAccount.setCallbackReceiver(new OshAccount.CallbackReceiver() {
             @Override
             public void registrationSuccess() {
                 sipConnectedState.changeValue(true);
@@ -376,16 +379,18 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
             @Override
             public void onIncomingCall(Context receiverContext, String accountID, int callID, String displayName, String remoteUri, boolean isVideo) {
-                SipCallActivity.startActivityIn(receiverContext, accountID, callID, displayName, remoteUri, isVideo, ((OshApplication) getApplication()).getApplicationConfig().getSip().getRingVolume());
+                //SipCallActivity.startActivityIn(receiverContext, accountID, callID, displayName, remoteUri, isVideo, ((OshApplication) getApplication()).getApplicationConfig().getSip().getRingVolume());
             }
 
             @Override
             public void onOutgoingCall(Context receiverContext, String accountID, int callID, String number, boolean isVideo, boolean isVideoConference) {
-                SipCallActivity.startActivityOut(receiverContext, accountID, callID, number, isVideo, isVideoConference);
+                //SipCallActivity.startActivityOut(receiverContext, accountID, callID, number, isVideo, isVideoConference);
             }
         });
 
         sipAccount.onCreate(this);
+
+        /*
         sipAccount.login(
                 ((OshApplication) getApplication()).getApplicationConfig().getSip().getHost(),
                 ((OshApplication) getApplication()).getApplicationConfig().getSip().getPort(),
@@ -393,15 +398,15 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 ((OshApplication) getApplication()).getApplicationConfig().getSip().getUsername(),
                 ((OshApplication) getApplication()).getApplicationConfig().getSip().getPassword()
                 );
-         */
 
+         */
 
         requestPermissions();
 
         dimTimer = new CountDownTimer(5 * 60000, 10000) {
             @Override
             public void onTick(long l) {
-
+                LogFacade.i(TAG, "Dim timer: " + l);
             }
 
             @Override
@@ -439,11 +444,20 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         return item;
     }
 
-    private void showCallActivity()
+    private void startCallActivity(Integer msgType, Integer evType, Long medIdx, Integer state)
     {
         standbyScreen(false, true);
         Intent intent = new Intent(this, SipCallActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        try {
+            if (sipAccount != null) intent.putExtra("accountID", sipAccount.getInfo().getUri());
+            if (msgType != null) intent.putExtra("msgType", msgType);
+            if (evType != null) intent.putExtra("evType", evType);
+            if (medIdx != null) intent.putExtra("medIdx", medIdx);
+            if (state != null) intent.putExtra("state", state);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         startActivity(intent);
     }
 
@@ -465,6 +479,11 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         };
         if (!checkPermissionAllGranted(permissions)) {
             ActivityCompat.requestPermissions(this, permissions, REQUEST_PERMISSIONS_APP);
+        }
+
+        if (!Settings.canDrawOverlays(this)) {
+            Intent myIntent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+            startActivityForResult(myIntent, REQUEST_OVERLAY_PERMISSION);
         }
     }
 
@@ -690,11 +709,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     @Override
     public void notifyCallMediaEvent(MyCall call, OnCallMediaEventParam prm) {
-        Intent intent = new Intent(this, SipCallActivity.class);
-        intent.putExtra("msgType", MSG_TYPE.CALL_MEDIA_EVENT);
-        intent.putExtra("evType", prm.getEv().getType());
-        intent.putExtra("medIdx", prm.getMedIdx());
-        startActivity(intent);
+        startCallActivity(MSG_TYPE.CALL_MEDIA_EVENT, prm.getEv().getType(), prm.getMedIdx(), null);
 
         /*
         if (CallActivity.handler_ != null) {

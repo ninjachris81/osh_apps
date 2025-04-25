@@ -1,0 +1,11 @@
+<resources>
+    <declare-styleable name="CameraButton">
+        <attr name="buttonLabelTitle" format="string" />
+        <attr name="buttonLabelColor" format="color" />
+        <attr name="buttonLabelSize" format="dimension" />
+        <attr name="buttonIconSize" format="dimension" />
+        <attr name="buttonIconColor" format="color" />
+        <attr name="buttonIcon" format="reference" />
+        <attr name="videoUrl" format="string" />
+    </declare-styleable>
+</resources>

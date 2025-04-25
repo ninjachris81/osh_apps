@@ -1,5 +1,9 @@
 package com.osh.ui.home;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
@@ -9,11 +13,13 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.Observable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.github.mikephil.charting.data.PieData;
 import com.google.android.material.badge.BadgeDrawable;
@@ -30,11 +36,14 @@ import com.osh.activity.WebviewActivity;
 import com.osh.actor.ActorCmds;
 import com.osh.actor.DigitalActor;
 import com.osh.databinding.FragmentHomeBinding;
+import com.osh.log.LogFacade;
 import com.osh.service.IServiceContext;
 import com.osh.value.EnumValue;
 import com.osh.wbb12.service.IWBB12Service;
 
 public class HomeFragment extends Fragment implements HomeViewModel.IBatteryDataChangeListener {
+
+    private static final String TAG = HomeFragment.class.getSimpleName();
 
     private FragmentHomeBinding binding;
 
@@ -47,6 +56,32 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
     private BadgeDrawable musicBadgeDrawable;
 
     public HomeFragment() {
+    }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            boolean standByState = intent.getBooleanExtra(MainActivity.STANDBY_STATE_CHANGED_VALUE, false);
+            LogFacade.d(TAG, "Standby state changed: " + standByState);
+
+            binding.btnFrontCamera.setVideoEnable(!standByState);
+            binding.btnBackCamera.setVideoEnable(!standByState);
+        }
+    };
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mMessageReceiver,
+                new IntentFilter(MainActivity.STANDBY_STATE_CHANGED));
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mMessageReceiver);
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -84,10 +119,12 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
         });
          */
 
+        binding.btnFrontCamera.setVideoUrl(app.getApplicationConfig().getCamera().getCameraSource("frontDoor.door").getStreamUri());
         binding.btnFrontCamera.setOnClickListener(listener -> {
             CameraDetailsActivity.invokeActivity(getContext(), "frontDoor.door", "Front Door");
         });
 
+        binding.btnBackCamera.setVideoUrl(app.getApplicationConfig().getCamera().getCameraSource("wintergarden.door").getStreamUri());
         binding.btnBackCamera.setOnClickListener(listener -> {
             CameraDetailsActivity.invokeActivity(getContext(), "wintergarden.door", "Wintergarden");
         });

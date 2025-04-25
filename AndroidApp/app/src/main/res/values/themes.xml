@@ -30,8 +30,7 @@
         <item name="android:tint">@color/white</item>
     </style>
 
-    <style name="Theme.OSH.ToolBar" parent="ThemeOverlay.MaterialComponents.ActionBar">
-    </style>
+    <style name="Theme.OSH.ToolBar" parent="ThemeOverlay.MaterialComponents.ActionBar"></style>
 
 
     <!--

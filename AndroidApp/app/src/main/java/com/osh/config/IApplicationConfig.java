@@ -27,4 +27,5 @@ public interface IApplicationConfig {
 
     FroniusConfig getFronius();
 
+    boolean isValid();
 }

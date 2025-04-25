@@ -36,8 +36,20 @@ public class WBB12ViewModel extends ViewModel {
     public final ObservableField<Double> electricPower = new ObservableField<>(0.0);
     public final ObservableField<Double> electricPowerTotal = new ObservableField<>(0.0);
 
+    public final ObservableField<String> energyStats = new ObservableField<>("...");
+
+    public final ObservableField<String> coilStats = new ObservableField<>("...");
+
     private int heatCoil1Status = 0;
     private int heatCoil2Status = 0;
+
+    private int energyStatsTotalToday = 0;
+    private int energyStatsTotalYesterday = 0;
+    private int energyStatsTotalMonth = 0;
+    private int energyStatsTotalYear = 0;
+
+    private int coil1WorkingHours = 0;
+    private int coil2WorkingHours = 0;
 
     final IWBB12Service wbb12Service;
 
@@ -120,6 +132,55 @@ public class WBB12ViewModel extends ViewModel {
             electricPowerTotal.set(item.getValue());
         }, true, () -> { return this != null; });
 
+
+        ((IntegerValue) serviceContext.getValueService().getValue("wbb12.energyTotalToday")).addItemChangeListener(item -> {
+            energyStatsTotalToday = item.getValue(0);
+            updateStats();
+        }, true, () -> { return this != null; });
+
+        ((IntegerValue) serviceContext.getValueService().getValue("wbb12.energyTotalYesterday")).addItemChangeListener(item -> {
+            energyStatsTotalYesterday = item.getValue(0);
+            updateStats();
+        }, true, () -> { return this != null; });
+
+        ((IntegerValue) serviceContext.getValueService().getValue("wbb12.energyTotalMonth")).addItemChangeListener(item -> {
+            energyStatsTotalMonth = item.getValue(0);
+            updateStats();
+        }, true, () -> { return this != null; });
+
+        ((IntegerValue) serviceContext.getValueService().getValue("wbb12.energyTotalYear")).addItemChangeListener(item -> {
+            energyStatsTotalYear = item.getValue(0);
+            updateStats();
+        }, true, () -> { return this != null; });
+
+
+        ((IntegerValue) serviceContext.getValueService().getValue("wbb12.heatCoilWorkingHoursCoil1")).addItemChangeListener(item -> {
+            coil1WorkingHours = item.getValue(0);
+            updateCoilStats();
+        }, true, () -> { return this != null; });
+
+        ((IntegerValue) serviceContext.getValueService().getValue("wbb12.heatCoilWorkingHoursCoil2")).addItemChangeListener(item -> {
+            coil2WorkingHours = item.getValue(0);
+            updateCoilStats();
+        }, true, () -> { return this != null; });
+
+
+    }
+
+    private void updateCoilStats() {
+        StringBuffer s = new StringBuffer();
+        s.append("Coil1: ").append(coil1WorkingHours).append("h\n");
+        s.append("Coil2: ").append(coil2WorkingHours).append("h");
+        coilStats.set(s.toString());
+    }
+
+    private void updateStats() {
+        StringBuffer s = new StringBuffer();
+        s.append("Today: ").append(energyStatsTotalToday).append("kWh\n");
+        s.append("Yesterday: ").append(energyStatsTotalYesterday).append("kWh\n");
+        s.append("Month: ").append(energyStatsTotalMonth).append("kWh\n");
+        s.append("Year: ").append(energyStatsTotalYear).append("kWh");
+        energyStats.set(s.toString());
     }
 
     private void updateHeatCoil() {

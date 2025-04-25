@@ -1,8 +1,6 @@
 package com.osh.activity;
 
-import android.app.ComponentCaller;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
@@ -12,9 +10,7 @@ import android.os.Message;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.Button;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
@@ -32,6 +28,7 @@ import com.osh.databinding.ActivitySipCallBinding;
 
 import net.gotev.sipservice.SipServiceCommand;
 
+import org.jetbrains.annotations.NotNull;
 import org.pjsip.pjsua2.CallInfo;
 import org.pjsip.pjsua2.CallMediaInfo;
 import org.pjsip.pjsua2.CallOpParam;
@@ -42,7 +39,6 @@ import org.pjsip.pjsua2.VideoWindowHandle;
 import org.pjsip.pjsua2.VideoWindowInfo;
 import org.pjsip.pjsua2.pjmedia_event_type;
 import org.pjsip.pjsua2.pjsip_inv_state;
-import org.pjsip.pjsua2.pjsip_role_e;
 import org.pjsip.pjsua2.pjsip_status_code;
 
 class VideoSurfaceHandler implements SurfaceHolder.Callback {
@@ -106,7 +102,6 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
 
     private String mAccountID;
     private String mDisplayName;
-    private int mCallID;
     private boolean mIsVideo;
     private String mNumber;
     private boolean micMute;
@@ -120,6 +115,8 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!handleIntent(getIntent())) return;
 
         binding = ActivitySipCallBinding.inflate(getLayoutInflater());
 
@@ -144,36 +141,25 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
         if (MainActivity.currentCall != null) {
             try {
                 lastCallInfo = MainActivity.currentCall.getInfo();
-                updateCallState(lastCallInfo);
+                updateCallState(lastCallInfo.getState());
             } catch (Exception e) {
                 System.out.println(e);
             }
         } else {
-            updateCallState(lastCallInfo);
+            updateCallState(lastCallInfo.getState());
         }
-
-        /*
-        binding.buttonAccept.setOnClickListener(v -> {
-            acceptCall(v);
-        });
-
-        binding.buttonHangup.setOnClickListener(v -> {
-            hangupCall(v);
-        });
-
-        binding.btnCancel.setOnClickListener(v -> {
-            hangupCall(v);
-        });
-         */
 
         binding.btnMuteMic.setOnClickListener(v -> {
             micMute = !micMute;
-            SipServiceCommand.setCallMute(this, mAccountID, mCallID, micMute);
+            SipServiceCommand.setCallMute(this, mAccountID, MainActivity.currentCall.getId(), micMute);
             binding.btnMuteMic.setIcon(micMute ? micOffIcon : micOnIcon);
             binding.btnMuteMic.setText(micMute ? "Muted" : "Mute");
         });
-        binding.btnHangUp.setOnClickListener(v -> {
-            hangupCall(v);
+        binding.btnAccept.setOnClickListener(view -> {
+            acceptCall();
+        });
+        binding.btnHangUp.setOnClickListener(view -> {
+            hangupCall();
         });
         binding.btnSwitchCamera.setOnClickListener(v -> {
             // TODO
@@ -201,26 +187,35 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
     }
 
     @Override
-    public void onNewIntent(Intent newIntent) {
+    public void onNewIntent(@NonNull Intent newIntent) {
         super.onNewIntent(newIntent);
+        handleIntent(newIntent);
+    }
 
-        if (newIntent.getIntExtra("msgType", 0) == MainActivity.MSG_TYPE.CALL_STATE) {
-            int state = newIntent.getIntExtra("state", 0);
+    private boolean handleIntent(@NotNull Intent intent) {
+        if (intent.hasExtra("accountID")) {
+            mAccountID = intent.getStringExtra("accountID");
+        }
+
+        if (intent.getIntExtra("msgType", 0) == MainActivity.MSG_TYPE.CALL_STATE) {
+            int state = intent.getIntExtra("state", 0);
 
             if (state == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
                 try {
-                    ringToneGenerator.stopTone();
-                    finish();
+                    hangupCall();
+                    return false;
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
+            } else {
+                updateCallState(state);
             }
         }
 
+        return true;
     }
 
-    public void acceptCall(View view)
-    {
+    public void acceptCall() {
         CallOpParam prm = new CallOpParam();
         prm.setStatusCode(pjsip_status_code.PJSIP_SC_OK);
         try {
@@ -228,27 +223,27 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
         } catch (Exception e) {
             System.out.println(e);
         }
-
-        view.setVisibility(View.GONE);
     }
 
-    public void hangupCall(View view)
-    {
-        localVideoHandler.resetVideoWindow();
-        remoteVideoHandler.resetVideoWindow();
+    public void hangupCall() {
+        if (localVideoHandler != null) localVideoHandler.resetVideoWindow();
+        if (remoteVideoHandler != null) remoteVideoHandler.resetVideoWindow();
 
-        ringToneGenerator.stopTone();
+        if (ringToneGenerator != null) ringToneGenerator.stopTone();
 
         if (MainActivity.currentCall != null) {
             CallOpParam prm = new CallOpParam();
-            prm.setStatusCode(pjsip_status_code.PJSIP_SC_DECLINE);
+            prm.setStatusCode(pjsip_status_code.PJSIP_SC_NOT_ACCEPTABLE_ANYWHERE);
             try {
                 MainActivity.currentCall.hangup(prm);
             } catch (Exception e) {
                 System.out.println(e);
             }
         }
+
+        finish();
     }
+
 
     private void initData() {
         if (getIntent().hasExtra("msgType")) {
@@ -257,7 +252,7 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
                     handleCallMediaEvent(getIntent().getIntExtra("evType", 0), getIntent().getLongExtra("medIdx", 0));
                     break;
                 case MainActivity.MSG_TYPE.CALL_STATE:
-                    handleCallStateEvent(getIntent().getIntExtra("state", 0));
+                    updateCallState(getIntent().getIntExtra("state", 0));
                     break;
                 case MainActivity.MSG_TYPE.CALL_MEDIA_STATE:
                     handleCallMediaState();
@@ -265,8 +260,11 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
             }
         }
 
+        if (getIntent().hasExtra("accountID")) {
+            mAccountID = getIntent().getStringExtra("accountID");
+        }
+
         /*
-        mAccountID = getIntent().getStringExtra("accountID");
         mCallID = getIntent().getIntExtra("callID", -1);
         mType = getIntent().getIntExtra("type", -1);
         mDisplayName = getIntent().getStringExtra("displayName");
@@ -284,6 +282,7 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
         micOffIcon = AppCompatResources.getDrawable(this, R.drawable.ic_microphone_off);
 
         binding.btnMuteMic.setIcon(micOnIcon);
+        binding.btnMuteMic.setVisibility(View.GONE);
         binding.btnSwitchCamera.setVisibility(mIsVideo ? View.VISIBLE : View.GONE);
 
         /*
@@ -337,7 +336,7 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
     protected void onDestroy() {
         super.onDestroy();
         //mReceiver.unregister(this);
-        player.stop();
+        if (player != null) player.stop();
     }
 
     /*
@@ -419,12 +418,29 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
      */
 
 
-    private void updateCallState(CallInfo ci) {
-        if (ci.getState() < pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
+    private void updateCallState(int state) {
+        if (state < pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
             ringToneGenerator.startTone(ToneGenerator.TONE_SUP_RINGTONE);
-
-        } else if (ci.getState() >= pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
+        } else if (state >= pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
             ringToneGenerator.stopTone();
+        }
+
+        if (state==pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
+            localVideoHandler.resetVideoWindow();
+            remoteVideoHandler.resetVideoWindow();
+        }
+
+
+        refreshButtons(state);
+    }
+
+
+    void refreshButtons(int state) {
+        try {
+            binding.btnAccept.setVisibility((state == pjsip_inv_state.PJSIP_INV_STATE_CALLING || state == pjsip_inv_state.PJSIP_INV_STATE_INCOMING || state == pjsip_inv_state.PJSIP_INV_STATE_EARLY) ? View.VISIBLE : View.GONE);
+            binding.btnMuteMic.setVisibility(state == pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED ? View.VISIBLE : View.GONE);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -433,7 +449,7 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
 
         if (m.what == MainActivity.MSG_TYPE.CALL_STATE) {
             lastCallInfo = (CallInfo) m.obj;
-            handleCallStateEvent(lastCallInfo.getState());
+            updateCallState(lastCallInfo.getState());
         } else if (m.what == MainActivity.MSG_TYPE.CALL_MEDIA_STATE) {
             handleCallMediaState();
         } else if (m.what == MainActivity.MSG_TYPE.CALL_MEDIA_EVENT) {
@@ -463,15 +479,6 @@ public class SipCallActivity extends AppCompatActivity implements Handler.Callba
             localVideoHandler.setVideoWindow(MainActivity.currentCall.vidPrev.getVideoWindow());
             setupVideoPreviewLayout();
         }
-    }
-
-    private void handleCallStateEvent(int state) {
-        if (state==pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
-            localVideoHandler.resetVideoWindow();
-            remoteVideoHandler.resetVideoWindow();
-        }
-
-        updateCallState(lastCallInfo);
     }
 
     private void handleCallMediaEvent(int type, long medIdx) {

@@ -9,6 +9,8 @@ import com.osh.grafana.config.GrafanaConfig;
 import com.osh.sip.SipConfig;
 import com.osh.user.config.UserConfig;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class ApplicationConfig implements IApplicationConfig {
 
 	private final UserConfig userConfig = new UserConfig();
@@ -65,5 +67,13 @@ public class ApplicationConfig implements IApplicationConfig {
 	@Override
 	public FroniusConfig getFronius() {
 		return fronius;
+	}
+
+	@Override
+	public boolean isValid() {
+		return !StringUtils.isEmpty(getMqtt().getServerHost()) &&
+				!StringUtils.isEmpty(getDatabase().getHost()) &&
+				!StringUtils.isEmpty(getSip().getUsername())
+				;
 	}
 }

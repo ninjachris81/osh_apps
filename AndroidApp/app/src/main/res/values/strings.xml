@@ -203,4 +203,5 @@
     <string name="toolbar_time_str">h:mm a</string>
     <string name="toolbar_date_str">MM-dd</string>
     <string name="volume_label">Volume:</string>
+    <string name="title_activity_start">StartActivity</string>
 </resources>

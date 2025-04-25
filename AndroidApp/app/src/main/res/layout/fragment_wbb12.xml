@@ -54,8 +54,8 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/mode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
@@ -72,8 +72,8 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/consumption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
@@ -90,8 +90,8 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/outsideTemp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
@@ -108,8 +108,8 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/roomTemp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
@@ -126,8 +126,8 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/waterTemp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
@@ -144,8 +144,8 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/heatCoil"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
@@ -161,26 +161,33 @@
                 />
 
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/energyStats"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                app:iconGravity="textTop"
-                app:iconSize="70dp"
-                app:iconPadding="0dp"
-                android:clickable="false"
-                android:inputType="text"
-                />
+                android:background="@drawable/button_border"
+                >
+                <TextView
+                    android:id="@+id/energyStats"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:textAlignment="gravity"
+                    android:text="@{wbb12Data.energyStats}"
+                    android:padding="4dp"
+                    android:textSize="16dp"
+                    android:textColor="@color/white"
+                    />
+            </RelativeLayout>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/flowOut"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
@@ -197,8 +204,8 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/flowIn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
@@ -215,8 +222,8 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/electricPower"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
@@ -233,8 +240,8 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/electricPowerTotal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
@@ -251,8 +258,8 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/test24"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
@@ -266,27 +273,33 @@
                 android:inputType="text"
                 />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/test25"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                app:iconGravity="textTop"
-                app:iconSize="70dp"
-                app:iconPadding="0dp"
-                android:clickable="false"
-                app:icon="@drawable/ic_cloud_question_outline"
-                android:inputType="text"
-                />
+                android:background="@drawable/button_border"
+                >
+                <TextView
+                    android:id="@+id/coilStats"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:textAlignment="gravity"
+                    android:text="@{wbb12Data.coilStats}"
+                    android:padding="4dp"
+                    android:textSize="22dp"
+                    android:textColor="@color/white"
+                    />
+            </RelativeLayout>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/test26"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"

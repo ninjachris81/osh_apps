@@ -69,8 +69,7 @@ public class FTPImageWorker {
 
     private List<CameraImageFolder> _fetchFolders(CameraFTPSource source, String pathName) throws IOException {
         FTPClient ftpClient = login(source);
-        ftpClient.changeWorkingDirectory(pathName);
-        FTPFile[] folders = ftpClient.listFiles(".", FTPFile::isDirectory);
+        FTPFile[] folders = ftpClient.listFiles(pathName, FTPFile::isDirectory);
 
         List<CameraImageFolder> returnList = new ArrayList<>(folders.length);
 
@@ -100,46 +99,48 @@ public class FTPImageWorker {
 
     private List<CameraImageContent.ThumbnailImageItem> _fetchThumbnails(CameraFTPSource source, String pathName, Resources res, GetThumbnailCallback callback) throws IOException {
         int total = 0;
-
-        FTPClient ftpClient = login(source);
-        ftpClient.changeWorkingDirectory(pathName);
-        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-        ftpClient.enterLocalPassiveMode();
-
-        String names[] = ftpClient.listNames();
         List<CameraImageContent.ThumbnailImageItem> returnList = new ArrayList<>(total);
 
-        if (Arrays.stream(names).anyMatch(s -> s.equals("thumbnails.zip"))) {
-            BufferedInputStream bis = new BufferedInputStream(ftpClient.retrieveFileStream("thumbnails.zip"));
-            //ftpClient.completePendingCommand();
-            ZipInputStream inputStream = new ZipInputStream(bis);
+        FTPClient ftpClient = login(source);
+        if (ftpClient.changeWorkingDirectory(pathName)) {
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+            ftpClient.enterLocalPassiveMode();
 
-            total = names.length - 1;       // minus the zip itself
+            String names[] = ftpClient.listNames(pathName);
 
-            int counter = 0;
-            ZipEntry entry;
-            while ((entry = inputStream.getNextEntry()) != null) {
-                counter++;
-                byte[] imageData = IOUtils.toByteArray(inputStream);
-                returnList.add(new CameraImageContent.ThumbnailImageItem(pathName, entry.getName(), new BitmapDrawable(res, BitmapFactory.decodeByteArray(imageData, 0, imageData.length)), ""));
-                callback.onProgress(total, counter);
+            if (Arrays.stream(names).anyMatch(s -> s.equals("thumbnails.zip"))) {
+                BufferedInputStream bis = new BufferedInputStream(ftpClient.retrieveFileStream("thumbnails.zip"));
+                //ftpClient.completePendingCommand();
+                ZipInputStream inputStream = new ZipInputStream(bis);
+
+                total = names.length - 1;       // minus the zip itself
+
+                int counter = 0;
+                ZipEntry entry;
+                while ((entry = inputStream.getNextEntry()) != null) {
+                    counter++;
+                    byte[] imageData = IOUtils.toByteArray(inputStream);
+                    returnList.add(new CameraImageContent.ThumbnailImageItem(pathName, entry.getName(), new BitmapDrawable(res, BitmapFactory.decodeByteArray(imageData, 0, imageData.length)), ""));
+                    callback.onProgress(total, counter);
+                }
+                inputStream.close();
+                logout(ftpClient);
+            } else {
+                // zip does not exist, load directly
+                int counter = 0;
+                for (String fileName : names) {
+                    counter++;
+                    callback.onProgress(total, counter);
+                    InputStream is = ftpClient.retrieveFileStream(fileName);
+                    ftpClient.completePendingCommand();
+                    byte[] imageData = IOUtils.toByteArray(is);
+
+                    returnList.add(new CameraImageContent.ThumbnailImageItem(pathName, fileName, new BitmapDrawable(res, BitmapFactory.decodeByteArray(imageData, 0, imageData.length)), ""));
+                    is.close();
+                }
             }
-            inputStream.close();
-            logout(ftpClient);
         } else {
-            // zip does not exist, load directly
-            int counter = 0;
-            for (String fileName : names) {
-                counter++;
-                callback.onProgress(total, counter);
-                InputStream is = ftpClient.retrieveFileStream(fileName);
-                ftpClient.completePendingCommand();
-                byte[] imageData = IOUtils.toByteArray(is);
-
-                returnList.add(new CameraImageContent.ThumbnailImageItem(pathName, fileName, new BitmapDrawable(res, BitmapFactory.decodeByteArray(imageData, 0, imageData.length)), ""));
-                is.close();
-            }
-
+            throw new IOException("Cannot change working dir");
         }
 
         return returnList;
