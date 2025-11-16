@@ -35,6 +35,7 @@ import com.osh.value.enums.EnergyMode;
 import com.osh.value.enums.EnergyTrend;
 import com.osh.value.enums.HomeConnectOperationalState;
 import com.osh.wbb12.WBB12_Enums;
+import com.osh.wbb12.WBB12_Input_Registers;
 import com.osh.wbb12.service.IWBB12Service;
 
 import java.util.ArrayList;
@@ -111,7 +112,11 @@ public class HomeViewModel extends ViewModel {
 
     private List<Integer> homeAppliances = new ArrayList<>();
     private Map<Integer, Integer> lastRemainingSec = new ConcurrentHashMap<>();
+    private Map<Integer, Double> lastProgress = new ConcurrentHashMap<>();
     private Map<Integer, HomeConnectOperationalState> lastOperationState = new ConcurrentHashMap<>();
+    private Map<Integer, Boolean> lastRemoteStartConfirmation = new ConcurrentHashMap<>();
+    private Map<Integer, Integer> lastRemoteStartDuration = new ConcurrentHashMap<>();
+    public Map<Integer, Boolean> remoteStartAvailable = new ConcurrentHashMap<>();
 
     private static LocalizedNumberFormatter kiloWattsFormatter = NumberFormatter.withLocale(Locale.ENGLISH).unit(MeasureUnit.KILOWATT).notation(Notation.compactShort()).precision(Precision.fixedFraction(1));
     private static LocalizedNumberFormatter tempFormatter = NumberFormatter.withLocale(Locale.ENGLISH).unit(MeasureUnit.CELSIUS).notation(Notation.compactShort()).precision(Precision.integer());
@@ -182,25 +187,25 @@ public class HomeViewModel extends ViewModel {
     }
 
     private void setupWbb12() {
-        IntegerValue wbb12Cons = (IntegerValue) wbb12Service.getWBB12Value("wbb12.heatPumpConsumption");
+        IntegerValue wbb12Cons = (IntegerValue) serviceContext.getValueService().getValue("wbb12.heatPumpConsumption");
         wbb12Cons.addItemChangeListener(item -> {
-            lastWbb12Consumption = item.getValue();
+            lastWbb12Consumption = item.getValue(0);
             refreshWbb12();
         }, true, () -> { return this != null; });
 
 
-        IntegerValue wbb12Mode = (IntegerValue) wbb12Service.getWBB12Value("wbb12.operatingDisplay");
+        IntegerValue wbb12Mode = (IntegerValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.OPERATING_DISPLAY);
         wbb12Mode.addItemChangeListener(item -> {
-            lastWbb12OperatingDisplay = item.getValue();
+            lastWbb12OperatingDisplay = item.getValue(0);
             refreshWbb12();
         }, true, () -> { return this != null; });
 
-        DoubleValue roomTemp = (DoubleValue) wbb12Service.getWBB12Value("wbb12.hk3FlowTemp");
+        DoubleValue roomTemp = (DoubleValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.HK3_FLOW_TEMP);
         roomTemp.addItemChangeListener(item -> {
             wbb12RoomInfos.set(item.getValue() + "°C");
         }, true, () -> { return this != null; });
 
-        DoubleValue waterTemp = (DoubleValue) wbb12Service.getWBB12Value("wbb12.warmWaterTemp");
+        DoubleValue waterTemp = (DoubleValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.WARM_WATER_TEMP);
         waterTemp.addItemChangeListener(item -> {
             wbb12WaterInfoText.set(item.getValue() + "°C");
         }, true, () -> { return this != null; });
@@ -210,6 +215,9 @@ public class HomeViewModel extends ViewModel {
         if (lastWbb12OperatingDisplay ==  WBB12_Enums.Enum_OPERATING_DISPLAY.DEICE.getValue()) {
             wbb12RoomIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_snowflake_melt));
             wbb12RoomIconTint.set(ColorStateList.valueOf(Color.WHITE));
+        } else if (lastWbb12OperatingDisplay ==  WBB12_Enums.Enum_OPERATING_DISPLAY.BLOCKED.getValue()) {
+            wbb12RoomIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_alert));
+            wbb12RoomIconTint.set(ColorStateList.valueOf(Color.RED));
         } else {
             wbb12RoomIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_home_thermometer));
             wbb12RoomIconTint.set(ColorStateList.valueOf((lastWbb12Consumption > 0 && (lastWbb12OperatingDisplay == WBB12_Enums.Enum_OPERATING_DISPLAY.HEATING.getValue() || lastWbb12OperatingDisplay == WBB12_Enums.Enum_OPERATING_DISPLAY.SG_READY_HEATING.getValue())) ? COLOR_ORANGE : Color.WHITE));
@@ -483,17 +491,22 @@ public class HomeViewModel extends ViewModel {
     private void setupHomeAppliances() {
         setupDishwasher();
         setupWashingMachine();
+        setupVacuumCleaner();
     }
 
     private void setupWashingMachine() {
-        registerHomeAppliance("washingmachine.operationState", "washingmachine.remainingTime", R.drawable.ic_washing_machine, R.drawable.ic_washing_machine_off, R.drawable.ic_washing_machine_alert);
+        registerHomeAppliance("washingmachine", R.drawable.ic_washing_machine, R.drawable.ic_washing_machine_off, R.drawable.ic_washing_machine_alert);
     }
 
     private void setupDishwasher() {
-        registerHomeAppliance("dishwasher.operationState", "dishwasher.remainingTime", R.drawable.ic_dishwasher, R.drawable.ic_dishwasher_off, R.drawable.ic_dishwasher_alert);
+        registerHomeAppliance("dishwasher", R.drawable.ic_dishwasher, R.drawable.ic_dishwasher_off, R.drawable.ic_dishwasher_alert);
     }
 
-    private int registerHomeAppliance(String operationStateFullId, String remainingTimeFullId, int onIcon, int offIcon, int alertIcon) {
+    private void setupVacuumCleaner() {
+        registerHomeAppliance("vacuumcleaner", R.drawable.ic_robot_vacuum_variant, R.drawable.ic_robot_vacuum_variant_off, R.drawable.ic_robot_vacuum_variant_alert);
+    }
+
+    private int registerHomeAppliance(String groupId, int onIcon, int offIcon, int alertIcon) {
         homeApplianceIcons.add(new ObservableField<>(AppCompatResources.getDrawable(context, R.drawable.ic_cloud_question_outline)));
         homeApplianceIconTints.add(new ObservableField<>(ColorStateList.valueOf(Color.WHITE)));
         homeApplianceTexts.add(new ObservableField<>(""));
@@ -502,29 +515,77 @@ public class HomeViewModel extends ViewModel {
         homeAppliances.add(index);
         lastOperationState.put(index, HomeConnectOperationalState.UNKNOWN);
         lastRemainingSec.put(index, 0);
+        lastProgress.put(index, 0.0);
+        lastRemoteStartDuration.put(index, -1);
+        lastRemoteStartConfirmation.put(index, false);
+        remoteStartAvailable.put(index, false);
 
-        EnumValue operationState = (EnumValue) serviceContext.getValueService().getValue(operationStateFullId);
+        EnumValue operationState = (EnumValue) serviceContext.getValueService().getValue(groupId + ".operationState");
         operationState.addItemChangeListener(item -> {
-            refreshHomeAppliance(index, HomeConnectOperationalState.values()[item.getValue(0)], lastRemainingSec.get(index), onIcon, offIcon, alertIcon);
+            refreshHomeAppliance(index, HomeConnectOperationalState.values()[item.getValue(0)], lastRemainingSec.get(index), lastProgress.get(index), lastRemoteStartDuration.get(index), lastRemoteStartConfirmation.get(index), onIcon, offIcon, alertIcon);
         }, true, () -> this != null);
 
-        IntegerValue remainingTime = (IntegerValue) serviceContext.getValueService().getValue(remainingTimeFullId);
+        IntegerValue remainingTime = (IntegerValue) serviceContext.getValueService().getValue(groupId + ".remainingTime");
         remainingTime.addItemChangeListener(item -> {
-            refreshHomeAppliance(index, lastOperationState.get(index), item.getValue(Integer.valueOf(0)), onIcon, offIcon, alertIcon);
+            refreshHomeAppliance(index, lastOperationState.get(index), item.getValue(Integer.valueOf(0)), lastProgress.get(index), lastRemoteStartDuration.get(index), lastRemoteStartConfirmation.get(index), onIcon, offIcon, alertIcon);
+        }, true, () -> this != null);
+
+        DoubleValue progress = (DoubleValue) serviceContext.getValueService().getValue(groupId + ".progress");
+        progress.addItemChangeListener(item -> {
+            refreshHomeAppliance(index, lastOperationState.get(index), lastRemainingSec.get(index), item.getValue(Double.valueOf(0)), lastRemoteStartDuration.get(index), lastRemoteStartConfirmation.get(index), onIcon, offIcon, alertIcon);
+        }, true, () -> this != null);
+
+        IntegerValue remoteStartDuration = (IntegerValue) serviceContext.getValueService().getValue(groupId + ".remoteStartDuration");
+        remoteStartDuration.addItemChangeListener(item -> {
+            refreshHomeAppliance(index, lastOperationState.get(index), lastRemainingSec.get(index), lastProgress.get(index), item.getValue(Integer.valueOf(-1)), lastRemoteStartConfirmation.get(index), onIcon, offIcon, alertIcon);
+        }, true, () -> this != null);
+
+        BooleanValue remoteStartConfirmation = (BooleanValue) serviceContext.getValueService().getValue(groupId + ".remoteStartConfirmation");
+        remoteStartConfirmation.addItemChangeListener(item -> {
+            refreshHomeAppliance(index, lastOperationState.get(index), lastRemainingSec.get(index), lastProgress.get(index), lastRemoteStartDuration.get(index), item.getValue(Boolean.valueOf(false)), onIcon, offIcon, alertIcon);
         }, true, () -> this != null);
 
         return index;
     }
 
-    private void refreshHomeAppliance(int index, HomeConnectOperationalState state, int remainingSec, int onIcon, int offIcon, int alertIcon) {
-        if (lastOperationState.get(index) == HomeConnectOperationalState.RUN && state == HomeConnectOperationalState.FINISHED) {
+    private void refreshHomeAppliance(int index, HomeConnectOperationalState state, int remainingSec, double progress, int remoteStartDuration, boolean remoteStartConfirmation, int onIcon, int offIcon, int alertIcon) {
+        String labelText = "";
+        boolean _remoteStartAvailable = false;
+
+        if (progress > 0.0 || remainingSec > 0) {
+            state = HomeConnectOperationalState.RUN;
+        }
+
+        if ((lastOperationState.get(index) == HomeConnectOperationalState.RUN && state == HomeConnectOperationalState.FINISHED) ||
+            lastRemainingSec.get(index) > 0 && remainingSec == 0
+        ) {
             finishedSound.start();
         }
 
         lastOperationState.put(index, state);
         lastRemainingSec.put(index, remainingSec);
+        lastProgress.put(index, progress);
+        lastRemoteStartDuration.put(index, remoteStartDuration);
+        lastRemoteStartConfirmation.put(index, remoteStartConfirmation);
 
-            String labelText = "";
+        // -1: remote start not ready
+        //  0: remote start waiting for conf
+        // >0: remote start waiting
+        if (remoteStartDuration == 0 && !remoteStartConfirmation) {
+            homeApplianceIcons.get(index).set(AppCompatResources.getDrawable(context, R.drawable.ic_check_bold));
+            homeApplianceIconTints.get(index).set(ColorStateList.valueOf(Color.GREEN));
+            labelText = "Start";
+            _remoteStartAvailable = true;
+        } else if (remoteStartDuration == 0 && remoteStartConfirmation) {
+            homeApplianceIcons.get(index).set(AppCompatResources.getDrawable(context, R.drawable.ic_timer_sand));
+            homeApplianceIconTints.get(index).set(ColorStateList.valueOf(COLOR_ORANGE));
+            labelText = "Starting";
+        } else if (remoteStartDuration > 0) {
+            int remainingTimeMs = (24*60*60*1000) - remoteStartDuration;
+            homeApplianceIcons.get(index).set(AppCompatResources.getDrawable(context, R.drawable.ic_timer_sand));
+            homeApplianceIconTints.get(index).set(ColorStateList.valueOf(COLOR_ORANGE));
+            labelText = OshValueFormats.formatTime(remainingTimeMs);
+        } else {
             switch(state) {
                 case UNKNOWN:
                     homeApplianceIcons.get(index).set(AppCompatResources.getDrawable(context, R.drawable.ic_cloud_question_outline));
@@ -555,6 +616,7 @@ public class HomeViewModel extends ViewModel {
                     labelText = remainingSec > 0 ? OshValueFormats.formatTime(remainingSec * 1000) : "...";
                     break;
                 case READY:
+                case CHARGING:
                     homeApplianceIcons.get(index).set(AppCompatResources.getDrawable(context, onIcon));
                     homeApplianceIconTints.get(index).set(ColorStateList.valueOf(Color.WHITE));
                     labelText = state.toString();
@@ -565,8 +627,10 @@ public class HomeViewModel extends ViewModel {
                     labelText = state.toString();
                     break;
             }
+        }
 
         homeApplianceTexts.get(index).set(labelText);
+        remoteStartAvailable.put(index, _remoteStartAvailable);
     }
 
 

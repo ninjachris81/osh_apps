@@ -39,7 +39,7 @@ public class CameraImageContent {
 
         public String getDateString() {
             String returnString = name;
-            if (name.startsWith("A")) returnString = returnString.substring(1);
+            if (name.startsWith("A") || name.startsWith("T")) returnString = returnString.substring(1);
 
             returnString = returnString.substring(0, INPUT_FORMAT.length());
             return LocalDateTime.parse(returnString, inputFormat).format(targetFormat);

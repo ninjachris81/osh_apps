@@ -37,7 +37,6 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.badge.ExperimentalBadgeUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.osh.R;
 import com.osh.databinding.ActivityMainBinding;
 import com.osh.log.LogFacade;
 import com.osh.service.IServiceContext;
@@ -48,6 +47,9 @@ import com.osh.sip.MyBuddy;
 import com.osh.sip.MyCall;
 import com.osh.sip.OshAccount;
 import com.osh.utils.ObservableBoolean;
+import com.osh.value.IntegerValue;
+import com.osh.wbb12.WBB12_Holding_Registers;
+import com.osh.wbb12.WBB12_Input_Registers;
 import com.osh.wbb12.service.IWBB12Service;
 
 import org.apache.commons.lang3.StringUtils;
@@ -207,6 +209,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     IServiceContext serviceContext;
 
     private BadgeDrawable sysintBadge;
+    private BadgeDrawable wbb12Badge;
 
     private OshAccount sipAccount;
     private ObservableBoolean sipConnectedState = new ObservableBoolean(false);
@@ -301,6 +304,19 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 } else {
                     sysintBadge.setVisible(true);
                     sysintBadge.setNumber(item);
+                }
+            });
+        }, true, () -> {return true;});
+
+        wbb12Badge = bottomNav.getOrCreateBadge(R.id.navigation_wbb12);
+        getWBB12Service().errorState().addItemChangeListener(item -> {
+            runOnUiThread(() -> {
+                if (item) {
+                    wbb12Badge.setVisible(true);
+                    wbb12Badge.setNumber(1);
+                } else {
+                    wbb12Badge.setVisible(false);
+                    wbb12Badge.clearNumber();
                 }
             });
         }, true, () -> {return true;});

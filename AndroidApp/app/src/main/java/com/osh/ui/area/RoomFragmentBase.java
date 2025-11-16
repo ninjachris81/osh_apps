@@ -6,13 +6,10 @@ import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
-import androidx.databinding.Observable;
 import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.renderscript.Sampler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +26,6 @@ import com.osh.actor.ShutterActor;
 import com.osh.actor.ToggleActor;
 import com.osh.service.IServiceContext;
 import com.osh.ui.components.ShutterModeButton;
-import com.osh.ui.home.HomeViewModel;
-import com.osh.ui.home.HomeViewModelFactory;
 import com.osh.value.BooleanValue;
 import com.osh.value.DoubleValue;
 import com.osh.value.EnumValue;
@@ -368,8 +363,10 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
         }, true, () -> {return roomViewModel!=null; });
 
         shutterActor.addItemChangeListener(item -> {
-            roomViewModel.shutterStates.get(index).set(item.getStateAsString());
+            roomViewModel.shutterStates.get(index).set(shutterActor.getCloseAndTiltState());
         }, true, () -> {return roomViewModel!=null; });
+
+        roomViewModel.supportsTilts.get(index).set(shutterActor.isTiltSupport());
 
         modeButton.setAutoClickListener(view -> {
             shutterMode.updateValue(shutterMode.getValue(ShutterActor.SHUTTER_OPERATION_MODE_AUTO) == ShutterActor.SHUTTER_OPERATION_MODE_AUTO ? ShutterActor.SHUTTER_OPERATION_MODE_MANUAL : ShutterActor.SHUTTER_OPERATION_MODE_AUTO);

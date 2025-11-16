@@ -9,10 +9,10 @@ import jakarta.validation.constraints.Email;
 public class KnownRoom extends AbstractEntity {
 
     private String name;
+    
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     private KnownArea knownArea;
 
-    private
     public String getName() {
         return name;
     }
@@ -27,5 +27,6 @@ public class KnownRoom extends AbstractEntity {
     }
 
     public int getActors() {
+    	return 0;
     }
 }

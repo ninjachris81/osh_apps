@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,7 +39,9 @@ import com.osh.actor.DigitalActor;
 import com.osh.databinding.FragmentHomeBinding;
 import com.osh.log.LogFacade;
 import com.osh.service.IServiceContext;
+import com.osh.value.BooleanValue;
 import com.osh.value.EnumValue;
+import com.osh.value.IntegerValue;
 import com.osh.wbb12.service.IWBB12Service;
 
 public class HomeFragment extends Fragment implements HomeViewModel.IBatteryDataChangeListener {
@@ -65,8 +68,10 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
             boolean standByState = intent.getBooleanExtra(MainActivity.STANDBY_STATE_CHANGED_VALUE, false);
             LogFacade.d(TAG, "Standby state changed: " + standByState);
 
-            binding.btnFrontCamera.setVideoEnable(!standByState);
-            binding.btnBackCamera.setVideoEnable(!standByState);
+            if (binding != null) {
+                binding.btnFrontCamera.setVideoEnable(!standByState);
+                binding.btnBackCamera.setVideoEnable(!standByState);
+            }
         }
     };
 
@@ -153,6 +158,9 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
             // TODO
         });
 
+        setupHomeApplianceButton(binding.dishwasherInfos, "dishwasher", 0);
+        setupHomeApplianceButton(binding.washingmachineInfos, "dishwasher", 1);
+        setupHomeApplianceButton(binding.vacuumcleanerInfos, "vacuumcleaner", 2);
 
         binding.audioInfos.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @OptIn(markerClass = ExperimentalBadgeUtils.class)
@@ -179,6 +187,24 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
         setupExceedButton(binding.exceedInfos1, "energy.excessEnergyMode1", "energy.excessEnergyTarget1");
 
         return binding.getRoot();
+    }
+
+    private void setupHomeApplianceButton(MaterialButton button, String valueGroupId, int index) {
+        button.setOnClickListener(v -> {
+            BooleanValue confirmation = (BooleanValue) serviceContext.getValueService().getValue(valueGroupId + ".remoteStartConfirmation");
+            if (homeViewModel.remoteStartAvailable.get(index)) {
+                confirmation.updateValue(true);
+                serviceContext.getValueService().publishValue(confirmation);
+            }
+        });
+
+        button.setOnLongClickListener(v -> {
+            BooleanValue confirmation = (BooleanValue) serviceContext.getValueService().getValue(valueGroupId + ".remoteStartConfirmation");
+            confirmation.updateValue(false );
+            serviceContext.getValueService().publishValue(confirmation);
+            Toast.makeText(getContext(), "Remote Start reset", Toast.LENGTH_SHORT).show();
+            return true;
+        });
     }
 
     private void setupExceedButton(MaterialButton button, String modeValueId, String actorId) {

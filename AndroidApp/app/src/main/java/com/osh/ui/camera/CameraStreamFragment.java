@@ -18,6 +18,8 @@ import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.rtsp.RtspMediaSource;
 import androidx.media3.exoplayer.source.MediaSource;
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
+import androidx.media3.exoplayer.trackselection.TrackSelectorResult;
 
 import com.osh.camera.config.CameraSource;
 import com.osh.databinding.FragmentCameraDetailsBinding;
@@ -63,8 +65,8 @@ public class CameraStreamFragment extends Fragment {
                 .createMediaSource(MediaItem.fromUri(cameraSource.getStreamUri()));
         player.setMediaSource(mediaSource);
         player.setPlayWhenReady(true);
+        player.setVolume(0f);
         player.prepare();
-
 
         View root = binding.getRoot();
         return root;

@@ -32,6 +32,8 @@ public class RoomViewModel extends ViewModel implements Serializable {
 
     public final List<ObservableBoolean> shutterAutoModes = new ArrayList<>();
     public final List<ObservableField<String>> shutterStates = new ArrayList<>();
+    public final List<ObservableBoolean> supportsTilts = new ArrayList<>();
+
     public final ObservableField<RoomPosition> roomPosition = new ObservableField<>(RoomPosition.POSITION_TOP);
 
     public final List<ObservableBoolean> lightStates = new ArrayList<>();
@@ -57,6 +59,7 @@ public class RoomViewModel extends ViewModel implements Serializable {
         for (int i = 0;i<count;i++) {
             shutterAutoModes.add(new ObservableBoolean(false));
             shutterStates.add(new ObservableField<>(""));
+            supportsTilts.add(new ObservableBoolean(false));
         }
     }
 

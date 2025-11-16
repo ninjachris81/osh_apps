@@ -16,27 +16,6 @@
         android:orientation="vertical"
         tools:context=".ui.wbb12.WBB12Fragment">
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/actionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="120dp"
-            android:clickable="true"
-            android:src="@android:drawable/ic_menu_send"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/statsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="40dp"
-            android:layout_marginBottom="0dp"
-            android:clickable="true"
-            android:src="@android:drawable/ic_menu_sort_by_size"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
         <GridLayout
             android:id="@+id/mainTile"
             android:layout_width="0dp"
@@ -297,7 +276,58 @@
             </RelativeLayout>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/test26"
+                android:id="@+id/statsButton"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_matrix"
+                android:inputType="text"
+                />
+        </GridLayout>
+
+        <GridLayout
+            android:id="@+id/cmdTile"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            android:useDefaultMargins="true"
+            android:padding="1dp"
+            android:columnCount="7"
+            android:rowCount="1"
+            app:layout_constraintTop_toBottomOf="@id/mainTile"
+            app:layout_constraintStart_toStartOf="@id/mainTile"
+            app:layout_constraintBottom_toTopOf="@id/scrollView"
+            app:layout_constraintEnd_toEndOf="@id/mainTile"
+            >
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/startWW15"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_play_circle_outline"
+                app:iconTint="@{wbb12Data.wwPushIconTint}"
+                android:inputType="text"
+                android:text="@{wbb12Data.wwPushLabel15}"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn0"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_rowWeight="1"
@@ -312,6 +342,92 @@
                 app:icon="@drawable/ic_cloud_question_outline"
                 android:inputType="text"
                 />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn1"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_cloud_question_outline"
+                android:inputType="text"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn2"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_cloud_question_outline"
+                android:inputType="text"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn3"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_cloud_question_outline"
+                android:inputType="text"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn4"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_cloud_question_outline"
+                android:inputType="text"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn5"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textTop"
+                app:iconSize="70dp"
+                app:iconPadding="0dp"
+                android:clickable="false"
+                app:icon="@drawable/ic_cloud_question_outline"
+                android:inputType="text"
+                />
+
         </GridLayout>
 
         <androidx.constraintlayout.widget.Guideline
@@ -330,7 +446,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/mainTile">
+            app:layout_constraintTop_toBottomOf="@id/cmdTile">
 
             <TableLayout
                 android:id="@+id/wbb12Container"

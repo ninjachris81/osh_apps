@@ -11,6 +11,15 @@
             app:key="@string/device_id_key"
             app:title="@string/device_id"
             app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="@string/wifi_name_key"
+            app:title="@string/wifi_name"
+            app:useSimpleSummaryProvider="true"/>
+
+        <CheckBoxPreference
+            app:key="@string/bio_auth_key"
+            app:title="@string/bio_auth_title"/>
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/mqtt_settings">

@@ -14,7 +14,9 @@ public enum HomeConnectOperationalState {
     ACTION_REQUIRED,
     FINISHED,
     ERROR,
-    ABORTING;
+    ABORTING,
+    CHARGING
+    ;
 
 
     @NonNull

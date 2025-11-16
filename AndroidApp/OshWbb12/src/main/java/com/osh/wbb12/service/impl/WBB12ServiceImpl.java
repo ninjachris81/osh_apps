@@ -6,6 +6,7 @@ import com.osh.communication.MessageBase;
 import com.osh.service.IActorService;
 import com.osh.service.IDatamodelService;
 import com.osh.service.IValueService;
+import com.osh.utils.ObservableBoolean;
 import com.osh.value.DoubleValue;
 import com.osh.value.IntegerValue;
 import com.osh.value.ValueBase;
@@ -29,6 +30,8 @@ public class WBB12ServiceImpl implements IWBB12Service {
     private static final int WBB12_NoWarning = 65535;
     private static final int WBB12_Temperature_NoSensor = -32768;
     private static final int WBB12_Temperature_NoValue = -32767;
+
+    private ObservableBoolean isErrorState = new ObservableBoolean(false);
 
     public enum WBB12Unit {
         PlainInt,
@@ -135,6 +138,16 @@ public class WBB12ServiceImpl implements IWBB12Service {
         return valueService.getValue(fullId);
     }
 
+    @Override
+    public ValueBase getWBB12Value(WBB12_Holding_Registers reg) {
+        return valueService.getValue("wbb12." + getMqttName(reg));
+    }
+
+    @Override
+    public ValueBase getWBB12Value(WBB12_Input_Registers reg) {
+        return valueService.getValue("wbb12." + getMqttName(reg));
+    }
+
     public WBB12ServiceImpl(IDatamodelService datamodelService, IValueService valueService, IActorService actorService) {
         this.valueService = valueService;
         this.actorService = actorService;
@@ -225,6 +238,19 @@ public class WBB12ServiceImpl implements IWBB12Service {
         registerHoldingRegister(WBB12_Holding_Registers.HEAT_PUMP_VOLUME_FLOW_HEATING, WBB12Unit.PlainInt, false, true);
         registerHoldingRegister(WBB12_Holding_Registers.HEAT_PUMP_VOLUME_FLOW_WARM_WATER, WBB12Unit.PlainInt, false, true);
 
+        ((IntegerValue)getWBB12Value(WBB12_Input_Registers.WARNING_CODE)).addItemChangeListener(item -> {
+            checkForError();
+        }, true, () -> {return true;});
+        ((IntegerValue)getWBB12Value(WBB12_Input_Registers.ERROR_CODE)).addItemChangeListener(item -> {
+            checkForError();
+        }, true, () -> {return true;});
+        ((IntegerValue)getWBB12Value(WBB12_Input_Registers.HEAT_PUMP_ERROR)).addItemChangeListener(item -> {
+            checkForError();
+        }, true, () -> {return true;});
+    }
+
+    private void checkForError() {
+        isErrorState.changeValue(((IntegerValue)getWBB12Value(WBB12_Input_Registers.WARNING_CODE)).getValue(0) != 0 || ((IntegerValue)getWBB12Value(WBB12_Input_Registers.ERROR_CODE)).getValue(0) != 0 || ((IntegerValue)getWBB12Value(WBB12_Input_Registers.HEAT_PUMP_ERROR)).getValue(0) != 0);
     }
 
     @Override
@@ -237,6 +263,10 @@ public class WBB12ServiceImpl implements IWBB12Service {
     }
 
     private String getMqttName(WBB12_Holding_Registers reg) {
+        return CaseUtils.toCamelCase(reg.toString(), false, '_');
+    }
+
+    private String getMqttName(WBB12_Input_Registers reg) {
         return CaseUtils.toCamelCase(reg.toString(), false, '_');
     }
 
@@ -305,11 +335,16 @@ public class WBB12ServiceImpl implements IWBB12Service {
     }
 
     @Override
+    public ObservableBoolean errorState() {
+        return isErrorState;
+    }
+
+    @Override
     public void addWarmwaterPush(int minutes) {
         String mqttName = getMqttName(WBB12_Holding_Registers.WARM_WATER_PUSH);
 
         ActorBase actor = actorService.getActor(ValueBase.getFullId(wbb12ValueGroup.getId(), mqttName));
         actor.updateValue(minutes);
-        actorService.publishCmd(actor, ActorCmds.ACTOR_CMD_SET_VALUE);
+        actorService.publishCmd(actor, ActorCmds.ACTOR_CMD_SET_VALUE, minutes);
     }
 }

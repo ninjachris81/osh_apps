@@ -29,6 +29,8 @@ import com.osh.activity.OshApplication;
 import com.osh.activity.WebviewActivity;
 import com.osh.databinding.FragmentWbb12Binding;
 import com.osh.service.IServiceContext;
+import com.osh.value.IntegerValue;
+import com.osh.wbb12.WBB12_Holding_Registers;
 import com.osh.wbb12.service.IWBB12Service;
 
 import java.util.ArrayList;
@@ -52,7 +54,7 @@ public class WBB12Fragment extends Fragment {
         wbb12Service = ((MainActivity) getActivity()).getWBB12Service();
         serviceContext = ((MainActivity) getActivity()).getServiceContext();
 
-        wbb12ViewModel = new ViewModelProvider(this, new WBB12ViewModelFactory(wbb12Service, serviceContext)).get(WBB12ViewModel.class);
+        wbb12ViewModel = new ViewModelProvider(this, new WBB12ViewModelFactory(getContext(), wbb12Service, serviceContext)).get(WBB12ViewModel.class);
 
         binding = FragmentWbb12Binding.inflate(inflater, container, false);
 
@@ -64,9 +66,7 @@ public class WBB12Fragment extends Fragment {
             WebviewActivity.invokeActivity(getContext(), app.getApplicationConfig().getGrafana().getWbb12Url(), "WBB12 Statistics", null);
         });
 
-        binding.actionButton.setOnClickListener(view -> {
-            wbb12Service.addWarmwaterPush(15);
-        });
+        setupWWPush();
 
         View root = binding.getRoot();
 
@@ -137,6 +137,14 @@ public class WBB12Fragment extends Fragment {
 
 
         return root;
+    }
+
+    private void setupWWPush() {
+        binding.startWW15.setOnClickListener(view -> {
+            wbb12Service.addWarmwaterPush(15);
+        });
+
+
     }
 
     @Override

@@ -106,7 +106,7 @@ public class FTPImageWorker {
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
             ftpClient.enterLocalPassiveMode();
 
-            String names[] = ftpClient.listNames(pathName);
+            String names[] = ftpClient.listNames();
 
             if (Arrays.stream(names).anyMatch(s -> s.equals("thumbnails.zip"))) {
                 BufferedInputStream bis = new BufferedInputStream(ftpClient.retrieveFileStream("thumbnails.zip"));

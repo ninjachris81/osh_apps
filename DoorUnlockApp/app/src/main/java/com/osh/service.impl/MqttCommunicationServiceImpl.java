@@ -1,10 +1,8 @@
 package com.osh.service.impl;
 
-import static com.osh.communication.mqtt.MqttConstants.MQTT_ACTOR_CMD_ATTR;
 import static com.osh.communication.mqtt.MqttConstants.MQTT_BASE_PATH;
 import static com.osh.communication.mqtt.MqttConstants.MQTT_PATH_SEP;
 import static com.osh.communication.mqtt.MqttConstants.MQTT_SENDER_DEVICE_ID_ATTR;
-import static com.osh.communication.mqtt.MqttConstants.MQTT_SINGLE_VALUE_ATTR;
 import static com.osh.communication.mqtt.MqttConstants.MQTT_TS;
 
 import java.nio.ByteBuffer;
@@ -41,6 +39,8 @@ import com.osh.manager.IMqttSupport;
 import com.osh.service.ICommunicationService;
 import com.osh.doorunlock.DoorUnlockMessage;
 import com.osh.log.LogFacade;
+import com.osh.utils.IObservableBoolean;
+import com.osh.utils.ObservableBoolean;
 
 public class MqttCommunicationServiceImpl implements ICommunicationService {
 
@@ -56,6 +56,13 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 	private Map<MessageBase.MESSAGE_TYPE, MessageTypeInfo> messageTypes = new ConcurrentHashMap<>();
 
 	private Map<MessageBase.MESSAGE_TYPE, IMqttSupport> messageTypeServices = new ConcurrentHashMap<>();
+
+	private final ObservableBoolean connectedState = new ObservableBoolean(false);
+
+	@Override
+	public IObservableBoolean connectedState() {
+		return connectedState;
+	}
 
 	public MqttCommunicationServiceImpl(MqttConfig config) {
 		this.executorService = Executors.newFixedThreadPool(1);
@@ -80,9 +87,11 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 				.serverPort(config.getServerPort())
 				.addConnectedListener(listener -> {
 					LogFacade.d(TAG, "Connected");
+					connectedState.changeValue(true);
 				})
 				.addDisconnectedListener(listener -> {
 					LogFacade.w(TAG, "Disconnected " + listener.getCause());
+					connectedState.changeValue(false);
 				})
 				.useMqttVersion3().buildAsync();
 

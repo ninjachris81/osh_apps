@@ -21,6 +21,8 @@ public interface IDoorUnlockService extends IMqttSupport {
 
         void onAuthFailure();
 
+        void onGeneralError();
+
     }
 
 }

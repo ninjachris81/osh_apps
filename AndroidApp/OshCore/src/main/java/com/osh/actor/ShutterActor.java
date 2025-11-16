@@ -10,6 +10,10 @@ public class ShutterActor extends ActorBase<ShutterActor, Integer> {
 
     public static final int SHUTTER_STATE_OPENED = 0;
     public static final int SHUTTER_STATE_CLOSED = 100;
+
+    public static final int SHUTTER_TILT_OPENED = 100;
+    public static final int SHUTTER_TILT_CLOSED = 0;
+
     private final boolean tiltSupport;
     private final long fullCloseDuration;
     private final long fullTiltDuration;
@@ -63,11 +67,41 @@ public class ShutterActor extends ActorBase<ShutterActor, Integer> {
         return fullTiltDuration;
     }
 
-    public String getStateAsString() {
+    public String getCloseAndTiltState() {
         if (this.value == null) return "";
-        if (this.value == SHUTTER_STATE_OPENED) return "Opened";
-        if (this.value == SHUTTER_STATE_CLOSED) return "Closed";
-        return this.value + " %";
+
+        int t = getTiltState();
+
+        if (getCloseState() != SHUTTER_STATE_CLOSED && getCloseState() != SHUTTER_STATE_OPENED) return getCloseStateAsString();
+        if (isTiltSupport()) {
+            if (getTiltState() != SHUTTER_TILT_CLOSED && getTiltState() != SHUTTER_TILT_OPENED) return getTiltStateAsString();
+            return getCloseStateAsString() + ", " + getTiltStateAsString();
+        } else {
+            return getCloseStateAsString();
+        }
+    }
+
+    public String getCloseStateAsString() {
+        if (this.value == null) return "";
+        if (getCloseState() == SHUTTER_STATE_OPENED) return "Opened";
+        if (getCloseState() == SHUTTER_STATE_CLOSED) return "Closed";
+        return getCloseState() + " %";
+    }
+
+    public int getCloseState() {
+        return this.value.shortValue() & 0x00FF;
+    }
+
+    public String getTiltStateAsString() {
+        if (this.value == null) return "";
+        if (!isTiltSupport()) return "";
+        if (getTiltState() == SHUTTER_TILT_OPENED) return "Tilted";
+        if (getTiltState() == SHUTTER_TILT_CLOSED) return "Closed";
+        return "Tilting " + getTiltState() + " %";
+    }
+
+    public int getTiltState() {
+        return (this.value & 0xFF00) >> 8;
     }
 
     public DBShutterActor toDBShutterActor() {

@@ -22,4 +22,6 @@
     <dimen name="image_dialog_width">800dp</dimen>
     <dimen name="image_dialog_height">550dp</dimen>
     <dimen name="toolbar_elevation">2dp</dimen>
+    <dimen name="nav_header_vertical_spacing">8dp</dimen>
+    <dimen name="nav_header_height">176dp</dimen>
 </resources>

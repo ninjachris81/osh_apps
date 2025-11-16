@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ValueGroupService {
-2
+
     private final ValueGroupRepository repository;
 
     public ValueGroupService(ValueGroupRepository repository) {

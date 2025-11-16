@@ -70,6 +70,7 @@
                         app:buttonIcon="@drawable/ic_cctv"
                         app:buttonIconColor="@color/white"
                         app:buttonIconSize="50dp"
+                        app:videoRotation="180"
                         />
 
                     <com.osh.ui.components.CameraButton
@@ -277,8 +278,29 @@
                     android:columnCount="3"
                     android:rowCount="3">
 
+
+
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/test25"
+                        android:id="@+id/wbb12WaterInfos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:clickable="true"
+                        android:inputType="text"
+                        app:iconTint="@{homeData.wbb12RoomIconTint}"
+                        app:icon="@{homeData.wbb12RoomIcon}"
+                        android:text="@{homeData.wbb12RoomInfos}"
+                        />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/wbb12Infos"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_rowWeight="1"
@@ -290,10 +312,30 @@
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
                         android:clickable="false"
-                        app:icon="@drawable/ic_cloud_question_outline"
+                        app:icon="@drawable/ic_thermometer_water"
+                        app:iconTint="@{homeData.wbb12WaterIconTint}"
                         android:inputType="text"
+                        android:text="@{homeData.wbb12WaterInfoText}"
                         />
 
+
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/waterInfos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:textSize="18dp"
+                        android:textAlignment="textStart"
+                        android:text='@{ "\uD83D\uDEBD " + String.format("%.0f", homeData.waterLevels[0]) + "l " + (homeData.waterFlows[0] > 0 ? "\u2191" : "") + "\n\u2744 " + String.format("%.0f", homeData.waterLevels[1]) + "l " + (homeData.waterFlows[1] > 0 ? "\u2191" : "") + "\n\u2668  " + String.format("%.0f", homeData.waterLevels[2]) + "l " + (homeData.waterFlows[2] > 0 ? "\u2191" : "") + "\n\u2698   " + String.format("%.0f", homeData.waterLevels[3]) + "l " + (homeData.waterFlows[3] > 0 ? "\u2191" : "")}'
+                        android:clickable="true"
+                        android:singleLine="false"
+                        android:maxLines="4"
+                        />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/windowStateInfos"
@@ -313,40 +355,7 @@
                         />
 
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/waterInfos"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_rowWeight="1"
-                        android:layout_columnWeight="1"
-                        android:layout_gravity="fill"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:textSize="18dp"
-                        android:textAlignment="textStart"
-                        android:text='@{ "WC: " + String.format("%.1f", homeData.waterLevels[0]) + "l " + (homeData.waterFlows[0] > 0 ? "\u2191" : "") + "\nCold: " + String.format("%.1f", homeData.waterLevels[1]) + "l " + (homeData.waterFlows[1] > 0 ? "\u2191" : "") + "\nWarm: " + String.format("%.1f", homeData.waterLevels[2]) + "l " + (homeData.waterFlows[2] > 0 ? "\u2191" : "") + "\nGarden: " + String.format("%.1f", homeData.waterLevels[3]) + "l " + (homeData.waterFlows[3] > 0 ? "\u2191" : "")}'
-                        android:clickable="true"
-                        android:singleLine="false"
-                        android:maxLines="4"
-                        />
 
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/app5"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_rowWeight="1"
-                        android:layout_columnWeight="1"
-                        android:layout_gravity="fill"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        app:icon="@drawable/ic_cloud_question_outline"
-                        app:iconGravity="textTop"
-                        app:iconSize="70dp"
-                        app:iconPadding="0dp"
-                        android:clickable="false"
-                        android:inputType="text"
-                        />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/app6"
@@ -421,7 +430,46 @@
 
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/wbb12WaterInfos"
+                        android:id="@+id/dishwasherInfos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:clickable="@{homeData.remoteStartAvailable[0]}"
+                        app:icon="@{homeData.homeApplianceIcons[0]}"
+                        app:iconTint="@{homeData.homeApplianceIconTints[0]}"
+                        android:text="@{homeData.homeApplianceTexts[0]}"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:inputType="text"
+                        />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/washingmachineInfos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:clickable="@{homeData.remoteStartAvailable[1]}"
+                        app:icon="@{homeData.homeApplianceIcons[1]}"
+                        app:iconTint="@{homeData.homeApplianceIconTints[1]}"
+                        android:text="@{homeData.homeApplianceTexts[1]}"
+                        app:iconGravity="textTop"
+                        app:iconSize="70dp"
+                        app:iconPadding="0dp"
+                        android:inputType="text"
+                        />
+
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/vacuumcleanerInfos"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_rowWeight="1"
@@ -432,15 +480,16 @@
                         app:iconGravity="textTop"
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
-                        android:clickable="true"
                         android:inputType="text"
-                        app:iconTint="@{homeData.wbb12RoomIconTint}"
-                        app:icon="@{homeData.wbb12RoomIcon}"
-                        android:text="@{homeData.wbb12RoomInfos}"
+                        android:clickable="@{homeData.remoteStartAvailable[2]}"
+                        app:icon="@{homeData.homeApplianceIcons[2]}"
+                        app:iconTint="@{homeData.homeApplianceIconTints[2]}"
+                        android:text="@{homeData.homeApplianceTexts[2]}"
                         />
 
+
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/wbb12Infos"
+                        android:id="@+id/app5"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_rowWeight="1"
@@ -448,15 +497,16 @@
                         android:layout_gravity="fill"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
+                        app:icon="@drawable/ic_cloud_question_outline"
                         app:iconGravity="textTop"
                         app:iconSize="70dp"
                         app:iconPadding="0dp"
                         android:clickable="false"
-                        app:icon="@drawable/ic_thermometer_water"
-                        app:iconTint="@{homeData.wbb12WaterIconTint}"
                         android:inputType="text"
-                        android:text="@{homeData.wbb12WaterInfoText}"
                         />
+
+
+
 
 
                     <com.google.android.material.button.MaterialButton
@@ -478,43 +528,7 @@
                         android:inputType="text"
                         />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/dishwasherInfos"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_gravity="fill"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    app:icon="@{homeData.homeApplianceIcons[0]}"
-                    app:iconTint="@{homeData.homeApplianceIconTints[0]}"
-                    android:text="@{homeData.homeApplianceTexts[0]}"
-                    app:iconGravity="textTop"
-                    app:iconSize="70dp"
-                    app:iconPadding="0dp"
-                    android:clickable="false"
-                    android:inputType="text"
-                    />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/washingmachine"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_rowWeight="1"
-                        android:layout_columnWeight="1"
-                        android:layout_gravity="fill"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        app:icon="@{homeData.homeApplianceIcons[1]}"
-                        app:iconTint="@{homeData.homeApplianceIconTints[1]}"
-                        android:text="@{homeData.homeApplianceTexts[1]}"
-                        app:iconGravity="textTop"
-                        app:iconSize="70dp"
-                        app:iconPadding="0dp"
-                        android:clickable="false"
-                        android:inputType="text"
-                        />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/exceedInfos1"

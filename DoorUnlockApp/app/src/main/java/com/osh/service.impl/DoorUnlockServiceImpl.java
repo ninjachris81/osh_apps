@@ -78,10 +78,10 @@ public class DoorUnlockServiceImpl implements IDoorUnlockService {
                             if (ts != null) {
                                 respondChallenge(dum.getUserId(), dum.getDoorId(), ts, oth);
                             } else {
-                                LogFacade.w(TAG,"TS cannot be empty");
+                                raiseGeneralError("TS cannot be empty");
                             }
                         } else {
-                            LogFacade.w(TAG,"OTH cannot be empty");
+                            raiseGeneralError("OTH cannot be empty");
                         }
                         break;
                     case CHALLENGE_SUCCESS:
@@ -97,7 +97,17 @@ public class DoorUnlockServiceImpl implements IDoorUnlockService {
                         }
                         break;
                 }
+            } else {
+                raiseGeneralError("attribute missing");
             }
+        }
+    }
+
+    private void raiseGeneralError(String msg) {
+        LogFacade.w(TAG, "General failure - " + msg);
+        // general error
+        if (callbackListener != null) {
+            callbackListener.onGeneralError();
         }
     }
 
@@ -134,7 +144,7 @@ public class DoorUnlockServiceImpl implements IDoorUnlockService {
                     ));
             communicationManager.sendMessage(msg);
         } else {
-            LogFacade.w(TAG, "Error while calculating result hash");
+            raiseGeneralError("Error while calculating result hash");
         }
     }
 

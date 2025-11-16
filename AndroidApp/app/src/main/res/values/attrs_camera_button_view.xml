@@ -7,5 +7,6 @@
         <attr name="buttonIconColor" format="color" />
         <attr name="buttonIcon" format="reference" />
         <attr name="videoUrl" format="string" />
+        <attr name="videoRotation" format="integer" />
     </declare-styleable>
 </resources>

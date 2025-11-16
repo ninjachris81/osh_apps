@@ -1,16 +1,24 @@
 package com.osh.ui.wbb12;
 
+import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+
+import androidx.core.content.res.ResourcesCompat;
 import androidx.databinding.ObservableField;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.osh.R;
 import com.osh.actor.ValueActor;
 import com.osh.service.IServiceContext;
-import com.osh.service.IValueService;
+import com.osh.utils.IItemChangeListener;
 import com.osh.value.DoubleValue;
 import com.osh.value.IntegerValue;
 import com.osh.value.ValueBase;
 import com.osh.wbb12.WBB12_Enums;
+import com.osh.wbb12.WBB12_Holding_Registers;
+import com.osh.wbb12.WBB12_Input_Registers;
 import com.osh.wbb12.service.IWBB12Service;
 
 import java.util.ArrayList;
@@ -40,6 +48,9 @@ public class WBB12ViewModel extends ViewModel {
 
     public final ObservableField<String> coilStats = new ObservableField<>("...");
 
+    public final ObservableField<ColorStateList> wwPushIconTint = new ObservableField<>();
+    public final ObservableField<String> wwPushLabel15 = new ObservableField<>("Start 15 min");
+
     private int heatCoil1Status = 0;
     private int heatCoil2Status = 0;
 
@@ -51,13 +62,19 @@ public class WBB12ViewModel extends ViewModel {
     private int coil1WorkingHours = 0;
     private int coil2WorkingHours = 0;
 
+    private int wwPush = 0;
+
     final IWBB12Service wbb12Service;
 
     final IServiceContext serviceContext;
 
-    public WBB12ViewModel(IWBB12Service wbb12Service, IServiceContext serviceContext) {
+    private static int COLOR_ORANGE;
+
+    public WBB12ViewModel(Context context, IWBB12Service wbb12Service, IServiceContext serviceContext) {
         this.wbb12Service = wbb12Service;
         this.serviceContext = serviceContext;
+
+        COLOR_ORANGE = ResourcesCompat.getColor(context.getResources(), R.color.orange, null);
 
         for (String key : wbb12Service.getWBB12Keys()) {
             ValueBase val = wbb12Service.getWBB12Value(key);
@@ -81,90 +98,109 @@ public class WBB12ViewModel extends ViewModel {
             dataLabels.add(wbb12Service.getWBB12Value(key).getId());
         }
 
-        ((IntegerValue) wbb12Service.getWBB12Value("wbb12.operatingDisplay")).addItemChangeListener(item -> {
-            WBB12_Enums.Enum_OPERATING_DISPLAY display = WBB12_Enums.Enum_OPERATING_DISPLAY.get(item.getValue());
+        ((IntegerValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.OPERATING_DISPLAY)).addItemChangeListener(item -> {
+            WBB12_Enums.Enum_OPERATING_DISPLAY display = WBB12_Enums.Enum_OPERATING_DISPLAY.get(item.getValue(0));
             mode.set(display.getShortName());
         }, true, () -> { return this != null; });
 
 
-        ((IntegerValue) wbb12Service.getWBB12Value("wbb12.heatPumpConsumption")).addItemChangeListener(item -> {
-            consumption.set(item.getValue());
+        ((IntegerValue) serviceContext.getValueService().getValue("wbb12.heatPumpConsumption")).addItemChangeListener(item -> {
+            consumption.set(item.getValue(0));
         }, true, () -> { return this != null; });
 
-        ((DoubleValue) wbb12Service.getWBB12Value("wbb12.outsideTemp1")).addItemChangeListener(item -> {
-            outsideTemp.set(item.getValue());
+        ((DoubleValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.OUTSIDE_TEMP_1)).addItemChangeListener(item -> {
+            outsideTemp.set(item.getValue(0.0));
         }, true, () -> { return this != null; });
 
-        ((DoubleValue) wbb12Service.getWBB12Value("wbb12.hk3FlowTemp")).addItemChangeListener(item -> {
-            roomTemp.set(item.getValue());
+        ((DoubleValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.HK3_FLOW_TEMP)).addItemChangeListener(item -> {
+            roomTemp.set(item.getValue(0.0));
         }, true, () -> { return this != null; });
 
-        ((DoubleValue) wbb12Service.getWBB12Value("wbb12.warmWaterTemp")).addItemChangeListener(item -> {
-            waterTemp.set(item.getValue());
+        ((DoubleValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.WARM_WATER_TEMP)).addItemChangeListener(item -> {
+            waterTemp.set(item.getValue(0.0));
         }, true, () -> { return this != null; });
 
 
 
-        ((IntegerValue) wbb12Service.getWBB12Value("wbb12.heatCoilStatusCoil1")).addItemChangeListener(item -> {
-            heatCoil1Status = item.getValue();
+        ((IntegerValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.HEAT_COIL_STATUS_COIL1)).addItemChangeListener(item -> {
+            heatCoil1Status = item.getValue(0);
             updateHeatCoil();
         }, true, () -> { return this != null; });
 
-        ((IntegerValue) wbb12Service.getWBB12Value("wbb12.heatCoilStatusCoil1")).addItemChangeListener(item -> {
-            heatCoil2Status = item.getValue();
+        ((IntegerValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.HEAT_COIL_STATUS_COIL2)).addItemChangeListener(item -> {
+            heatCoil2Status = item.getValue(0);
             updateHeatCoil();
         }, true, () -> { return this != null; });
 
-        ((DoubleValue) wbb12Service.getWBB12Value("wbb12.heatPumpFlowTemp")).addItemChangeListener(item -> {
-            flowTempOut.set(item.getValue());
+        ((DoubleValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.HEAT_PUMP_FLOW_TEMP)).addItemChangeListener(item -> {
+            flowTempOut.set(item.getValue(0.0));
         }, true, () -> { return this != null; });
 
-        ((DoubleValue) wbb12Service.getWBB12Value("wbb12.heatPumpReturnFlowTemp")).addItemChangeListener(item -> {
-            flowTempIn.set(item.getValue());
+        ((DoubleValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.HEAT_PUMP_RETURN_FLOW_TEMP)).addItemChangeListener(item -> {
+            flowTempIn.set(item.getValue(0.0));
         }, true, () -> { return this != null; });
 
 
         ((DoubleValue) serviceContext.getValueService().getValue("wbb12EnergyMeter.powerTotal")).addItemChangeListener(item -> {
-            electricPower.set(item.getValue());
+            electricPower.set(item.getValue(0.0));
         }, true, () -> { return this != null; });
 
         ((DoubleValue) serviceContext.getValueService().getValue("wbb12EnergyMeter.energyTotal")).addItemChangeListener(item -> {
-            electricPowerTotal.set(item.getValue());
+            electricPowerTotal.set(item.getValue(0.0));
         }, true, () -> { return this != null; });
 
 
-        ((IntegerValue) serviceContext.getValueService().getValue("wbb12.energyTotalToday")).addItemChangeListener(item -> {
+        ((IntegerValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.ENERGY_TOTAL_TODAY)).addItemChangeListener(item -> {
             energyStatsTotalToday = item.getValue(0);
             updateStats();
         }, true, () -> { return this != null; });
 
-        ((IntegerValue) serviceContext.getValueService().getValue("wbb12.energyTotalYesterday")).addItemChangeListener(item -> {
+        ((IntegerValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.ENERGY_TOTAL_YESTERDAY)).addItemChangeListener(item -> {
             energyStatsTotalYesterday = item.getValue(0);
             updateStats();
         }, true, () -> { return this != null; });
 
-        ((IntegerValue) serviceContext.getValueService().getValue("wbb12.energyTotalMonth")).addItemChangeListener(item -> {
+        ((IntegerValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.ENERGY_TOTAL_MONTH)).addItemChangeListener(item -> {
             energyStatsTotalMonth = item.getValue(0);
             updateStats();
         }, true, () -> { return this != null; });
 
-        ((IntegerValue) serviceContext.getValueService().getValue("wbb12.energyTotalYear")).addItemChangeListener(item -> {
+        ((IntegerValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.ENERGY_TOTAL_YEAR)).addItemChangeListener(item -> {
             energyStatsTotalYear = item.getValue(0);
             updateStats();
         }, true, () -> { return this != null; });
 
 
-        ((IntegerValue) serviceContext.getValueService().getValue("wbb12.heatCoilWorkingHoursCoil1")).addItemChangeListener(item -> {
+        ((IntegerValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.HEAT_COIL_WORKING_HOURS_COIL1)).addItemChangeListener(item -> {
             coil1WorkingHours = item.getValue(0);
             updateCoilStats();
         }, true, () -> { return this != null; });
 
-        ((IntegerValue) serviceContext.getValueService().getValue("wbb12.heatCoilWorkingHoursCoil2")).addItemChangeListener(item -> {
+        ((IntegerValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.HEAT_COIL_WORKING_HOURS_COIL2)).addItemChangeListener(item -> {
             coil2WorkingHours = item.getValue(0);
             updateCoilStats();
         }, true, () -> { return this != null; });
 
+        wbb12Service.getWBB12Value(WBB12_Holding_Registers.WARM_WATER_PUSH).addItemChangeListener((IItemChangeListener<ValueActor>) item -> {
+            if (item.getValue() == null) {
+                wwPush = 0;
+            } else {
+                wwPush = (int) item.getValue();
+            }
+            updateWarmWater();
 
+        }, true);
+
+    }
+
+    private void updateWarmWater() {
+        if (wwPush > 0) {
+            wwPushIconTint.set(ColorStateList.valueOf(COLOR_ORANGE));
+            wwPushLabel15.set(wwPush + " min");
+        } else {
+            wwPushIconTint.set(ColorStateList.valueOf(Color.WHITE));
+            wwPushLabel15.set("Start 15 min");
+        }
     }
 
     private void updateCoilStats() {

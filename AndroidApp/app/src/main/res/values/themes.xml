@@ -32,6 +32,15 @@
 
     <style name="Theme.OSH.ToolBar" parent="ThemeOverlay.MaterialComponents.ActionBar"></style>
 
+    <style name="Theme.OSH.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.OSH.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.OSH.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
 
     <!--
     <style name="Theme.OSH.ActionBar" parent="Theme.MaterialComponents.DayNight.DarkActionBar">

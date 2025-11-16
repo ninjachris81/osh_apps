@@ -2,11 +2,8 @@ package com.osh.ui.components;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -22,9 +19,11 @@ import androidx.media3.exoplayer.source.MediaSource;
 import androidx.media3.ui.PlayerView;
 
 import com.osh.R;
-import com.osh.camera.config.CameraSource;
+import com.osh.log.LogFacade;
 
 public class CameraButton extends LinearLayout {
+
+    private static final String TAG = CameraButton.class.getName();
 
     private ExoPlayer player;
     private MediaSource mediaSource;
@@ -84,10 +83,15 @@ public class CameraButton extends LinearLayout {
 
         PlayerView videoSurface = findViewById(R.id.video_surface);
         player = new ExoPlayer.Builder(getContext()).build();
+        videoSurface.setClickable(false);
         videoSurface.setPlayer(player);
+        /*
         videoSurface.setOnClickListener(view -> {
             videoSurface.setUseController(true);
         });
+        */
+
+        videoSurface.setRotation(a.getInt(R.styleable.CameraButton_videoRotation, 0));
 
         player.setPlayWhenReady(true);
         player.prepare();
@@ -107,10 +111,14 @@ public class CameraButton extends LinearLayout {
     }
 
     public void setVideoEnable(boolean enable) {
+        if (player == null) return;
+
+        LogFacade.d(TAG, "Video enabled: " + enable);
         if (enable) {
+            player.prepare();
             player.play();
         } else {
-            player.pause();
+            player.stop();
         }
     }
 }

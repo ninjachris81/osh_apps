@@ -9,25 +9,18 @@ import com.osh.service.IDoorUnlockService;
 
 public class MainViewModelFactory implements ViewModelProvider.Factory {
 
-    private static MainViewModelFactory instance;
-
     private final MqttConfig mqttConfig;
     private final String userId;
     private final String deviceId;
-    private final IDoorUnlockService.CallbackListener callbackListener;
+    private final IDoorUnlockCallbackListener callbackListener;
 
-    public MainViewModelFactory(IDoorUnlockService.CallbackListener callbackListener, MqttConfig mqttConfig, String userId, String deviceId) {
+    public MainViewModelFactory(IDoorUnlockCallbackListener callbackListener, MqttConfig mqttConfig, String userId, String deviceId) {
         this.callbackListener = callbackListener;
         this.mqttConfig = mqttConfig;
         this.userId = userId;
         this.deviceId = deviceId;
     }
 
-    public static MainViewModelFactory getInstance(IDoorUnlockService.CallbackListener callbackListener, MqttConfig mqttConfig, String userId, String deviceId) {
-        if (instance != null) return instance;
-        instance = new MainViewModelFactory(callbackListener, mqttConfig, userId, deviceId);
-        return instance;
-    }
 
     @NonNull
     @Override
