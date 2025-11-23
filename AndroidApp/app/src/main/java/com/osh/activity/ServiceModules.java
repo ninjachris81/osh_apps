@@ -2,28 +2,28 @@ package com.osh.activity;
 
 import android.content.Context;
 
-import com.osh.service.IActorService;
-import com.osh.service.IAudioActorService;
-import com.osh.service.IAudioSourceService;
-import com.osh.service.ICommunicationService;
-import com.osh.service.IDatabaseService;
-import com.osh.service.IDatamodelService;
-import com.osh.service.IDeviceDiscoveryService;
-import com.osh.service.IServiceContext;
-import com.osh.service.impl.ActorServiceImpl;
-import com.osh.service.impl.AudioActorServiceImpl;
-import com.osh.service.impl.AudioSourceServiceImpl;
-import com.osh.service.impl.ClientDeviceDiscoveryServiceImpl;
-import com.osh.service.impl.DatabaseServiceImpl;
-import com.osh.service.impl.DatamodelServiceImpl;
-import com.osh.service.impl.LocalDatabaseServiceImpl;
-import com.osh.service.impl.MqttCommunicationServiceImpl;
+import com.osh.core.service.IActorService;
+import com.osh.core.service.IAudioActorService;
+import com.osh.core.service.IAudioSourceService;
+import com.osh.core.service.ICommunicationService;
+import com.osh.core.service.IDatabaseService;
+import com.osh.core.service.IDatamodelService;
+import com.osh.core.service.IDeviceDiscoveryService;
+import com.osh.core.service.IServiceContext;
+import com.osh.core.service.impl.ActorServiceImpl;
+import com.osh.core.service.impl.AudioActorServiceImpl;
+import com.osh.core.service.impl.AudioSourceServiceImpl;
+import com.osh.core.service.impl.ClientDeviceDiscoveryServiceImpl;
+import com.osh.core.service.impl.DatabaseServiceImpl;
+import com.osh.core.service.impl.DatamodelServiceImpl;
+import com.osh.core.service.impl.LocalDatabaseServiceImpl;
+import com.osh.core.service.impl.MqttCommunicationServiceImpl;
 import com.osh.config.IApplicationConfig;
-import com.osh.service.impl.DoorUnlockServiceImpl;
-import com.osh.service.IDoorUnlockService;
-import com.osh.service.IValueService;
-import com.osh.service.impl.ServiceContextImpl;
-import com.osh.service.impl.ValueServiceImpl;
+import com.osh.core.service.impl.DoorUnlockServiceImpl;
+import com.osh.core.service.IDoorUnlockService;
+import com.osh.core.service.IValueService;
+import com.osh.core.service.impl.ServiceContextImpl;
+import com.osh.core.service.impl.ValueServiceImpl;
 import com.osh.wbb12.service.IWBB12Service;
 import com.osh.wbb12.service.impl.WBB12ServiceImpl;
 
@@ -31,7 +31,6 @@ import java.sql.SQLException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import javax.inject.Singleton;
 

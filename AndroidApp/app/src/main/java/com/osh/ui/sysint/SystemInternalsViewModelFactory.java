@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.osh.service.IDeviceDiscoveryService;
+import com.osh.core.service.IDeviceDiscoveryService;
 
 public class SystemInternalsViewModelFactory implements ViewModelProvider.Factory {
 

@@ -3,40 +3,26 @@ package com.osh.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.SimpleAdapter;
-import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.osh.R;
-import com.osh.actor.AudioPlaybackActor;
+import com.osh.core.actor.AudioPlaybackActor;
 import com.osh.databinding.ActivityAudioBinding;
-import com.osh.databinding.ActivityCameraDetailsBinding;
-import com.osh.datamodel.meta.AudioPlaybackSource;
-import com.osh.log.LogFacade;
-import com.osh.service.IServiceContext;
-import com.osh.ui.components.ArrayAdapterBase;
+import com.osh.core.datamodel.meta.AudioPlaybackSource;
+import com.osh.core.service.IServiceContext;
 import com.osh.ui.components.AudioPlaybackActorArrayAdapter;
 import com.osh.ui.components.AudioPlaybackSourceArrayAdapter;
-import com.osh.utils.IItemChangeListener;
-import com.osh.value.DoubleValue;
-import com.osh.value.StringValue;
+import com.osh.core.utils.IItemChangeListener;
+import com.osh.core.value.DoubleValue;
+import com.osh.core.value.StringValue;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 

@@ -81,6 +81,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/bottom_nav_menu" />
 
+    <!--
     <View
         android:id="@+id/blackOverlay"
         android:layout_width="0dp"
@@ -91,5 +92,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:visibility="invisible"
         android:background="@color/black"/>
+        -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

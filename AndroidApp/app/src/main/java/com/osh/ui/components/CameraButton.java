@@ -19,7 +19,7 @@ import androidx.media3.exoplayer.source.MediaSource;
 import androidx.media3.ui.PlayerView;
 
 import com.osh.R;
-import com.osh.log.LogFacade;
+import com.osh.core.log.LogFacade;
 
 public class CameraButton extends LinearLayout {
 

@@ -11,8 +11,8 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.osh.activity.OshApplication;
 import com.osh.R;
-import com.osh.camera.config.CameraFTPSource;
-import com.osh.camera.config.CameraSource;
+import com.osh.core.camera.config.CameraFTPSource;
+import com.osh.core.camera.config.CameraSource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +29,13 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     private List<Fragment> fragmentList = new ArrayList<>();
 
-    public SectionsPagerAdapter(Activity activity, FragmentManager fm, String cameraId) {
+    public SectionsPagerAdapter(Activity activity, FragmentManager fm, String cameraId, int cameraRotation) {
         super(fm);
         mContext = activity.getApplicationContext();
 
         CameraSource cameraSource = ((OshApplication) activity.getApplication()).getApplicationConfig().getCamera().getCameraSource(cameraId);
         CameraFTPSource cameraFTPSource = ((OshApplication) activity.getApplication()).getApplicationConfig().getCamera().getCameraFTPSource(cameraId);
-        fragmentList.add(new CameraStreamFragment(cameraSource));
+        fragmentList.add(new CameraStreamFragment(cameraSource, cameraRotation));
         fragmentList.add(new SurveillancePictureFragment(cameraFTPSource));
         fragmentList.add(new SurveillanceRingFragment(cameraFTPSource));
     }

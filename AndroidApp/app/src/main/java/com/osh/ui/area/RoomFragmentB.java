@@ -1,12 +1,8 @@
 package com.osh.ui.area;
 
-import androidx.fragment.app.FragmentManager;
-
 import com.osh.R;
 import com.osh.databinding.FragmentRoomBBinding;
-import com.osh.service.IServiceContext;
 
-import java.util.Collections;
 import java.util.List;
 
 public class RoomFragmentB extends RoomFragmentBase<FragmentRoomBBinding> {

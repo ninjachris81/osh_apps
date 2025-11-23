@@ -17,20 +17,11 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.osh.activity.MainActivity;
 import com.osh.activity.OshApplication;
 import com.osh.activity.WebviewActivity;
 import com.osh.databinding.FragmentWbb12Binding;
-import com.osh.service.IServiceContext;
-import com.osh.value.IntegerValue;
-import com.osh.wbb12.WBB12_Holding_Registers;
+import com.osh.core.service.IServiceContext;
 import com.osh.wbb12.service.IWBB12Service;
 
 import java.util.ArrayList;

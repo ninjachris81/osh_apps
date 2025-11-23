@@ -12,15 +12,9 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 
-import com.osh.R;
 import com.osh.activity.MainActivity;
 import com.osh.databinding.FragmentSystemInternalsBinding;
-import com.osh.device.DeviceBase;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class SystemInternalsFragment extends Fragment {
 

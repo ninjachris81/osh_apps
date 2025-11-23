@@ -32,8 +32,8 @@ public class SettingsActivity extends AppCompatActivity {
 
         Toolbar myToolbar = binding.myToolbar;
         myToolbar.setTitle("Settings");
-        setSupportActionBar(myToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //setSupportActionBar(myToolbar);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {

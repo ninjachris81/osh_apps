@@ -1,16 +1,16 @@
 package com.osh.wbb12.service.impl;
 
-import com.osh.actor.ActorBase;
-import com.osh.actor.ActorCmds;
-import com.osh.communication.MessageBase;
-import com.osh.service.IActorService;
-import com.osh.service.IDatamodelService;
-import com.osh.service.IValueService;
-import com.osh.utils.ObservableBoolean;
-import com.osh.value.DoubleValue;
-import com.osh.value.IntegerValue;
-import com.osh.value.ValueBase;
-import com.osh.value.ValueGroup;
+import com.osh.core.actor.ActorBase;
+import com.osh.core.actor.ActorCmds;
+import com.osh.core.communication.MessageBase;
+import com.osh.core.service.IActorService;
+import com.osh.core.service.IDatamodelService;
+import com.osh.core.service.IValueService;
+import com.osh.core.utils.ObservableBoolean;
+import com.osh.core.value.DoubleValue;
+import com.osh.core.value.IntegerValue;
+import com.osh.core.value.ValueBase;
+import com.osh.core.value.ValueGroup;
 import com.osh.wbb12.WBB12_Enums;
 import com.osh.wbb12.WBB12_Holding_Registers;
 import com.osh.wbb12.WBB12_Input_Registers;

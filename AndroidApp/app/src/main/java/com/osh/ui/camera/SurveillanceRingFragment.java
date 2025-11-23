@@ -11,11 +11,10 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.osh.R;
-import com.osh.camera.config.CameraFTPSource;
+import com.osh.core.camera.config.CameraFTPSource;
 import com.osh.databinding.FragmentSurveillanceListBinding;
-import com.osh.log.LogFacade;
+import com.osh.core.log.LogFacade;
 import com.osh.ui.dialogs.SelectAudioDialogFragment;
-import com.osh.ui.dialogs.ShowImageDetailsFragment;
 import com.osh.ui.dialogs.ShowVideoDetailsFragment;
 import com.osh.worker.FTPImageWorker;
 

@@ -5,15 +5,13 @@ import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
 import com.osh.R;
-import com.osh.actor.AudioPlaybackActor;
-import com.osh.datamodel.meta.AudioPlaybackSource;
+import com.osh.core.datamodel.meta.AudioPlaybackSource;
 
 import java.util.ArrayList;
 import java.util.List;

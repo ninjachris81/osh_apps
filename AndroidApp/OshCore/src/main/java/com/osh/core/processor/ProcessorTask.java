@@ -1,0 +1,32 @@
+package com.osh.core.processor;
+
+import com.osh.core.SerializableIdentifyable;
+
+public class ProcessorTask extends SerializableIdentifyable {
+	
+    public enum ProcessorTaskType {
+        PTT_INTERVAL,
+        PTT_ONLY_ONCE,
+        PTT_TRIGGER
+    };
+    
+    private String scriptCode;
+    private String runCondition;
+    private long scheduleInterval;
+    
+    private ProcessorTaskType processorTaskType = ProcessorTaskType.PTT_INTERVAL;
+    
+	public ProcessorTask(String id, ProcessorTaskType taskType, String scriptCode, String runCondition,
+			long scheduleInterval) {
+		super(id);
+		this.processorTaskType = taskType;
+		this.scriptCode = scriptCode;
+		this.runCondition = runCondition;
+		this.scheduleInterval = scheduleInterval;
+	}
+
+	public ProcessorTask() {
+	}
+
+	
+}

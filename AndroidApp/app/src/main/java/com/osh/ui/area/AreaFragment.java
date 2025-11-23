@@ -23,7 +23,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import com.osh.R;
 import com.osh.activity.MainActivity;
 import com.osh.databinding.FragmentAreaBinding;
-import com.osh.service.IServiceContext;
+import com.osh.core.service.IServiceContext;
 
 public class AreaFragment extends Fragment {
 

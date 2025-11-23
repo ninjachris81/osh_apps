@@ -1,8 +1,8 @@
 package com.osh.wbb12.service;
 
-import com.osh.manager.IMqttSupport;
-import com.osh.utils.ObservableBoolean;
-import com.osh.value.ValueBase;
+import com.osh.core.manager.IMqttSupport;
+import com.osh.core.utils.ObservableBoolean;
+import com.osh.core.value.ValueBase;
 import com.osh.wbb12.WBB12_Holding_Registers;
 import com.osh.wbb12.WBB12_Input_Registers;
 import com.osh.wbb12.service.impl.WBB12ServiceImpl;

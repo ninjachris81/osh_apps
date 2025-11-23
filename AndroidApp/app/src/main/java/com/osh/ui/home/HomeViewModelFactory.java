@@ -5,8 +5,7 @@ import android.content.Context;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.osh.service.IServiceContext;
-import com.osh.ui.dashboard.DashboardViewModel;
+import com.osh.core.service.IServiceContext;
 import com.osh.wbb12.service.IWBB12Service;
 
 public class HomeViewModelFactory implements ViewModelProvider.Factory {
@@ -14,7 +13,7 @@ public class HomeViewModelFactory implements ViewModelProvider.Factory {
     private final Context context;
     private final IServiceContext serviceContext;
     private final IWBB12Service wbb12Service;
-    private final HomeViewModel.IBatteryDataChangeListener batteryDataChangeListener;
+    private final HomeViewModelBase.IBatteryDataChangeListener batteryDataChangeListener;
 
     public HomeViewModelFactory(Context context, IServiceContext serviceContext, IWBB12Service wbb12Service, HomeViewModel.IBatteryDataChangeListener batteryDataChangeListener) {
         this.context = context;

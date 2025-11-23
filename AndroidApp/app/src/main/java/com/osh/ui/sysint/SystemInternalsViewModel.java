@@ -4,15 +4,13 @@ import android.os.Build;
 import android.os.Handler;
 
 import androidx.databinding.ObservableArrayList;
-import androidx.databinding.ObservableField;
 import androidx.lifecycle.ViewModel;
 
-import com.osh.device.DeviceBase;
-import com.osh.device.KnownDevice;
-import com.osh.service.IDeviceDiscoveryService;
+import com.osh.core.device.DeviceBase;
+import com.osh.core.device.KnownDevice;
+import com.osh.core.service.IDeviceDiscoveryService;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 

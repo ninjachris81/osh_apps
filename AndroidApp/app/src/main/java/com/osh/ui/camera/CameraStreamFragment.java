@@ -1,27 +1,20 @@
 package com.osh.ui.camera;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.rtsp.RtspMediaSource;
 import androidx.media3.exoplayer.source.MediaSource;
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
-import androidx.media3.exoplayer.trackselection.TrackSelectorResult;
 
-import com.osh.camera.config.CameraSource;
+import com.osh.core.camera.config.CameraSource;
 import com.osh.databinding.FragmentCameraDetailsBinding;
 
 /**
@@ -33,13 +26,15 @@ public class CameraStreamFragment extends Fragment {
 
     private ExoPlayer player;
     private CameraSource cameraSource;
+    private int cameraRotation;
 
     public CameraStreamFragment() {
 
     }
 
-    public CameraStreamFragment(CameraSource cameraSource) {
+    public CameraStreamFragment(CameraSource cameraSource, int cameraRotation) {
         this.cameraSource = cameraSource;
+        this.cameraRotation = cameraRotation;
     }
 
     @Override
@@ -57,6 +52,7 @@ public class CameraStreamFragment extends Fragment {
 
         player = new ExoPlayer.Builder(getContext()).build();
         binding.videoSurface.setPlayer(player);
+        binding.videoSurface.setRotation(cameraRotation);
         binding.videoSurface.setOnClickListener(view -> {
             binding.videoSurface.setUseController(true);
         });
@@ -68,8 +64,7 @@ public class CameraStreamFragment extends Fragment {
         player.setVolume(0f);
         player.prepare();
 
-        View root = binding.getRoot();
-        return root;
+        return binding.getRoot();
     }
 
     @Override

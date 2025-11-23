@@ -13,17 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
 import com.osh.R;
-import com.osh.actor.AudioPlaybackActor;
 import com.osh.databinding.FragmentImageDetailsDialogBinding;
-import com.osh.datamodel.meta.AudioPlaybackSource;
-import com.osh.ui.components.AudioPlaybackActorArrayAdapter;
-import com.osh.ui.components.AudioPlaybackSourceArrayAdapter;
-
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.

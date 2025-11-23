@@ -1,0 +1,626 @@
+package com.osh.ui.home;
+
+import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.icu.number.LocalizedNumberFormatter;
+import android.icu.number.Notation;
+import android.icu.number.NumberFormatter;
+import android.icu.number.Precision;
+import android.icu.util.MeasureUnit;
+import android.media.MediaPlayer;
+import android.util.Log;
+
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.databinding.ObservableField;
+import androidx.databinding.ObservableInt;
+import androidx.lifecycle.ViewModel;
+
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.osh.R;
+import com.osh.core.actor.DigitalActor;
+import com.osh.core.log.LogFacade;
+import com.osh.core.service.IServiceContext;
+import com.osh.core.utils.OshValueFormats;
+import com.osh.core.value.BooleanValue;
+import com.osh.core.value.DoubleValue;
+import com.osh.core.value.EnumValue;
+import com.osh.core.value.IntegerValue;
+import com.osh.core.value.StringValue;
+import com.osh.core.value.enums.EnergyMode;
+import com.osh.core.value.enums.EnergyTrend;
+import com.osh.core.value.enums.HomeConnectOperationalState;
+import com.osh.wbb12.WBB12_Enums;
+import com.osh.wbb12.WBB12_Input_Registers;
+import com.osh.wbb12.service.IWBB12Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class HomeViewModelBase extends ViewModel {
+
+
+    protected static final String TAG = HomeViewModelBase.class.getName();
+
+    private final IBatteryDataChangeListener batteryDataChangeListener;
+    public String batteryText = "...";
+    public final PieData batteryData = new PieData();
+
+    public interface IBatteryDataChangeListener {
+        void onBatteryDataChanged(String text, PieData data);
+    }
+
+
+    public final ObservableField<String> currentModeText = new ObservableField<>("");
+    public final ObservableField<Drawable> currentModeIcon = new ObservableField<>();
+
+    public final List<ObservableField<String>> homeApplianceTexts = new ArrayList<>();
+    public final List<ObservableField<Drawable>> homeApplianceIcons = new ArrayList<>();
+    public final List<ObservableField<ColorStateList>> homeApplianceIconTints = new ArrayList<>();
+
+    public final ObservableField<Drawable> currentTrendIcon = new ObservableField<>();
+    public final ObservableField<ColorStateList> currentTrendIconTint = new ObservableField<>();
+
+    public final ObservableField<Drawable> weatherTodayIcon = new ObservableField<>();
+    public final ObservableField<Drawable> weatherTomorrowIcon = new ObservableField<>();
+    public final ObservableField<Drawable> weatherTomorrow2Icon = new ObservableField<>();
+
+    public final ObservableField<String> weatherTempToday = new ObservableField<>();
+    public final ObservableField<String> weatherTempTomorrow = new ObservableField<>();
+    public final ObservableField<String> weatherTempTomorrow2 = new ObservableField<>();
+
+    public final List<ObservableField<Float>> waterLevels = new ArrayList<>();
+    public final List<ObservableField<Float>> waterFlows = new ArrayList<>();
+
+    public final ObservableField<Drawable> windowStateInfoIcon = new ObservableField<>();
+    public final ObservableField<String> windowStateInfoText = new ObservableField<>();
+
+    private final MediaPlayer finishedSound;
+
+    public final ObservableField<String> powerConsumptionText = new ObservableField<>();
+
+    public final ObservableField<String> wbb12RoomInfos = new ObservableField<>();
+    public final ObservableField<Drawable> wbb12RoomIcon = new ObservableField<>();
+    public final ObservableField<ColorStateList> wbb12RoomIconTint = new ObservableField<>();
+    public final ObservableField<String> wbb12WaterInfoText = new ObservableField<>();
+    public final ObservableField<ColorStateList> wbb12WaterIconTint = new ObservableField<>();
+
+    public final ObservableInt musicPlayingCount = new ObservableInt();
+
+    public final ObservableField<String> exceedText0 = new ObservableField<>("");
+    public final ObservableField<String> exceedText1 = new ObservableField<>("");
+    public final ObservableField<ColorStateList> exceedIconTint0 = new ObservableField<>();
+    public final ObservableField<ColorStateList> exceedIconTint1 = new ObservableField<>();
+
+    protected final IServiceContext serviceContext;
+
+    protected final IWBB12Service wbb12Service;
+
+    protected EnergyMode lastEnergyMode = EnergyMode.UNKNOWN;
+    protected double lastGridPower = 0;
+    protected double lastBatteryPower = 0;
+    protected double lastGeneratorPower = 0;
+
+    protected int lastWbb12Consumption = 0;
+    protected int lastWbb12OperatingDisplay = 0;
+
+    protected List<Integer> homeAppliances = new ArrayList<>();
+    protected Map<Integer, Integer> lastRemainingSec = new ConcurrentHashMap<>();
+    protected Map<Integer, Double> lastProgress = new ConcurrentHashMap<>();
+    protected Map<Integer, HomeConnectOperationalState> lastOperationState = new ConcurrentHashMap<>();
+    protected Map<Integer, Boolean> lastRemoteStartConfirmation = new ConcurrentHashMap<>();
+    protected Map<Integer, Integer> lastRemoteStartDuration = new ConcurrentHashMap<>();
+    public Map<Integer, Boolean> remoteStartAvailable = new ConcurrentHashMap<>();
+
+    protected static LocalizedNumberFormatter kiloWattsFormatter = NumberFormatter.withLocale(Locale.ENGLISH).unit(MeasureUnit.KILOWATT).notation(Notation.compactShort()).precision(Precision.fixedFraction(1));
+    protected static LocalizedNumberFormatter tempFormatter = NumberFormatter.withLocale(Locale.ENGLISH).unit(MeasureUnit.CELSIUS).notation(Notation.compactShort()).precision(Precision.integer());
+
+    protected List<String> windows = List.of(
+            "allSwitches1.0",
+            "allSwitches1.1",
+            "allSwitches1.2",
+            "allSwitches1.3",
+            "allSwitches1.4",
+            "allSwitches1.5",
+            "allSwitches1.6",
+            "allSwitches1.7",
+            "allSwitches1.8",
+            "allSwitches1.9",
+            "allSwitches1.10",
+            "allSwitches1.11"
+    );
+
+    protected static int COLOR_ORANGE;
+
+    protected final Context context;
+
+    public HomeViewModelBase(Context context, IServiceContext serviceContext, IWBB12Service wbb12Service, IBatteryDataChangeListener batteryDataChangeListener) {
+        this.context = context;
+        this.serviceContext = serviceContext;
+        this.wbb12Service = wbb12Service;
+        this.batteryDataChangeListener = batteryDataChangeListener;
+
+        COLOR_ORANGE = ResourcesCompat.getColor(context.getResources(), R.color.orange, null);
+
+        finishedSound = MediaPlayer.create(context, R.raw.success1);
+    }
+
+    protected void setupExceed() {
+        ((EnumValue) serviceContext.getValueService().getValue("energy.excessEnergyMode0")).addItemChangeListener(item -> {
+            exceedText0.set(item.getValue(0) == 0 ? "AUTO" : "MANUAL");
+        }, true, () -> {return this != null; });
+
+        ((DigitalActor) serviceContext.getActorService().getActor("energy.excessEnergyTarget0")).addItemChangeListener(item -> {
+            exceedIconTint0.set(ColorStateList.valueOf(item.getValue(false) ? COLOR_ORANGE : Color.WHITE));
+        }, true, () -> {return this != null; });
+
+        ((EnumValue) serviceContext.getValueService().getValue("energy.excessEnergyMode1")).addItemChangeListener(item -> {
+            exceedText1.set(item.getValue(0) == 0 ? "AUTO" : "MANUAL");
+        }, true, () -> {return this != null; });
+
+        ((DigitalActor) serviceContext.getActorService().getActor("energy.excessEnergyTarget1")).addItemChangeListener(item -> {
+            exceedIconTint1.set(ColorStateList.valueOf(item.getValue(false) ? COLOR_ORANGE : Color.WHITE));
+        }, true, () -> {return this != null; });
+    }
+
+    protected void setupMusic() {
+        serviceContext.getAudioActorService().getPlayingMusicCount().addItemChangeListener(musicPlayingCount::set, true, () -> { return this != null; });
+    }
+
+    protected void setupWbb12() {
+        IntegerValue wbb12Cons = (IntegerValue) serviceContext.getValueService().getValue("wbb12.heatPumpConsumption");
+        wbb12Cons.addItemChangeListener(item -> {
+            lastWbb12Consumption = item.getValue(0);
+            refreshWbb12();
+        }, true, () -> { return this != null; });
+
+
+        IntegerValue wbb12Mode = (IntegerValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.OPERATING_DISPLAY);
+        wbb12Mode.addItemChangeListener(item -> {
+            lastWbb12OperatingDisplay = item.getValue(0);
+            refreshWbb12();
+        }, true, () -> { return this != null; });
+
+        DoubleValue roomTemp = (DoubleValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.HK3_FLOW_TEMP);
+        roomTemp.addItemChangeListener(item -> {
+            wbb12RoomInfos.set(item.getValue() + "°C");
+        }, true, () -> { return this != null; });
+
+        DoubleValue waterTemp = (DoubleValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.WARM_WATER_TEMP);
+        waterTemp.addItemChangeListener(item -> {
+            wbb12WaterInfoText.set(item.getValue() + "°C");
+        }, true, () -> { return this != null; });
+    }
+
+    protected void refreshWbb12() {
+        if (lastWbb12OperatingDisplay ==  WBB12_Enums.Enum_OPERATING_DISPLAY.DEICE.getValue()) {
+            wbb12RoomIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_snowflake_melt));
+            wbb12RoomIconTint.set(ColorStateList.valueOf(Color.WHITE));
+        } else if (lastWbb12OperatingDisplay ==  WBB12_Enums.Enum_OPERATING_DISPLAY.BLOCKED.getValue()) {
+            wbb12RoomIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_alert));
+            wbb12RoomIconTint.set(ColorStateList.valueOf(Color.RED));
+        } else {
+            wbb12RoomIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_home_thermometer));
+            wbb12RoomIconTint.set(ColorStateList.valueOf((lastWbb12Consumption > 0 && (lastWbb12OperatingDisplay == WBB12_Enums.Enum_OPERATING_DISPLAY.HEATING.getValue() || lastWbb12OperatingDisplay == WBB12_Enums.Enum_OPERATING_DISPLAY.SG_READY_HEATING.getValue())) ? COLOR_ORANGE : Color.WHITE));
+        }
+        wbb12WaterIconTint.set(ColorStateList.valueOf((lastWbb12Consumption > 0 && (lastWbb12OperatingDisplay == WBB12_Enums.Enum_OPERATING_DISPLAY.WARM_WATER.getValue() || lastWbb12OperatingDisplay == WBB12_Enums.Enum_OPERATING_DISPLAY.SG_READY_WARM_WATER.getValue())) ? COLOR_ORANGE : Color.WHITE));
+    }
+
+    protected void setupWindowState() {
+        for (String window : windows) {
+            BooleanValue windowState = (BooleanValue) serviceContext.getValueService().getValue(window);
+            windowState.addItemChangeListener(item -> {
+                recalculateWindowStates();
+            }, true, () -> {return this != null;});
+        }
+    }
+
+    protected void recalculateWindowStates() {
+        List<String> openWindows = new ArrayList<>();
+
+        for (String window : windows) {
+            BooleanValue windowState = (BooleanValue) serviceContext.getValueService().getValue(window);
+            if (windowState != null && !windowState.getValue()) {
+                openWindows.add(windowState.getKnownRoomName());
+            } else {
+                Log.w(TAG, "Window state is null");
+            }
+        }
+
+        if (openWindows.isEmpty()) {
+            windowStateInfoText.set("All closed");
+        } else if (openWindows.size() == 1) {
+            windowStateInfoText.set(openWindows.get(0) +  " open");
+        } else {
+            windowStateInfoText.set(openWindows.size() + " open");
+        }
+
+        windowStateInfoIcon.set(AppCompatResources.getDrawable(context, openWindows.isEmpty() ? R.drawable.ic_window_closed : R.drawable.ic_window_open));
+    }
+
+    protected void setupWater() {
+        registerWaterLevel("waterLevels0.0", "waterFlows0.0");
+        registerWaterLevel("waterLevels0.1", "waterFlows0.1");
+        registerWaterLevel("waterLevels0.2", "waterFlows0.2");
+        registerWaterLevel("waterLevels0.3", "waterFlows0.3");
+    }
+
+    private void registerWaterLevel(String fullIdLevel, String fullIdFlow) {
+        final int index = waterLevels.size();
+        waterLevels.add(new ObservableField<>());
+        DoubleValue valueLevel = (DoubleValue) serviceContext.getValueService().getValue(fullIdLevel);
+        valueLevel.addItemChangeListener(item -> {waterLevels.get(index).set(item.getValue(Double.valueOf(0)).floatValue());}, true, () -> {return this != null;});
+
+        final int index2 = waterFlows.size();
+        waterFlows.add(new ObservableField<>());
+        DoubleValue valueFlow = (DoubleValue) serviceContext.getValueService().getValue(fullIdFlow);
+        valueFlow.addItemChangeListener(item -> {waterFlows.get(index2).set(item.getValue(Double.valueOf(0)).floatValue());}, true, () -> {return this != null;});
+    }
+
+    protected void setupWeather() {
+        StringValue descToday = (StringValue) serviceContext.getValueService().getValue("weather.descToday");
+        descToday.addItemChangeListener(item -> {
+            setWeatherIcon(item.getValue(""), weatherTodayIcon);
+        }, true, () -> {return this!=null;});
+
+        StringValue descTomorrow = (StringValue) serviceContext.getValueService().getValue("weather.descTomorrow");
+        descTomorrow.addItemChangeListener(item -> {
+            setWeatherIcon(item.getValue(""), weatherTomorrowIcon);
+        }, true, () -> {return this!=null;});
+
+        StringValue descTomorrow2 = (StringValue) serviceContext.getValueService().getValue("weather.descTomorrow2");
+        descTomorrow2.addItemChangeListener(item -> {
+            setWeatherIcon(item.getValue(""), weatherTomorrow2Icon);
+        }, true, () -> {return this!=null;});
+
+
+        DoubleValue tempToday = (DoubleValue) serviceContext.getValueService().getValue("weather.tempToday");
+        tempToday.addItemChangeListener(item -> {
+            weatherTempToday.set(tempFormatter.format(item.getValue(Double.valueOf(0))).toString());
+        }, true, () -> {return this!=null;});
+
+        DoubleValue tempTomorrow = (DoubleValue) serviceContext.getValueService().getValue("weather.tempTomorrow");
+        tempTomorrow.addItemChangeListener(item -> {
+            weatherTempTomorrow.set(tempFormatter.format(item.getValue(Double.valueOf(0))).toString());
+        }, true, () -> {return this!=null;});
+
+        DoubleValue tempTomorrow2 = (DoubleValue) serviceContext.getValueService().getValue("weather.tempTomorrow2");
+        tempTomorrow2.addItemChangeListener(item -> {
+            weatherTempTomorrow2.set(tempFormatter.format(item.getValue(Double.valueOf(0))).toString());
+        }, true, () -> {return this!=null;});
+
+    }
+
+    private void setWeatherIcon(String weatherCondition, ObservableField<Drawable> icon) {
+        String desc = weatherCondition.toLowerCase();
+
+        if ((desc.equals("sky clear") || desc.equals("sky is clear"))) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_white_balance_sunny));
+        } else if (desc.equals("few clouds")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_partly_cloudy));
+        } else if (desc.equals("scattered clouds")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_cloudy));
+        } else if (desc.equals("broken clouds") || desc.equals("overcast clouds")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_clouds));
+        } else if (desc.equals("shower rain")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_partly_rainy));
+        } else if (
+                desc.equals("rain") ||
+                        desc.equals("light rain") ||
+                        desc.equals("moderate rain") ||
+                        desc.equals("heavy intensity rain") ||
+                        desc.equals("light intensity shower rain") ||
+                        desc.equals("shower rain") ||
+                        desc.equals("heavy intensity shower rain") ||
+                        desc.equals("ragged shower rain") ||
+                        desc.contains("drizzle")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_rainy));
+        } else if (desc.equals("very heavy rain") || desc.equals("extreme rain") || desc.equals("moderate rain") || desc.equals("heavy intensity rain")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_pouring));
+        } else if (desc.equals("freezing rain") || desc.equals("light rain and snow") || desc.equals("rain and snow")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_snowflake_melt));
+        } else if (
+                desc.equals("light snow") ||
+                        desc.equals("snow") ||
+                        desc.equals("sleet") ||
+                        desc.equals("light shower sleet") ||
+                        desc.equals("shower sleet") ||
+                        desc.equals("light shower snow") ||
+                        desc.equals("shower snow") ||
+                        desc.equals("snow")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_snowy));
+        } else if (desc.equals("heavy snow") || desc.equals("heavy shower snow")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_snowy_heavy));
+        } else if (
+                desc.equals("mist") ||
+                        desc.equals("smoke") ||
+                        desc.equals("haze") ||
+                        desc.equals("sand/dust whirls") ||
+                        desc.equals("fog") ||
+                        desc.equals("sand") ||
+                        desc.equals("sand") ||
+                        desc.equals("sand") ||
+                        desc.equals("sand") ||
+                        desc.equals("sand") ||
+                        desc.equals("mist")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_fog));
+        } else if (desc.equals("dust")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_dust));
+        } else if (desc.equals("volcanic ash")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_volcano_outline));
+        } else if (desc.equals("squalls") || desc.equals("tornado")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_tornado));
+        } else if (desc.contains("thunderstorm")) {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_weather_lightning_rainy));
+        } else {
+            icon.set(AppCompatResources.getDrawable(context, R.drawable.ic_cloud_question_outline));
+            LogFacade.w(TAG, "Unknown weather: " + desc);
+        }
+    }
+
+    protected void setupTrend() {
+        EnumValue currentTrend = (EnumValue) serviceContext.getValueService().getValue("energy.currentTrend");
+        currentTrend.addItemChangeListener(item -> {
+            EnergyTrend mode = EnergyTrend.values()[item.getValue(0)];
+            switch(mode) {
+                case POSITIVE:
+                    currentTrendIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_arrow_top_right_thick));
+                    currentTrendIconTint.set(ColorStateList.valueOf(Color.GREEN));
+                    break;
+                case NEUTRAL:
+                    currentTrendIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_arrow_right_thick));
+                    currentTrendIconTint.set(ColorStateList.valueOf(COLOR_ORANGE));
+                    break;
+                case NEGATIVE:
+                    currentTrendIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_arrow_bottom_right_thick));
+                    currentTrendIconTint.set(ColorStateList.valueOf(Color.RED));
+                    break;
+            }
+        }, true, () -> { return this != null; });
+    }
+
+    protected void setupConsumption() {
+        DoubleValue consumptionPower = (DoubleValue) serviceContext.getValueService().getValue("energy.consumptionPower");
+        consumptionPower.addItemChangeListener(item -> {
+            powerConsumptionText.set(kiloWattsFormatter.format(Double.valueOf(-item.getValue(Double.valueOf(0)) / 1000)).toString());
+        }, true, () -> { return this != null; });
+    }
+
+    protected void setupCommon() {
+        DoubleValue batteryPower = (DoubleValue) serviceContext.getValueService().getValue("energy.batteryPower");
+        batteryPower.addItemChangeListener(item -> {
+            lastBatteryPower = batteryPower.getValue(Double.valueOf(0)).doubleValue();
+            refreshCurrentMode();
+        });
+
+        DoubleValue gridPower = (DoubleValue) serviceContext.getValueService().getValue("energy.gridPower");
+        gridPower.addItemChangeListener(item -> {
+            lastGridPower = gridPower.getValue(Double.valueOf(0)).doubleValue();
+            refreshCurrentMode();
+        });
+
+        DoubleValue generatorPower = (DoubleValue) serviceContext.getValueService().getValue("energy.generatorPower");
+        generatorPower.addItemChangeListener(item -> {
+            lastGeneratorPower = generatorPower.getValue(Double.valueOf(0)).doubleValue();
+            refreshCurrentMode();
+        });
+    }
+
+    protected void setupBattery(Context context) {
+        batteryData.setValueFormatter(new PercentFormatter());
+        batteryData.setDataSet(getDataset(context, 0));
+        batteryData.setDrawValues(false);
+        batteryData.setValueTextSize(0);
+
+        DoubleValue batteryState = (DoubleValue) serviceContext.getValueService().getValue("energy.batteryState");
+        batteryState.addItemChangeListener((item) -> {
+            Double newValue = item.getValue(Double.valueOf(0));
+            if (newValue < 0.99) {
+                batteryText = Double.valueOf(newValue * 100).intValue() + "%";
+            } else {
+                batteryText = "\uD83D\uDD0B";
+            }
+
+            batteryData.setDataSet(getDataset(context, newValue.floatValue()));
+            batteryData.setValueTextSize(0);
+
+            batteryDataChangeListener.onBatteryDataChanged(batteryText, batteryData);
+        }, true, () -> { return this!=null; });
+    }
+
+    private PieDataSet getDataset(Context context, float value) {
+        PieEntry e = new PieEntry(value);
+        if (lastBatteryPower < 0 && value < 0.99) {
+            e.setIcon(AppCompatResources.getDrawable(context, R.drawable.ic_arrow_up_bold));
+        } else if (lastBatteryPower > 0 && value < 0.99) {
+            e.setIcon(AppCompatResources.getDrawable(context, R.drawable.ic_arrow_down_bold));
+        } else {
+            e.setIcon(null);
+        }
+        PieDataSet dataSet = new PieDataSet(List.of(e, new PieEntry(1-value)), "");
+        int color = value > 0.6 ? Color.GREEN : value > 0.3 ? COLOR_ORANGE : value == 0.0 ? Color.GRAY : Color.RED;
+        dataSet.setColors(color, com.google.android.material.R.color.design_default_color_primary);
+        return dataSet;
+    }
+
+    protected void setupCurrentMode() {
+        currentModeIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_cloud_question_outline));
+
+        EnumValue currentModeValue = (EnumValue) serviceContext.getValueService().getValue("energy.currentMode");
+        currentModeValue.addItemChangeListener(item -> {
+            lastEnergyMode = EnergyMode.values()[item.getValue(0)];
+            refreshCurrentMode();
+        }, true, () -> this != null);
+    }
+
+    private void refreshCurrentMode() {
+        switch(lastEnergyMode) {
+            case MAINLY_PV:
+                currentModeIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_solar_panel));
+                currentModeText.set(kiloWattsFormatter.format(Double.valueOf(lastGeneratorPower / 1000)).toString());
+                break;
+            case MAINLY_GRID:
+                currentModeIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_transmission_tower));
+                currentModeText.set(kiloWattsFormatter.format(Double.valueOf(lastGridPower / 1000)).toString());
+                break;
+            case MAINLY_BATTERY:
+                // TODO: change symbol according to state
+                currentModeIcon.set(AppCompatResources.getDrawable(context, R.drawable.ic_battery_50));
+                currentModeText.set(kiloWattsFormatter.format(Double.valueOf(lastBatteryPower / 1000)).toString());
+                break;
+        }
+    }
+
+    protected void setupHomeAppliances() {
+        setupDishwasher();
+        setupWashingMachine();
+        setupVacuumCleaner();
+    }
+
+    private void setupWashingMachine() {
+        registerHomeAppliance("washingmachine", R.drawable.ic_washing_machine, R.drawable.ic_washing_machine_off, R.drawable.ic_washing_machine_alert);
+    }
+
+    private void setupDishwasher() {
+        registerHomeAppliance("dishwasher", R.drawable.ic_dishwasher, R.drawable.ic_dishwasher_off, R.drawable.ic_dishwasher_alert);
+    }
+
+    private void setupVacuumCleaner() {
+        registerHomeAppliance("vacuumcleaner", R.drawable.ic_robot_vacuum_variant, R.drawable.ic_robot_vacuum_variant_off, R.drawable.ic_robot_vacuum_variant_alert);
+    }
+
+    private int registerHomeAppliance(String groupId, int onIcon, int offIcon, int alertIcon) {
+        homeApplianceIcons.add(new ObservableField<>(AppCompatResources.getDrawable(context, R.drawable.ic_cloud_question_outline)));
+        homeApplianceIconTints.add(new ObservableField<>(ColorStateList.valueOf(Color.WHITE)));
+        homeApplianceTexts.add(new ObservableField<>(""));
+
+        int index = homeAppliances.size();
+        homeAppliances.add(index);
+        lastOperationState.put(index, HomeConnectOperationalState.UNKNOWN);
+        lastRemainingSec.put(index, 0);
+        lastProgress.put(index, 0.0);
+        lastRemoteStartDuration.put(index, -1);
+        lastRemoteStartConfirmation.put(index, false);
+        remoteStartAvailable.put(index, false);
+
+        EnumValue operationState = (EnumValue) serviceContext.getValueService().getValue(groupId + ".operationState");
+        operationState.addItemChangeListener(item -> {
+            refreshHomeAppliance(index, HomeConnectOperationalState.values()[item.getValue(0)], lastRemainingSec.get(index), lastProgress.get(index), lastRemoteStartDuration.get(index), lastRemoteStartConfirmation.get(index), onIcon, offIcon, alertIcon);
+        }, true, () -> this != null);
+
+        IntegerValue remainingTime = (IntegerValue) serviceContext.getValueService().getValue(groupId + ".remainingTime");
+        remainingTime.addItemChangeListener(item -> {
+            refreshHomeAppliance(index, lastOperationState.get(index), item.getValue(Integer.valueOf(0)), lastProgress.get(index), lastRemoteStartDuration.get(index), lastRemoteStartConfirmation.get(index), onIcon, offIcon, alertIcon);
+        }, true, () -> this != null);
+
+        DoubleValue progress = (DoubleValue) serviceContext.getValueService().getValue(groupId + ".progress");
+        progress.addItemChangeListener(item -> {
+            refreshHomeAppliance(index, lastOperationState.get(index), lastRemainingSec.get(index), item.getValue(Double.valueOf(0)), lastRemoteStartDuration.get(index), lastRemoteStartConfirmation.get(index), onIcon, offIcon, alertIcon);
+        }, true, () -> this != null);
+
+        IntegerValue remoteStartDuration = (IntegerValue) serviceContext.getValueService().getValue(groupId + ".remoteStartDuration");
+        remoteStartDuration.addItemChangeListener(item -> {
+            refreshHomeAppliance(index, lastOperationState.get(index), lastRemainingSec.get(index), lastProgress.get(index), item.getValue(Integer.valueOf(-1)), lastRemoteStartConfirmation.get(index), onIcon, offIcon, alertIcon);
+        }, true, () -> this != null);
+
+        BooleanValue remoteStartConfirmation = (BooleanValue) serviceContext.getValueService().getValue(groupId + ".remoteStartConfirmation");
+        remoteStartConfirmation.addItemChangeListener(item -> {
+            refreshHomeAppliance(index, lastOperationState.get(index), lastRemainingSec.get(index), lastProgress.get(index), lastRemoteStartDuration.get(index), item.getValue(Boolean.valueOf(false)), onIcon, offIcon, alertIcon);
+        }, true, () -> this != null);
+
+        return index;
+    }
+
+    private void refreshHomeAppliance(int index, HomeConnectOperationalState state, int remainingSec, double progress, int remoteStartDuration, boolean remoteStartConfirmation, int onIcon, int offIcon, int alertIcon) {
+        String labelText = "";
+        boolean _remoteStartAvailable = false;
+
+        if (progress > 0.0 || remainingSec > 0) {
+            state = HomeConnectOperationalState.RUN;
+        }
+
+        if ((lastOperationState.get(index) == HomeConnectOperationalState.RUN && (state == HomeConnectOperationalState.FINISHED || state == HomeConnectOperationalState.READY))) {
+            finishedSound.start();
+        }
+
+        lastOperationState.put(index, state);
+        lastRemainingSec.put(index, remainingSec);
+        lastProgress.put(index, progress);
+        lastRemoteStartDuration.put(index, remoteStartDuration);
+        lastRemoteStartConfirmation.put(index, remoteStartConfirmation);
+
+        // -1: remote start not ready -> display other states
+        //  0: remote start waiting for conf
+        // >0: remote start waiting
+        if (remoteStartDuration == 0 && !remoteStartConfirmation) {
+            homeApplianceIcons.get(index).set(AppCompatResources.getDrawable(context, R.drawable.ic_check_bold));
+            homeApplianceIconTints.get(index).set(ColorStateList.valueOf(Color.GREEN));
+            labelText = "Start";
+            _remoteStartAvailable = true;
+        } else if (remoteStartDuration == 0 && remoteStartConfirmation) {
+            homeApplianceIcons.get(index).set(AppCompatResources.getDrawable(context, R.drawable.ic_timer_sand));
+            homeApplianceIconTints.get(index).set(ColorStateList.valueOf(COLOR_ORANGE));
+            labelText = "Starting";
+        } else if (remoteStartDuration > 0) {
+            int remainingTimeMs = (24*60*60*1000) - remoteStartDuration;
+            homeApplianceIcons.get(index).set(AppCompatResources.getDrawable(context, R.drawable.ic_timer_sand));
+            homeApplianceIconTints.get(index).set(ColorStateList.valueOf(COLOR_ORANGE));
+            labelText = OshValueFormats.formatTime(remainingTimeMs);
+        } else {
+            switch(state) {
+                case UNKNOWN:
+                    homeApplianceIcons.get(index).set(AppCompatResources.getDrawable(context, R.drawable.ic_cloud_question_outline));
+                    homeApplianceIconTints.get(index).set(ColorStateList.valueOf(Color.WHITE));
+                    labelText = "";
+                    break;
+                case ACTION_REQUIRED:
+                case ERROR:
+                case PAUSE:
+                    homeApplianceIcons.get(index).set(AppCompatResources.getDrawable(context, alertIcon));
+                    homeApplianceIconTints.get(index).set(ColorStateList.valueOf(Color.RED));
+                    labelText = state.toString();
+                    break;
+                case INACTIVE:
+                case ABORTING:
+                    homeApplianceIcons.get(index).set(AppCompatResources.getDrawable(context, offIcon));
+                    homeApplianceIconTints.get(index).set(ColorStateList.valueOf(Color.GRAY));
+                    labelText = state.toString();
+                    break;
+                case DELAYED_START:
+                    homeApplianceIcons.get(index).set(AppCompatResources.getDrawable(context, onIcon));
+                    homeApplianceIconTints.get(index).set(ColorStateList.valueOf(Color.GRAY));
+                    labelText = state.toString();
+                    break;
+                case RUN:
+                    homeApplianceIcons.get(index).set(AppCompatResources.getDrawable(context, onIcon));
+                    homeApplianceIconTints.get(index).set(ColorStateList.valueOf(Color.WHITE));
+                    labelText = remainingSec > 0 ? OshValueFormats.formatTime(remainingSec * 1000) : "Running";
+                    break;
+                case READY:
+                case CHARGING:
+                    homeApplianceIcons.get(index).set(AppCompatResources.getDrawable(context, onIcon));
+                    homeApplianceIconTints.get(index).set(ColorStateList.valueOf(Color.WHITE));
+                    labelText = state.toString();
+                    break;
+                case FINISHED:
+                    homeApplianceIcons.get(index).set(AppCompatResources.getDrawable(context, onIcon));
+                    homeApplianceIconTints.get(index).set(ColorStateList.valueOf(Color.GREEN));
+                    labelText = state.toString();
+                    break;
+            }
+        }
+
+        homeApplianceTexts.get(index).set(labelText);
+        remoteStartAvailable.put(index, _remoteStartAvailable);
+    }
+
+
+}

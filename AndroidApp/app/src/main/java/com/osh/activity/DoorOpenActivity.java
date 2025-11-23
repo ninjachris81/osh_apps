@@ -13,20 +13,16 @@ import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 
-import android.nfc.NdefMessage;
-import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 
 import com.osh.databinding.ActivityDoorOpenBinding;
-import com.osh.service.IDoorUnlockService;
+import com.osh.core.service.IDoorUnlockService;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Date;
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;

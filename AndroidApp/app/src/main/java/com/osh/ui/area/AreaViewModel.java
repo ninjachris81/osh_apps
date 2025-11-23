@@ -1,9 +1,8 @@
 package com.osh.ui.area;
 
-import androidx.databinding.ObservableField;
 import androidx.lifecycle.ViewModel;
 
-import com.osh.service.IServiceContext;
+import com.osh.core.service.IServiceContext;
 
 public class AreaViewModel extends ViewModel {
 

@@ -5,8 +5,7 @@ import android.content.Context;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.osh.service.IServiceContext;
-import com.osh.service.IValueService;
+import com.osh.core.service.IServiceContext;
 import com.osh.wbb12.service.IWBB12Service;
 
 public class WBB12ViewModelFactory implements ViewModelProvider.Factory {

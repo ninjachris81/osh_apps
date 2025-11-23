@@ -4,7 +4,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.osh.activity.MainActivity;
-import com.osh.service.IServiceContext;
+import com.osh.core.service.IServiceContext;
 
 public abstract class AreaFragmentBase extends Fragment {
 

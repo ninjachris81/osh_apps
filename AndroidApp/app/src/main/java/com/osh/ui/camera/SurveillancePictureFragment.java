@@ -1,6 +1,5 @@
 package com.osh.ui.camera;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -8,19 +7,14 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 
 import com.osh.R;
-import com.osh.actor.ActorCmds;
-import com.osh.camera.config.CameraFTPSource;
+import com.osh.core.camera.config.CameraFTPSource;
 import com.osh.databinding.FragmentSurveillanceListBinding;
-import com.osh.log.LogFacade;
+import com.osh.core.log.LogFacade;
 import com.osh.ui.dialogs.SelectAudioDialogFragment;
 import com.osh.ui.dialogs.ShowImageDetailsFragment;
 import com.osh.worker.FTPImageWorker;

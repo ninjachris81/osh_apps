@@ -23,7 +23,7 @@ import androidx.media3.exoplayer.rtsp.RtspMediaSource;
 import androidx.media3.exoplayer.source.MediaSource;
 
 import com.osh.R;
-import com.osh.camera.config.CameraSource;
+import com.osh.core.camera.config.CameraSource;
 import com.osh.databinding.ActivitySipCallBinding;
 
 import net.gotev.sipservice.SipServiceCommand;

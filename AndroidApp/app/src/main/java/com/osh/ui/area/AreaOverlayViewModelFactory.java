@@ -4,8 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.osh.service.IServiceContext;
-
 public class AreaOverlayViewModelFactory implements ViewModelProvider.Factory {
 
     private static AreaOverlayViewModelFactory instance;

@@ -3,7 +3,7 @@ package com.osh.ui.dashboard;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.osh.service.IValueService;
+import com.osh.core.service.IValueService;
 
 public class DashboardViewModelFactory implements ViewModelProvider.Factory {
 

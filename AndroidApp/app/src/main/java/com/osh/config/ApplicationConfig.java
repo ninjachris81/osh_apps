@@ -1,13 +1,13 @@
 package com.osh.config;
 
-import com.osh.camera.config.CameraConfig;
-import com.osh.communication.mqtt.config.MqttConfig;
-import com.osh.database.config.DatabaseConfig;
-import com.osh.datamodel.config.DatamodelConfig;
+import com.osh.core.camera.config.CameraConfig;
+import com.osh.core.communication.mqtt.config.MqttConfig;
+import com.osh.core.database.config.DatabaseConfig;
+import com.osh.core.datamodel.config.DatamodelConfig;
 import com.osh.fronius.config.FroniusConfig;
 import com.osh.grafana.config.GrafanaConfig;
 import com.osh.sip.SipConfig;
-import com.osh.user.config.UserConfig;
+import com.osh.core.user.config.UserConfig;
 
 import org.apache.commons.lang3.StringUtils;
 

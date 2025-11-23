@@ -1,0 +1,29 @@
+package com.osh.ui.home;
+
+import android.content.Context;
+
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.osh.core.service.IServiceContext;
+import com.osh.wbb12.service.IWBB12Service;
+
+public class HomeViewMobileModelFactory implements ViewModelProvider.Factory {
+
+    private final Context context;
+    private final IServiceContext serviceContext;
+    private final IWBB12Service wbb12Service;
+    private final HomeViewModelBase.IBatteryDataChangeListener batteryDataChangeListener;
+
+    public HomeViewMobileModelFactory(Context context, IServiceContext serviceContext, IWBB12Service wbb12Service, HomeViewModel.IBatteryDataChangeListener batteryDataChangeListener) {
+        this.context = context;
+        this.serviceContext = serviceContext;
+        this.wbb12Service = wbb12Service;
+        this.batteryDataChangeListener = batteryDataChangeListener;
+    }
+
+    @Override
+    public <T extends ViewModel> T create(Class<T> modelClass) {
+        return (T) new HomeViewMobileModel(context, serviceContext, wbb12Service, batteryDataChangeListener);
+    }
+}

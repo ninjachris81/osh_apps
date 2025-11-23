@@ -16,9 +16,9 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.osh.R;
-import com.osh.device.DeviceBase;
-import com.osh.device.KnownDevice;
-import com.osh.utils.OshValueFormats;
+import com.osh.core.device.DeviceBase;
+import com.osh.core.device.KnownDevice;
+import com.osh.core.utils.OshValueFormats;
 
 import java.util.List;
 

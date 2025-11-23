@@ -1,0 +1,52 @@
+package com.osh.core.actor;
+
+import com.osh.core.value.ValueGroup;
+import com.osh.core.value.ValueType;
+
+public class DigitalActor extends ActorBase<DigitalActor, Boolean> {
+	
+	protected boolean isAsync;
+
+	public DigitalActor(ValueGroup valueGroup, String id, ValueType valueType, boolean isAsync) {
+		super(valueGroup, id, valueType);
+		this.isAsync = isAsync;
+	}
+
+	public DigitalActor() {
+		super();
+	}
+
+	@Override
+	public boolean cmdSupported(ActorCmds cmd) {
+	    switch(cmd) {
+	    case ACTOR_CMD_ON:
+	    case ACTOR_CMD_OFF:
+	        return true;
+	    default:
+	        return false;
+	    }
+	}
+
+	@Override
+	protected void _triggerCmd(ActorCmds cmd) {
+	    switch(cmd) {
+	    case ACTOR_CMD_ON:
+	        //Q_EMIT(statusRequested(true));
+	        break;
+	    case ACTOR_CMD_OFF:
+	        //Q_EMIT(statusRequested(false));o
+	        break;
+	    default:
+	        break;
+	    }
+	}
+	
+	protected Boolean _updateValue(Object newValue) {
+	    if (newValue instanceof Boolean) {
+	        return (Boolean) newValue;
+	    } else {
+	        return null;
+	    }
+	}
+
+}

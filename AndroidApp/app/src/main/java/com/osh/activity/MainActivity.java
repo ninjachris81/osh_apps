@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,22 +38,18 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.badge.ExperimentalBadgeUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.osh.R;
 import com.osh.databinding.ActivityMainBinding;
-import com.osh.log.LogFacade;
-import com.osh.service.IServiceContext;
-import com.osh.sip.MyAccount;
+import com.osh.core.log.LogFacade;
+import com.osh.core.service.IServiceContext;
 import com.osh.sip.MyApp;
 import com.osh.sip.MyAppObserver;
 import com.osh.sip.MyBuddy;
 import com.osh.sip.MyCall;
 import com.osh.sip.OshAccount;
-import com.osh.utils.ObservableBoolean;
-import com.osh.value.IntegerValue;
-import com.osh.wbb12.WBB12_Holding_Registers;
-import com.osh.wbb12.WBB12_Input_Registers;
+import com.osh.core.utils.ObservableBoolean;
 import com.osh.wbb12.service.IWBB12Service;
 
-import org.apache.commons.lang3.StringUtils;
 import org.pjsip.PjCameraInfo2;
 import org.pjsip.pjsua2.AccountConfig;
 import org.pjsip.pjsua2.AuthCredInfo;
@@ -65,7 +62,6 @@ import org.pjsip.pjsua2.pjsip_status_code;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -76,8 +72,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class MainActivity extends AppCompatActivity implements Handler.Callback, MyAppObserver {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    public static final String STANDBY_STATE_CHANGED = "standbyStateChanged";
-    public static final String STANDBY_STATE_CHANGED_VALUE = "standby";
 
     final int REQUEST_OVERLAY_PERMISSION = 666;
 
@@ -96,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         public final static int CHANGE_NETWORK = 6;
         public final static int CALL_MEDIA_EVENT = 7;
 
-        public final static int DIM_DISPLAY = 100;
+        public final static int WAKE_DISPLAY = 100;
     }
 
     ArrayList<Map<String, String>> buddyList;
@@ -106,8 +100,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     private final Handler handler = new Handler(this);
-
-    private CountDownTimer dimTimer;
 
     @Override
     public boolean handleMessage(@NonNull Message m) {
@@ -189,8 +181,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
         } else if (m.what == MSG_TYPE.CHANGE_NETWORK) {
             app.handleNetworkChange();
-        } else if (m.what == MSG_TYPE.DIM_DISPLAY) {
-            standbyScreen(m.arg1 != 0, true);
+        } else if (m.what == MSG_TYPE.WAKE_DISPLAY) {
+            wakeScreen();
         } else {
             /* Message not handled */
             return false;
@@ -227,42 +219,11 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     private Boolean currentStandbyState;
 
-    private void dimScreen(boolean dim) {
-        /*
-        WindowManager.LayoutParams params = this.getWindow().getAttributes();
-        params.screenBrightness = dim ? 0.0f : 0.8f;
-        this.getWindow().setAttributes(params);
-         */
+    PowerManager.WakeLock wakeLock;
 
-        binding.blackOverlay.setVisibility(dim ? View.VISIBLE : View.INVISIBLE);
-        binding.bottomNav.setVisibility(dim ? View.INVISIBLE : View.VISIBLE);
-    }
-
-    private void standbyScreen(boolean standby, boolean restartTimer) {
-        if (currentStandbyState == null || standby != currentStandbyState) {
-            if (Settings.System.canWrite(context)) {
-                dimScreen(standby);
-                if (standby) {
-                    Settings.System.putInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-                    Settings.System.putInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, 0);
-                } else {
-                    Settings.System.putInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
-                }
-            } else {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                context.startActivity(intent);
-            }
-            currentStandbyState = standby;
-
-            Intent intent = new Intent(MainActivity.STANDBY_STATE_CHANGED);
-            intent.putExtra(MainActivity.STANDBY_STATE_CHANGED_VALUE, currentStandbyState);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-        }
-
-        if (!standby && restartTimer) {
-            dimTimer.cancel();
-            dimTimer.start();
-        }
+    private void wakeScreen() {
+        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        // TODO
     }
 
     @OptIn(markerClass = ExperimentalBadgeUtils.class)
@@ -272,19 +233,15 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
         this.context = this;
 
-        setShowWhenLocked(true);
-        setTurnScreenOn(true);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        //setShowWhenLocked(true);
+        //setTurnScreenOn(true);
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        /*
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock  wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK |
-                PowerManager.ACQUIRE_CAUSES_WAKEUP |
-                PowerManager.ON_AFTER_RELEASE, "appname::WakeLock");
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "appname::WakeLock");
 
         //acquire will turn on the display
         wakeLock.acquire();
-         */
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
 
@@ -419,36 +376,17 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
         requestPermissions();
 
-        dimTimer = new CountDownTimer(5 * 60000, 10000) {
-            @Override
-            public void onTick(long l) {
-                LogFacade.i(TAG, "Dim timer: " + l);
-            }
-
-            @Override
-            public void onFinish() {
-                standbyScreen(true, false);
-            }
-        };
-
-        binding.blackOverlay.setOnClickListener(view -> {
-            standbyScreen(false, true);
-        });
-        standbyScreen(false, true);
-
         binding.stationName.setText(((OshApplication) getApplication()).getApplicationConfig().getUser().getUserId());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        standbyScreen(false, true);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        standbyScreen(false, false);
     }
 
 
@@ -462,7 +400,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     private void startCallActivity(Integer msgType, Integer evType, Long medIdx, Integer state)
     {
-        standbyScreen(false, true);
         Intent intent = new Intent(this, SipCallActivity.class);
         try {
             if (sipAccount != null) intent.putExtra("accountID", sipAccount.getInfo().getUri());
@@ -658,6 +595,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     protected void onDestroy() {
         super.onDestroy();
         sipAccount.onDestroy();
+        wakeLock.release();
     }
 
     @Override

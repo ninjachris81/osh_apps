@@ -236,7 +236,7 @@
                 />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/test24"
+                android:id="@+id/hk3Delta"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_rowWeight="1"
@@ -248,8 +248,10 @@
                 app:iconSize="70dp"
                 app:iconPadding="0dp"
                 android:clickable="false"
-                app:icon="@drawable/ic_cloud_question_outline"
+                app:icon="@drawable/ic_thermometer_chevron_up"
+                app:iconTint="@{wbb12Data.hk3IconTint}"
                 android:inputType="text"
+                android:text='@{ String.format("%.1f", wbb12Data.hk3DeltaTemp) + "°"}'
                 />
 
             <RelativeLayout

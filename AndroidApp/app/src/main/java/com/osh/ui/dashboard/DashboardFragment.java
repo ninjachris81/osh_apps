@@ -11,9 +11,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.osh.activity.MainActivity;
 import com.osh.databinding.FragmentDashboardBinding;
-import com.osh.service.IDatamodelService;
-import com.osh.service.IServiceContext;
-import com.osh.service.IValueService;
+import com.osh.core.service.IServiceContext;
 
 public class DashboardFragment extends Fragment {
 

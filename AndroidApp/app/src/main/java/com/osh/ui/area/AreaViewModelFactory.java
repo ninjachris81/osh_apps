@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.viewmodel.CreationExtras;
 
-import com.osh.service.IServiceContext;
+import com.osh.core.service.IServiceContext;
 
 public class AreaViewModelFactory implements ViewModelProvider.Factory {
 

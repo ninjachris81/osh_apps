@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,14 +35,13 @@ import com.osh.activity.DoorOpenActivity;
 import com.osh.activity.MainActivity;
 import com.osh.activity.OshApplication;
 import com.osh.activity.WebviewActivity;
-import com.osh.actor.ActorCmds;
-import com.osh.actor.DigitalActor;
+import com.osh.core.actor.ActorCmds;
+import com.osh.core.actor.DigitalActor;
 import com.osh.databinding.FragmentHomeBinding;
-import com.osh.log.LogFacade;
-import com.osh.service.IServiceContext;
-import com.osh.value.BooleanValue;
-import com.osh.value.EnumValue;
-import com.osh.value.IntegerValue;
+import com.osh.core.log.LogFacade;
+import com.osh.core.service.IServiceContext;
+import com.osh.core.value.BooleanValue;
+import com.osh.core.value.EnumValue;
 import com.osh.wbb12.service.IWBB12Service;
 
 public class HomeFragment extends Fragment implements HomeViewModel.IBatteryDataChangeListener {
@@ -61,32 +61,14 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
     public HomeFragment() {
     }
 
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // Get extra data included in the Intent
-            boolean standByState = intent.getBooleanExtra(MainActivity.STANDBY_STATE_CHANGED_VALUE, false);
-            LogFacade.d(TAG, "Standby state changed: " + standByState);
-
-            if (binding != null) {
-                binding.btnFrontCamera.setVideoEnable(!standByState);
-                binding.btnBackCamera.setVideoEnable(!standByState);
-            }
-        }
-    };
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mMessageReceiver,
-                new IntentFilter(MainActivity.STANDBY_STATE_CHANGED));
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mMessageReceiver);
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -104,8 +86,7 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
                 Message m = new Message();
-                m.what = MainActivity.MSG_TYPE.DIM_DISPLAY;
-                m.arg1 = 0;
+                m.what = MainActivity.MSG_TYPE.WAKE_DISPLAY;
                 ((MainActivity)getActivity()).getHandler().sendMessage(m);
             }
         });
@@ -126,12 +107,12 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
 
         binding.btnFrontCamera.setVideoUrl(app.getApplicationConfig().getCamera().getCameraSource("frontDoor.door").getStreamUri());
         binding.btnFrontCamera.setOnClickListener(listener -> {
-            CameraDetailsActivity.invokeActivity(getContext(), "frontDoor.door", "Front Door");
+            CameraDetailsActivity.invokeActivity(getContext(), "frontDoor.door", "Front Door", 180);
         });
 
         binding.btnBackCamera.setVideoUrl(app.getApplicationConfig().getCamera().getCameraSource("wintergarden.door").getStreamUri());
         binding.btnBackCamera.setOnClickListener(listener -> {
-            CameraDetailsActivity.invokeActivity(getContext(), "wintergarden.door", "Wintergarden");
+            CameraDetailsActivity.invokeActivity(getContext(), "wintergarden.door", "Wintergarden", 0);
         });
 
         binding.audioInfos.setOnClickListener(listener -> {
@@ -283,5 +264,21 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
             binding.batteryState.notifyDataSetChanged();
             binding.batteryState.invalidate();
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        binding.btnFrontCamera.setVideoEnable(true);
+        binding.btnBackCamera.setVideoEnable(true);
+        Log.d(TAG, "video enable");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        binding.btnFrontCamera.setVideoEnable(false);
+        binding.btnBackCamera.setVideoEnable(false);
+        Log.d(TAG, "video disable");
     }
 }

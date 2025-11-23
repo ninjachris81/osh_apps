@@ -10,12 +10,12 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.osh.R;
-import com.osh.actor.ValueActor;
-import com.osh.service.IServiceContext;
-import com.osh.utils.IItemChangeListener;
-import com.osh.value.DoubleValue;
-import com.osh.value.IntegerValue;
-import com.osh.value.ValueBase;
+import com.osh.core.actor.ValueActor;
+import com.osh.core.service.IServiceContext;
+import com.osh.core.utils.IItemChangeListener;
+import com.osh.core.value.DoubleValue;
+import com.osh.core.value.IntegerValue;
+import com.osh.core.value.ValueBase;
 import com.osh.wbb12.WBB12_Enums;
 import com.osh.wbb12.WBB12_Holding_Registers;
 import com.osh.wbb12.WBB12_Input_Registers;
@@ -40,6 +40,8 @@ public class WBB12ViewModel extends ViewModel {
 
     public final ObservableField<Double> flowTempOut = new ObservableField<>(0.0);
     public final ObservableField<Double> flowTempIn = new ObservableField<>(0.0);
+    public final ObservableField<Double> hk3DeltaTemp = new ObservableField<>(0.0);
+    public final ObservableField<ColorStateList> hk3IconTint = new ObservableField<>();
 
     public final ObservableField<Double> electricPower = new ObservableField<>(0.0);
     public final ObservableField<Double> electricPowerTotal = new ObservableField<>(0.0);
@@ -63,6 +65,9 @@ public class WBB12ViewModel extends ViewModel {
     private int coil2WorkingHours = 0;
 
     private int wwPush = 0;
+
+    private double lastHk3Temp = 0.0;
+    private double lastHk3TargetTemp = 0.0;
 
     final IWBB12Service wbb12Service;
 
@@ -113,7 +118,12 @@ public class WBB12ViewModel extends ViewModel {
         }, true, () -> { return this != null; });
 
         ((DoubleValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.HK3_FLOW_TEMP)).addItemChangeListener(item -> {
+            updateHk3(item.getValue(0.0), lastHk3TargetTemp);
+        }, true, () -> { return this != null; });
+
+        ((DoubleValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.HK3_FLOW_TARGET_TEMP)).addItemChangeListener(item -> {
             roomTemp.set(item.getValue(0.0));
+            updateHk3(lastHk3Temp, item.getValue(0.0));
         }, true, () -> { return this != null; });
 
         ((DoubleValue) wbb12Service.getWBB12Value(WBB12_Input_Registers.WARM_WATER_TEMP)).addItemChangeListener(item -> {
@@ -217,6 +227,15 @@ public class WBB12ViewModel extends ViewModel {
         s.append("Month: ").append(energyStatsTotalMonth).append("kWh\n");
         s.append("Year: ").append(energyStatsTotalYear).append("kWh");
         energyStats.set(s.toString());
+    }
+
+    private void updateHk3(double hk3Temp, double hk3TargetTemp) {
+        lastHk3Temp = hk3Temp;
+        lastHk3TargetTemp = hk3TargetTemp;
+        roomTemp.set(hk3Temp);
+        double delta = hk3Temp - hk3TargetTemp;
+        hk3DeltaTemp.set(delta);
+        hk3IconTint.set(delta < 0 ? ColorStateList.valueOf(COLOR_ORANGE) : ColorStateList.valueOf(Color.WHITE));
     }
 
     private void updateHeatCoil() {
