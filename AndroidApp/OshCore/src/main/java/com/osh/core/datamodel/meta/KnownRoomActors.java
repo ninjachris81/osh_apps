@@ -1,6 +1,7 @@
 package com.osh.core.datamodel.meta;
 
 import androidx.room.ColumnInfo;
+import androidx.room.Database;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 
@@ -32,6 +33,10 @@ public class KnownRoomActors {
     @ColumnInfo(name = "value_group_id")
     public String valueGroupId;
 
+    @DatabaseField(columnName = "order_index")
+    @ColumnInfo(name = "order_index")
+    public int orderIndex;
+
     public String getRoomId() {
         return roomId;
     }
@@ -44,13 +49,16 @@ public class KnownRoomActors {
         return valueGroupId;
     }
 
+    public int getOrderIndex() { return orderIndex; }
+
     public KnownRoomActors() {
     }
 
     @Ignore
-    public KnownRoomActors(@NotNull String roomId, @NotNull String valueGroupId, @NotNull String actorId) {
+    public KnownRoomActors(@NotNull String roomId, @NotNull String valueGroupId, @NotNull String actorId, @NotNull int orderIndex) {
         this.roomId = roomId;
         this.valueGroupId = valueGroupId;
         this.actorId = actorId;
+        this.orderIndex = orderIndex;
     }
 }

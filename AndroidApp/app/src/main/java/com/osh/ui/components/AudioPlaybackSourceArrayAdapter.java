@@ -2,6 +2,7 @@ package com.osh.ui.components;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +24,11 @@ public class AudioPlaybackSourceArrayAdapter extends TextImageSpinnerArrayAdapte
     public AudioPlaybackSourceArrayAdapter(@NonNull Context context, int resource, List<AudioPlaybackSource> audioPlaybackSources) {
         super(context, resource);
 
+        Bitmap defaultBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_music);
+
         for (AudioPlaybackSource source : audioPlaybackSources) {
             super.add(source.getName());
-            bitmaps.add(source.getImage());
+            bitmaps.add(source.getImage() == null ? defaultBitmap : source.getImage());
         }
     }
 

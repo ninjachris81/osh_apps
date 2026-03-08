@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.osh.R;
 import com.osh.activity.MainActivity;
 import com.osh.core.actor.AudioPlaybackActor;
+import com.osh.core.log.LogFacade;
 import com.osh.ui.components.WindowStateIndicator;
 import com.osh.ui.dialogs.SelectAudioDialogFragment;
 import com.osh.core.actor.ActorCmds;
@@ -33,6 +34,8 @@ import com.osh.core.value.ValueBase;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> extends Fragment {
 
@@ -78,13 +81,7 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
     protected IServiceContext serviceContext;
     protected BINDING_TYPE binding;
 
-    protected List<ShutterInfo> shutterInfos = new ArrayList<>();
-
-    protected List<LightInfo> lightInfos = new ArrayList<>();
-
-    protected final SensorInfo sensorInfos = new SensorInfo();
-
-    protected RoomViewModel roomViewModel;
+    protected RoomViewModel2 roomViewModel;
     protected RoomViewModel.RoomPosition roomPosition;
     private View roomBackground;
 
@@ -99,6 +96,9 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
     protected String roomId;
     protected String areaId;
 
+    protected TimerTask shutterRepeatTimerTask;
+    protected Timer shutterRepeatTimer = new Timer();
+
     public RoomFragmentBase() {
         // Required empty public constructor
     }
@@ -112,10 +112,20 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            //mParam1 = getArguments().getString(ARG_PARAM1);
-            //mParam2 = getArguments().getString(ARG_PARAM2);
+
+        if (savedInstanceState != null) {
+            this.roomId = savedInstanceState.getString("roomId");
+            this.areaId = savedInstanceState.getString("areaId");
+            this.roomPosition = RoomViewModel.RoomPosition.valueOf(savedInstanceState.getString("roomPosition"));
         }
+
+        MainActivity mainActivity = ((MainActivity) getActivity());
+        this.serviceContext = mainActivity.getServiceContext();
+
+        roomViewModel = new ViewModelProvider(mainActivity, RoomViewModelFactory.getInstance(serviceContext)).get(roomId, RoomViewModel2.class);
+        roomViewModel.roomPosition.set(roomPosition);
+        areaViewModel = new ViewModelProvider(mainActivity, AreaViewModelFactory.getInstance(serviceContext)).get(areaId, AreaViewModel.class);
+        areaOverlayViewModel = new ViewModelProvider(mainActivity, AreaOverlayViewModelFactory.getInstance()).get(AreaOverlayViewModel.class);
     }
 
     @Override
@@ -130,8 +140,6 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        this.serviceContext = ((MainActivity) getActivity()).getServiceContext();
-
         if (savedInstanceState != null) {
             this.roomId = savedInstanceState.getString("roomId");
             this.areaId = savedInstanceState.getString("areaId");
@@ -139,11 +147,6 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
         }
 
         binding = DataBindingUtil.inflate(inflater, getLayout(), container, false);
-
-        roomViewModel = new ViewModelProvider(this, new RoomViewModelFactory(serviceContext)).get(roomId, RoomViewModel.class);
-        roomViewModel.roomPosition.set(roomPosition);
-        areaViewModel = new ViewModelProvider(getParentFragment(), AreaViewModelFactory.getInstance(serviceContext)).get(areaId, AreaViewModel.class);
-        areaOverlayViewModel = new ViewModelProvider(getParentFragment().getParentFragment(), AreaOverlayViewModelFactory.getInstance()).get(AreaOverlayViewModel.class);
 
         setBindingData();
 
@@ -154,36 +157,16 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
 
         initRoom();
 
-        for (int i = 0;i<lightInfos.size();i++) {
-            bindLight(lightInfos.get(i), i);
-        }
-
-        if (!shutterInfos.isEmpty() && shutterInfos.size() != getShutterModeButtons().size()) {
+        if (!roomViewModel.shutterAutoModes.isEmpty() && roomViewModel.shutterAutoModes.size() != getShutterModeButtons().size()) {
             throw new RuntimeException("Shutter info mismatch for room " + this.roomViewModel.getRoom().getId());
         }
 
-        for (int i = 0;i<shutterInfos.size();i++) {
-            bindShutter(shutterInfos.get(i), getShutterModeButtons().get(i), i);
+        for (int i = 0;i<roomViewModel.shutterAutoModes.size();i++) {
+            bindShutter(getShutterModeButtons().get(i), i);
         }
 
-        for (int i = 0;i<sensorInfos.temperatureIds.size();i++) {
-            bindTemperatureSensor(sensorInfos.temperatureIds.get(i), i);
-        }
-
-        for (int i = 0;i<sensorInfos.humidityIds.size();i++) {
-            bindHumiditySensor(sensorInfos.humidityIds.get(i), i);
-        }
-
-        for (int i = 0;i<sensorInfos.windowStateIds.size();i++) {
-            bindWindowState(sensorInfos.windowStateIds.get(i), getWindowStateIndicators().get(i), i);
-        }
-
-        for (int i = 0;i<sensorInfos.brightnessIds.size();i++) {
-            bindBrightnessSensor(sensorInfos.brightnessIds.get(i), i);
-        }
-
-        for (int i = 0;i<sensorInfos.presenceIds.size();i++) {
-            bindPresence(sensorInfos.presenceIds.get(i), i);
+        for (int i = 0;i<roomViewModel.windowStates.size();i++) {
+            bindWindowState(getWindowStateIndicators().get(i), i);
         }
 
         return binding.getRoot();
@@ -207,7 +190,7 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
     }
 
     protected void handleBackgroundClickEventLight(int index) {
-        ToggleActor lightToggleActor = (ToggleActor) serviceContext.getDatamodelService().getDatamodel().getActor(lightInfos.get(index).lightToggleId, lightInfos.get(index).lightToggleValueGroupId);
+        ToggleActor lightToggleActor = roomViewModel.roomLightToggleActors.get(index);
         serviceContext.getActorService().publishCmd(lightToggleActor, ActorCmds.ACTOR_CMD_TOGGLE);
     }
 
@@ -233,6 +216,7 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
         }
     }
 
+    /*
     public RoomFragmentBase withLight(String lightRelayValueGroupId, String lightRelayId, String lightToggleValueGroupId, String lightToggleId) {
         lightInfos.add(new LightInfo(lightRelayValueGroupId, lightRelayId, lightToggleValueGroupId, lightToggleId));
         return this;
@@ -262,128 +246,83 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
         return this;
     }
 
-    protected void bindTemperatureSensor(String id, int index) {
-        DoubleValue value = (DoubleValue) serviceContext.getDatamodelService().getDatamodel().getValue(id);
-        if (value != null) {
-            value.addItemChangeListener(item -> {
-                if (roomViewModel!=null) {
-                    roomViewModel.temperatures.get(index).set(item.getValue(-1.0));
-                }
-            }, true, () -> {return roomViewModel!=null;});
-        } else {
-            throw new RuntimeException("Sensor value not found: " + id);
-        }
-    }
-
-    protected  void bindHumiditySensor(String id, int index) {
-        DoubleValue value = (DoubleValue) serviceContext.getDatamodelService().getDatamodel().getValue(id);
-        if (value != null) {
-            value.addItemChangeListener(item -> {
-                if (roomViewModel!=null) {
-                    roomViewModel.humidities.get(index).set(item.getValue(-1.0));
-                }
-            }, true, () -> { return roomViewModel!=null;});
-        } else {
-            throw new RuntimeException("Sensor value not found: " + id);
-        }
-    }
-
-
-    protected void bindWindowState(String id, @IdRes int windowStateIndicator, int index) {
-        WindowStateIndicator stateIndicator = binding.getRoot().findViewById(windowStateIndicator);
-        stateIndicator.setVisibility(View.VISIBLE);
-
-        BooleanValue value = (BooleanValue) serviceContext.getValueService().getValue(id);
-        if (value != null) {
-            value.addItemChangeListener(item -> {
-                if (roomViewModel!=null) {
-                    roomViewModel.windowStates.get(index).set(item.getValue(false));
-                }
-            }, true, () -> {return roomViewModel!=null;});
-        } else {
-            throw new RuntimeException("Sensor value not found: " + id);
-        }
-    }
-
-    protected void bindBrightnessSensor(String id, int index) {
-        DoubleValue value = (DoubleValue) serviceContext.getValueService().getValue(id);
-        if (value != null) {
-            value.addItemChangeListener(item -> {
-                if (roomViewModel!=null) {
-                    roomViewModel.brightnesses.get(index).set(item.getValue(-1.0));
-                }
-            }, true, () -> { return roomViewModel!=null; });
-        } else {
-            throw new RuntimeException("Sensor value not found: " + id);
-        }
-    }
-
-    protected void bindPresence(String id, int index) {
-        BooleanValue value = (BooleanValue) serviceContext.getValueService().getValue(id);
-
-        if (value != null) {
-            value.addItemChangeListener(item -> {
-                if (areaViewModel!=null && roomViewModel!=null) {
-                    if (areaOverlayViewModel.currentOverlay.get() == AreaFragment.AreaOverlays.PRESENCE) {
-                        roomViewModel.roomPresences.get(index).set(item.getValue(false));
-                        //roomViewModel.backgroundVisible.set(item.getValue(false));
-                    }
-                }
-            }, true, () -> { return areaViewModel!=null && roomViewModel!=null; });
-        } else {
-            throw new RuntimeException("Sensor value not found: " + id);
-        }
-    }
-
-    protected void bindLight(LightInfo lightInfo, int index) {
-        DigitalActor lightActor = (DigitalActor) serviceContext.getDatamodelService().getDatamodel().getActor(lightInfo.lightRelayId, lightInfo.lightRelayValueGroupId);
-
-        lightActor.addItemChangeListener(isEnabled -> {
-            if (roomViewModel!=null) {
-                roomViewModel.lightStates.get(index).set(isEnabled.getValue(false));
-            }
-        }, true, () -> { return roomViewModel!=null;});
-    }
-
     public RoomFragmentBase withShutter(String shutterValueGroupId, String shutterId, String shutterModeValueGroupId, String shutterModeId) {
         shutterInfos.add(new ShutterInfo(shutterValueGroupId, shutterId, shutterModeValueGroupId, shutterModeId));
         return this;
     }
+    */
 
+    protected void bindWindowState(@IdRes int windowStateIndicator, int index) {
+        WindowStateIndicator stateIndicator = binding.getRoot().findViewById(windowStateIndicator);
+        stateIndicator.setVisibility(View.VISIBLE);
+    }
 
-    protected void bindShutter(ShutterInfo shutterInfo, @IdRes int shutterModeButton, int index) {
+    protected void bindShutter(@IdRes int shutterModeButton, int index) {
         ShutterModeButton modeButton = binding.getRoot().findViewById(shutterModeButton);
         modeButton.setVisibility(View.VISIBLE);
 
-        ShutterActor shutterActor = (ShutterActor) serviceContext.getDatamodelService().getDatamodel().getActor(shutterInfo.shutterId, shutterInfo.shutterValueGroupId);
-        EnumValue shutterMode = (EnumValue) serviceContext.getDatamodelService().getDatamodel().getValue(shutterInfo.shutterModeId, shutterInfo.shutterModeValueGroupId);
-
-        shutterMode.addItemChangeListener(item -> {
-            roomViewModel.shutterAutoModes.get(index).set(item.getValue(ShutterActor.SHUTTER_OPERATION_MODE_AUTO) == ShutterActor.SHUTTER_OPERATION_MODE_AUTO);
-        }, true, () -> {return roomViewModel!=null; });
-
-        shutterActor.addItemChangeListener(item -> {
-            roomViewModel.shutterStates.get(index).set(shutterActor.getCloseAndTiltState());
-        }, true, () -> {return roomViewModel!=null; });
-
-        roomViewModel.supportsTilts.get(index).set(shutterActor.isTiltSupport());
+        ShutterActor shutterActor = roomViewModel.roomShutterActors.get(index);
+        EnumValue shutterMode = roomViewModel.roomShutterAutoModes.get(index);
 
         modeButton.setAutoClickListener(view -> {
             shutterMode.updateValue(shutterMode.getValue(ShutterActor.SHUTTER_OPERATION_MODE_AUTO) == ShutterActor.SHUTTER_OPERATION_MODE_AUTO ? ShutterActor.SHUTTER_OPERATION_MODE_MANUAL : ShutterActor.SHUTTER_OPERATION_MODE_AUTO);
             serviceContext.getValueService().publishValue(shutterMode);
         });
 
-        modeButton.setUpClickListener(view -> {
-            shutterMode.updateValue(ShutterActor.SHUTTER_OPERATION_MODE_MANUAL);
-            serviceContext.getValueService().publishValue(shutterMode);
-            serviceContext.getActorService().publishCmd(shutterActor, ActorCmds.ACTOR_CMD_UP);
+        modeButton.setUpClickListener(new ShutterModeButton.OnClickListener() {
+            @Override
+            public void onTap(View view) {
+                shutterMode.updateValue(ShutterActor.SHUTTER_OPERATION_MODE_MANUAL);
+                serviceContext.getValueService().publishValue(shutterMode);
+                serviceContext.getActorService().publishCmd(shutterActor, ActorCmds.ACTOR_CMD_UP);
+            }
+
+            @Override
+            public void onLongClick(View view, boolean release) {
+                if (release) {
+                    if (shutterRepeatTimerTask != null) shutterRepeatTimerTask.cancel();
+                    serviceContext.getActorService().publishCmd(shutterActor, ActorCmds.ACTOR_CMD_STOP);
+                } else {
+                    scheduleNewTimerTask(new TimerTask() {
+                        @Override
+                        public void run() {
+                            serviceContext.getActorService().publishCmd(shutterActor, ActorCmds.ACTOR_CMD_SHUTTER_MANUAL_UP);
+                        }
+                    });
+                }
+            }
         });
 
-        modeButton.setDownClickListener(view -> {
-            shutterMode.updateValue(ShutterActor.SHUTTER_OPERATION_MODE_MANUAL);
-            serviceContext.getValueService().publishValue(shutterMode);
-            serviceContext.getActorService().publishCmd(shutterActor, ActorCmds.ACTOR_CMD_DOWN);
+
+        modeButton.setDownClickListener(new ShutterModeButton.OnClickListener() {
+            @Override
+            public void onTap(View view) {
+                shutterMode.updateValue(ShutterActor.SHUTTER_OPERATION_MODE_MANUAL);
+                serviceContext.getValueService().publishValue(shutterMode);
+                serviceContext.getActorService().publishCmd(shutterActor, ActorCmds.ACTOR_CMD_DOWN);
+            }
+
+            @Override
+            public void onLongClick(View view, boolean release) {
+                if (release) {
+                    if (shutterRepeatTimerTask != null) shutterRepeatTimerTask.cancel();
+                    serviceContext.getActorService().publishCmd(shutterActor, ActorCmds.ACTOR_CMD_STOP);
+                } else {
+                    scheduleNewTimerTask(new TimerTask() {
+                        @Override
+                        public void run() {
+                            serviceContext.getActorService().publishCmd(shutterActor, ActorCmds.ACTOR_CMD_SHUTTER_MANUAL_DOWN);
+                        }
+                    });
+                }
+            }
         });
+    }
+
+    void scheduleNewTimerTask(TimerTask timerTask) {
+        if (shutterRepeatTimerTask != null) shutterRepeatTimerTask.cancel();
+        shutterRepeatTimerTask = timerTask;
+        shutterRepeatTimer.scheduleAtFixedRate(shutterRepeatTimerTask, 0, 500);
     }
 
     protected void setBackgroundForOverlay(View roomBackground) {

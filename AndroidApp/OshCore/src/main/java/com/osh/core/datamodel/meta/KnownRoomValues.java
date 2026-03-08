@@ -31,6 +31,11 @@ public class KnownRoomValues {
     @ColumnInfo(name = "value_group_id")
     public String valueGroupId;
 
+    @DatabaseField(columnName = "order_index")
+    @ColumnInfo(name = "order_index")
+    public int orderIndex;
+
+
     public String getRoomId() {
         return roomId;
     }
@@ -43,13 +48,16 @@ public class KnownRoomValues {
         return valueGroupId;
     }
 
+    public int getOrderIndex() { return orderIndex; }
+
     public KnownRoomValues() {
     }
 
     @Ignore
-    public KnownRoomValues(@NotNull String roomId, @NotNull String valueGroupId, @NotNull String valueId) {
+    public KnownRoomValues(@NotNull String roomId, @NotNull String valueGroupId, @NotNull String valueId, @NotNull int orderIndex) {
         this.roomId = roomId;
         this.valueGroupId = valueGroupId;
         this.valueId = valueId;
+        this.orderIndex = orderIndex;
     }
 }

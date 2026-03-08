@@ -76,11 +76,13 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
 
         OshApplication app = (OshApplication) getActivity().getApplication();
 
-        serviceContext = ((MainActivity) getActivity()).getServiceContext();
-        wbb12Service = ((MainActivity) getActivity()).getWBB12Service();
+        MainActivity mainActivity = (MainActivity) getActivity();
+
+        serviceContext = mainActivity.getServiceContext();
+        wbb12Service = mainActivity.getWBB12Service();
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
 
-        homeViewModel = new ViewModelProvider(this, new HomeViewModelFactory(getContext(), serviceContext, wbb12Service, this)).get(HomeViewModel.class);
+        homeViewModel = new ViewModelProvider(mainActivity, new HomeViewModelFactory(getContext(), serviceContext, wbb12Service, this)).get(HomeViewModel.class);
 
         homeViewModel.windowStateInfoText.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
             @Override

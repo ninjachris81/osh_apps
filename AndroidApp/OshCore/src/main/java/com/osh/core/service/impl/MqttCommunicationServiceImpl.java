@@ -102,7 +102,7 @@ public class MqttCommunicationServiceImpl implements ICommunicationService {
 		registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_DOOR_UNLOCK, false, MqttConstants.MQTT_MESSAGE_TYPE_DU, 2, true);
 
 		registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_VALUE, true, MqttConstants.MQTT_MESSAGE_TYPE_VA, 2, false);
-		registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_ACTOR, true, MqttConstants.MQTT_MESSAGE_TYPE_AC, 2, false);
+		registerMessageType(MessageBase.MESSAGE_TYPE.MESSAGE_TYPE_ACTOR, false, MqttConstants.MQTT_MESSAGE_TYPE_AC, 2, false);
 
 		mqttClient = MqttClient.builder()
 				.identifier(config.getClientId())

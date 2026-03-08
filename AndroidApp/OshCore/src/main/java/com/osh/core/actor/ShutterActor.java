@@ -70,8 +70,6 @@ public class ShutterActor extends ActorBase<ShutterActor, Integer> {
     public String getCloseAndTiltState() {
         if (this.value == null) return "";
 
-        int t = getTiltState();
-
         if (getCloseState() != SHUTTER_STATE_CLOSED && getCloseState() != SHUTTER_STATE_OPENED) return getCloseStateAsString();
         if (isTiltSupport()) {
             if (getTiltState() != SHUTTER_TILT_CLOSED && getTiltState() != SHUTTER_TILT_OPENED) return getTiltStateAsString();
@@ -89,6 +87,7 @@ public class ShutterActor extends ActorBase<ShutterActor, Integer> {
     }
 
     public int getCloseState() {
+        if (this.value == null) return 0;
         return this.value.shortValue() & 0x00FF;
     }
 

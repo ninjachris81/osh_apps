@@ -3,7 +3,11 @@ package com.osh.ui.components;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.appcompat.content.res.AppCompatResources;
@@ -16,7 +20,66 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.osh.R;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class ShutterModeButton extends ChipGroup {
+
+    public interface OnClickListener {
+        void onTap(View view);
+        void onLongClick(View view, boolean release);
+    }
+
+    private final long LONG_PRESS_TIMEOUT_MS = 1000;
+    private OnClickListener upSelectionClickListener;
+    private OnClickListener downSelectionClickListener;
+    private long upSelectionClickStart = 0;
+    private long downSelectionClickStart = 0;
+    Timer upTimer = new Timer();
+    Timer downTimer = new Timer();
+    TimerTask upTimerTask;
+    TimerTask downTimerTask;
+
+    enum TimerType {
+        UP,
+        DOWN
+    }
+
+    TimerTask getTimerTask(TimerType timerType) {
+        return switch (timerType) {
+            case UP -> upTimerTask;
+            case DOWN -> downTimerTask;
+        };
+    }
+
+    void setTimerTask(TimerType timerType, TimerTask timerTask) {
+        switch (timerType) {
+            case UP -> upTimerTask = timerTask;
+            case DOWN -> downTimerTask = timerTask;
+        }
+    }
+
+    void startTimerTask(Timer timer, TimerType timerType, OnClickListener listener, View view) {
+        TimerTask timerTask = getTimerTask(timerType);
+
+        if (timerTask != null) timerTask.cancel();
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                listener.onLongClick(view, false);
+            }
+        };
+
+        timer.schedule(timerTask, LONG_PRESS_TIMEOUT_MS);
+        setTimerTask(timerType, timerTask);
+    }
+
+    void cancelTimerTask(TimerType timerType) {
+        TimerTask timerTask = getTimerTask(timerType);
+        if (timerTask != null) {
+            timerTask.cancel();
+        }
+    }
 
     public ShutterModeButton(Context context) {
         super(context);
@@ -64,6 +127,25 @@ public class ShutterModeButton extends ChipGroup {
         this.addView(downSelection);
 
         setChipSpacingResource(R.dimen.shutter_mode_button_spacing);
+    }
+
+    private void setupClickListener(Chip chip, OnClickListener listener, Timer timer, TimerType timerType) {
+        chip.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                upSelectionClickStart = System.currentTimeMillis();
+                startTimerTask(timer, timerType, listener, chip);
+            } else if (motionEvent.getAction() == MotionEvent.ACTION_UP || motionEvent.getAction() == MotionEvent.ACTION_CANCEL) {
+                long upSelectionClickDuration = System.currentTimeMillis() - upSelectionClickStart;
+                if (upSelectionClickDuration < LONG_PRESS_TIMEOUT_MS) {
+                    if (listener != null) listener.onTap(view);
+                } else {
+                    if (listener != null) listener.onLongClick(view, true);
+                }
+                cancelTimerTask(timerType);
+            }
+
+            return true;
+        });
     }
 
     public void setAuto(boolean isAuto) {
@@ -147,14 +229,16 @@ public class ShutterModeButton extends ChipGroup {
         }
     }
 
-    public void setAutoClickListener(OnClickListener listener) {
+    public void setAutoClickListener(View.OnClickListener listener) {
         autoSelection.setOnClickListener(listener);
     }
     public void setUpClickListener(OnClickListener listener) {
-        upSelection.setOnClickListener(listener);
+        upSelectionClickListener = listener;
+        setupClickListener(upSelection, upSelectionClickListener, upTimer, TimerType.UP);
     }
 
     public void setDownClickListener(OnClickListener listener) {
-        downSelection.setOnClickListener(listener);
+        downSelectionClickListener = listener;
+        setupClickListener(downSelection, downSelectionClickListener, downTimer, TimerType.DOWN);
     }
 }

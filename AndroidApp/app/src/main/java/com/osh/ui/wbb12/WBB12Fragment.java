@@ -42,10 +42,11 @@ public class WBB12Fragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        wbb12Service = ((MainActivity) getActivity()).getWBB12Service();
-        serviceContext = ((MainActivity) getActivity()).getServiceContext();
+        MainActivity mainActivity = (MainActivity) getActivity();
+        wbb12Service = mainActivity.getWBB12Service();
+        serviceContext = mainActivity.getServiceContext();
 
-        wbb12ViewModel = new ViewModelProvider(this, new WBB12ViewModelFactory(getContext(), wbb12Service, serviceContext)).get(WBB12ViewModel.class);
+        wbb12ViewModel = new ViewModelProvider(mainActivity, new WBB12ViewModelFactory(getContext(), wbb12Service, serviceContext)).get(WBB12ViewModel.class);
 
         binding = FragmentWbb12Binding.inflate(inflater, container, false);
 

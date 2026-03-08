@@ -9,6 +9,7 @@ import com.osh.core.service.ICommunicationService;
 import com.osh.core.service.IDatabaseService;
 import com.osh.core.service.IDatamodelService;
 import com.osh.core.service.IServiceContext;
+import com.osh.core.service.IUserService;
 import com.osh.core.service.IValueService;
 
 public class ServiceContextImpl implements IServiceContext {
@@ -20,10 +21,10 @@ public class ServiceContextImpl implements IServiceContext {
     private final IDatabaseService databaseService;
     private final IDatamodelService datamodelService;
     private final ICommunicationService communicationService;
-
     private final IDeviceDiscoveryService deviceDiscoveryService;
+    private final IUserService userService;
 
-    public ServiceContextImpl(IActorService actorService, IAudioActorService audioActorService, IAudioSourceService audioSourceService, IDoorUnlockService doorUnlockManager, IValueService valueService, IDatabaseService databaseService, IDatamodelService datamodelService, ICommunicationService communicationService, IDeviceDiscoveryService deviceDiscoveryService) {
+    public ServiceContextImpl(IActorService actorService, IAudioActorService audioActorService, IAudioSourceService audioSourceService, IDoorUnlockService doorUnlockManager, IValueService valueService, IDatabaseService databaseService, IDatamodelService datamodelService, ICommunicationService communicationService, IDeviceDiscoveryService deviceDiscoveryService, IUserService userService) {
         this.actorService = actorService;
         this.audioActorService = audioActorService;
         this.audioSourceService = audioSourceService;
@@ -33,6 +34,7 @@ public class ServiceContextImpl implements IServiceContext {
         this.datamodelService = datamodelService;
         this.communicationService = communicationService;
         this.deviceDiscoveryService = deviceDiscoveryService;
+        this.userService = userService;
     }
 
     @Override
@@ -78,5 +80,10 @@ public class ServiceContextImpl implements IServiceContext {
     @Override
     public IDeviceDiscoveryService getDeviceDiscoveryService() {
         return this.deviceDiscoveryService;
+    }
+
+    @Override
+    public IUserService getUserService() {
+        return this.userService;
     }
 }

@@ -9,6 +9,7 @@ import com.osh.core.utils.IObservableListenerHolder;
 import com.osh.core.utils.ObservableManagerImpl;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -21,7 +22,7 @@ public abstract class ValueBase<VALUE_TYPE extends ValueBase, NATIVE_TYPE> exten
 
 	public static final String VALUE_SEPARATOR = ".";
 
-	protected abstract NATIVE_TYPE _updateValue(Object newValue);
+    protected abstract NATIVE_TYPE _updateValue(Object newValue);
 
 	private int valueTimeout = VT_NONE;
 

@@ -16,6 +16,8 @@ import java.util.Arrays;
 @DatabaseTable(tableName = User.TABLE_NAME)
 public class User {
 
+    public static final String USER_RIGHT_UNLOCK_DOOR = "unlock_door";
+
     @Ignore
     public static final String TABLE_NAME = "dm_users";
 

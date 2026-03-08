@@ -76,13 +76,17 @@ public abstract class MergeDao {
             LogFacade.d(TAG, "Inserting known room " + knownRoom.getId());
             knownRoomDao.insert(knownRoom);
 
+            int i = 0;
             for (ValueBase value : knownRoom.getValues().values()) {
                 LogFacade.d(TAG, "Inserting known room value " + value.getId());
-                knownRoomValuesDao.insert(new KnownRoomValues(knownRoom.getId(), value.getValueGroup().getId(), value.getId()));
+                knownRoomValuesDao.insert(new KnownRoomValues(knownRoom.getId(), value.getValueGroup().getId(), value.getId(), i));
+                i++;
             }
 
+            i = 0;
             for (ActorBase actor : knownRoom.getActors().values()) {
-                knownRoomActorsDao.insert(new KnownRoomActors(knownRoom.getId(), actor.getValueGroup().getId(), actor.getId()));
+                knownRoomActorsDao.insert(new KnownRoomActors(knownRoom.getId(), actor.getValueGroup().getId(), actor.getId(), i));
+                i++;
             }
         }
 

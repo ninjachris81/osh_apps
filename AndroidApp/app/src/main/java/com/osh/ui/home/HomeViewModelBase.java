@@ -2,6 +2,7 @@ package com.osh.ui.home;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.database.Observable;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.icu.number.LocalizedNumberFormatter;
@@ -23,9 +24,13 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.osh.R;
+import com.osh.activity.MainActivity;
+import com.osh.activity.OshApplication;
 import com.osh.core.actor.DigitalActor;
 import com.osh.core.log.LogFacade;
 import com.osh.core.service.IServiceContext;
+import com.osh.core.service.IUserService;
+import com.osh.core.user.User;
 import com.osh.core.utils.OshValueFormats;
 import com.osh.core.value.BooleanValue;
 import com.osh.core.value.DoubleValue;
@@ -99,6 +104,8 @@ public class HomeViewModelBase extends ViewModel {
     public final ObservableField<String> exceedText1 = new ObservableField<>("");
     public final ObservableField<ColorStateList> exceedIconTint0 = new ObservableField<>();
     public final ObservableField<ColorStateList> exceedIconTint1 = new ObservableField<>();
+
+    public final ObservableField<Boolean> userCanUnlockDoor = new ObservableField<Boolean>(false);
 
     protected final IServiceContext serviceContext;
 
@@ -412,6 +419,9 @@ public class HomeViewModelBase extends ViewModel {
             lastGeneratorPower = generatorPower.getValue(Double.valueOf(0)).doubleValue();
             refreshCurrentMode();
         });
+
+        String userId = ((OshApplication) ((MainActivity) context).getApplication()).getApplicationConfig().getUser().getUserId();
+        userCanUnlockDoor.set(serviceContext.getUserService().hasRight(userId, User.USER_RIGHT_UNLOCK_DOOR));
     }
 
     protected void setupBattery(Context context) {

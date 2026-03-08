@@ -21,7 +21,7 @@
 
         <variable
             name="roomData"
-            type="com.osh.ui.area.RoomViewModel" />
+            type="com.osh.ui.area.RoomViewModel2" />
     </data>
 
 

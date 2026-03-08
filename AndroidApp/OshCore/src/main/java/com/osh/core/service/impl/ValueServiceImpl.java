@@ -1,19 +1,27 @@
 package com.osh.core.service.impl;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.osh.core.actor.ActorBase;
 import com.osh.core.communication.MessageBase;
 import com.osh.core.communication.MessageBase.MESSAGE_TYPE;
+import com.osh.core.datamodel.meta.KnownRoom;
 import com.osh.core.service.ICommunicationService;
 import com.osh.core.service.IValueService;
 import com.osh.core.utils.IObservableManager;
 import com.osh.core.utils.ObservableManagerImpl;
 import com.osh.core.value.ValueBase;
 import com.osh.core.value.ValueMessage;
+import com.osh.core.value.ValueType;
 
 public class ValueServiceImpl implements IValueService {
 	
@@ -87,5 +95,10 @@ public class ValueServiceImpl implements IValueService {
 		communicationService.sendMessage(msg);
 
 	}
+
+    @Override
+    public List<ValueBase> getValues(KnownRoom knownRoom, ValueType valueType) {
+        return knownRoom.getValues().values().stream().filter(a -> a.getKnownRoom() != null && Objects.equals(knownRoom.getId(), a.getKnownRoom().getId()) && (valueType != ValueType.VT_UNKNOWN && a.getValueType() == valueType)).collect(Collectors.toList());
+    }
 
 }

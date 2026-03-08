@@ -1,19 +1,25 @@
 package com.osh.core.service.impl;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.osh.core.actor.ActorBase;
 import com.osh.core.actor.ActorCmds;
 import com.osh.core.actor.ActorMessage;
+import com.osh.core.actor.ShutterActor;
 import com.osh.core.communication.MessageBase;
 import com.osh.core.communication.MessageBase.MESSAGE_TYPE;
+import com.osh.core.datamodel.meta.KnownRoom;
 import com.osh.core.service.IActorService;
 import com.osh.core.service.ICommunicationService;
 import com.osh.core.service.IValueService;
 import com.osh.core.value.ValueMessage;
+import com.osh.core.value.ValueType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +63,7 @@ public class ActorServiceImpl implements IActorService {
 		}
 	}
 
-	@Override
+    @Override
 	public ActorBase getActor(String fullId) {
 		return actors.get(fullId);
 	}
@@ -67,7 +73,12 @@ public class ActorServiceImpl implements IActorService {
 		return actors.values().stream().filter(a -> a.getClass().equals(classFilter)).collect(Collectors.toList());
 	}
 
-	@Override
+    @Override
+    public List<ActorBase> getActors(KnownRoom knownRoom, ValueType valueType) {
+        return knownRoom.getActors().values().stream().filter(a -> a.getKnownRoom() != null && Objects.equals(a.getKnownRoom().getId(), knownRoom.getId()) && (valueType != ValueType.VT_UNKNOWN && a.getValueType() == valueType)).collect(Collectors.toList());
+    }
+
+    @Override
 	public MESSAGE_TYPE getMessageType() {
 		return MESSAGE_TYPE.MESSAGE_TYPE_ACTOR;
 	}

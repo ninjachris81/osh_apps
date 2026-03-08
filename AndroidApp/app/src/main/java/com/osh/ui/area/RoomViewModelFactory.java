@@ -11,6 +11,15 @@ public class RoomViewModelFactory  implements ViewModelProvider.Factory {
 
     private final IServiceContext serviceContext;
 
+    private static RoomViewModelFactory instance;
+
+    public static RoomViewModelFactory getInstance(IServiceContext serviceContext) {
+        if (instance != null) return instance;
+        instance = new RoomViewModelFactory(serviceContext);
+        return instance;
+    }
+
+
     public RoomViewModelFactory(IServiceContext serviceContext) {
         this.serviceContext = serviceContext;
     }
@@ -19,6 +28,7 @@ public class RoomViewModelFactory  implements ViewModelProvider.Factory {
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass, @NonNull CreationExtras extras) {
         String roomKey = extras.get(ViewModelProvider.NewInstanceFactory.VIEW_MODEL_KEY);
-        return (T) new RoomViewModel(serviceContext, roomKey.toString());
+        //return (T) new RoomViewModel(serviceContext, roomKey.toString());
+        return (T) new RoomViewModel2(serviceContext, roomKey);
     }
 }

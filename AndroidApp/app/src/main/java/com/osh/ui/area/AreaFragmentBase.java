@@ -15,8 +15,10 @@ public abstract class AreaFragmentBase extends Fragment {
     }
 
     protected void _onCreateView(String areaId) {
-        this.serviceContext = ((MainActivity) getActivity()).getServiceContext();
-        this.areaViewModel = new ViewModelProvider(this, AreaViewModelFactory.getInstance(serviceContext)).get(areaId, AreaViewModel.class);
+        MainActivity mainActivity = (MainActivity) getActivity();
+
+        this.serviceContext = mainActivity.getServiceContext();
+        this.areaViewModel = new ViewModelProvider(mainActivity, AreaViewModelFactory.getInstance(serviceContext)).get(areaId, AreaViewModel.class);
     }
 
 }

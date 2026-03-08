@@ -7,6 +7,8 @@ import androidx.room.PrimaryKey;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -46,10 +48,10 @@ public class KnownRoom {
 	private KnownArea knownArea;
 
 	@Ignore
-	private Map<String, ActorBase> actors = new HashMap<>();
+	private SortedMap<String, ActorBase> actors = new TreeMap<>();
 
 	@Ignore
-	private Map<String, ValueBase> values = new HashMap<>();
+	private SortedMap<String, ValueBase> values = new TreeMap<>();
 
 	public KnownRoom() {
 	}
@@ -89,19 +91,19 @@ public class KnownRoom {
         this.fullName = fullName;
     }
 	
-	public Map<String, ActorBase> getActors() {
+	public SortedMap<String, ActorBase> getActors() {
 		return actors;
 	}
 
-	public void setActors(Map<String, ActorBase> actors) {
+	public void setActors(SortedMap<String, ActorBase> actors) {
 		this.actors = actors;
 	}
 
-	public Map<String, ValueBase> getValues() {
+	public SortedMap<String, ValueBase> getValues() {
 		return values;
 	}
 
-	public void setValues(Map<String, ValueBase> values) {
+	public void setValues(SortedMap<String, ValueBase> values) {
 		this.values = values;
 	}
 

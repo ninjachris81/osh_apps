@@ -10,6 +10,7 @@ import com.osh.core.service.IDatabaseService;
 import com.osh.core.service.IDatamodelService;
 import com.osh.core.service.IDeviceDiscoveryService;
 import com.osh.core.service.IServiceContext;
+import com.osh.core.service.IUserService;
 import com.osh.core.service.impl.ActorServiceImpl;
 import com.osh.core.service.impl.AudioActorServiceImpl;
 import com.osh.core.service.impl.AudioSourceServiceImpl;
@@ -23,6 +24,7 @@ import com.osh.core.service.impl.DoorUnlockServiceImpl;
 import com.osh.core.service.IDoorUnlockService;
 import com.osh.core.service.IValueService;
 import com.osh.core.service.impl.ServiceContextImpl;
+import com.osh.core.service.impl.UserServiceImpl;
 import com.osh.core.service.impl.ValueServiceImpl;
 import com.osh.wbb12.service.IWBB12Service;
 import com.osh.wbb12.service.impl.WBB12ServiceImpl;
@@ -122,6 +124,12 @@ public class ServiceModules {
 
     @Provides
     @Singleton
+    static IUserService provideUserService(IDatamodelService datamodelService) {
+        return new UserServiceImpl(datamodelService);
+    }
+
+    @Provides
+    @Singleton
     static ICommunicationService provideCommunicationManager(IApplicationConfig applicationConfig) {
         return new MqttCommunicationServiceImpl(applicationConfig.getMqtt());
     }
@@ -146,8 +154,8 @@ public class ServiceModules {
 
     @Provides
     @Singleton
-    static IServiceContext provideServiceContext(IActorService actorService, IAudioActorService audioActorService, IAudioSourceService audioSourceService, IDoorUnlockService doorUnlockManager, IValueService valueService, IDatabaseService databaseService, IDatamodelService datamodelService, ICommunicationService communicationService, IDeviceDiscoveryService deviceDiscoveryService) {
-        return new ServiceContextImpl(actorService, audioActorService, audioSourceService, doorUnlockManager, valueService, databaseService, datamodelService, communicationService, deviceDiscoveryService);
+    static IServiceContext provideServiceContext(IActorService actorService, IAudioActorService audioActorService, IAudioSourceService audioSourceService, IDoorUnlockService doorUnlockManager, IValueService valueService, IDatabaseService databaseService, IDatamodelService datamodelService, ICommunicationService communicationService, IDeviceDiscoveryService deviceDiscoveryService, IUserService userService) {
+        return new ServiceContextImpl(actorService, audioActorService, audioSourceService, doorUnlockManager, valueService, databaseService, datamodelService, communicationService, deviceDiscoveryService, userService);
     }
 
 

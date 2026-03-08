@@ -18,11 +18,13 @@ public class CameraDetailsActivity extends AppCompatActivity {
     private ActivityCameraDetailsBinding binding;
     private String cameraId;
     private String cameraName;
+    private int cameraRotation;
 
-    public static void invokeActivity(Context context, String cameraId, String cameraName) {
+    public static void invokeActivity(Context context, String cameraId, String cameraName, int cameraRotation) {
         Intent intent = new Intent(context, CameraDetailsActivity.class);
         intent.putExtra("cameraId", cameraId);
         intent.putExtra("cameraName", cameraName);
+        intent.putExtra("cameraRotation", cameraRotation);
         context.startActivity(intent);
     }
 
@@ -34,6 +36,7 @@ public class CameraDetailsActivity extends AppCompatActivity {
 
         cameraId = getIntent().getStringExtra("cameraId");
         cameraName = getIntent().getStringExtra("cameraName");
+        cameraRotation = getIntent().getIntExtra("cameraRotation", 0);
 
         binding = ActivityCameraDetailsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -43,7 +46,7 @@ public class CameraDetailsActivity extends AppCompatActivity {
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager(), cameraId);
+        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager(), cameraId, cameraRotation);
         ViewPager viewPager = binding.viewPager;
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = binding.tabs;

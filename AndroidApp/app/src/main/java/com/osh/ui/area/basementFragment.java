@@ -48,27 +48,21 @@ public class basementFragment extends AreaFragmentBase {
 
 
         getChildFragmentManager().beginTransaction().add(R.id.roomL2, new RoomFragment("l2", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
-                .withLight(relayValueGroupId, "10", toggleValueGroupId, "lightL2")
         ).commit();
 
         getChildFragmentManager().beginTransaction().add(R.id.roomL3, new RoomFragment("l3", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
-                .withLight(relayValueGroupId, "12", toggleValueGroupId, "lightL3")
         ).commit();
 
         getChildFragmentManager().beginTransaction().add(R.id.roomWS, new RoomFragment("ws", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
-                .withLight(relayValueGroupId, "14", toggleValueGroupId, "lightWS")
         ).commit();
 
         getChildFragmentManager().beginTransaction().add(R.id.roomHW, new RoomFragment("hw", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
-                .withLight(relayValueGroupId, "15", toggleValueGroupId, "lightHW")
         ).commit();
 
         getChildFragmentManager().beginTransaction().add(R.id.roomHFB, new RoomFragment("hfb", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
-                .withLight(relayValueGroupId, "11", toggleValueGroupId, "lightHFB")
         ).commit();
 
         getChildFragmentManager().beginTransaction().add(R.id.roomL1, new RoomFragment("l1", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
-                .withLight(relayValueGroupId, "13", toggleValueGroupId, "lightL1")
         ).commit();
 
 

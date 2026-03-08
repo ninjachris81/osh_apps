@@ -20,4 +20,5 @@ public interface IServiceContext {
 
     IDeviceDiscoveryService getDeviceDiscoveryService();
 
+    IUserService getUserService();
 }

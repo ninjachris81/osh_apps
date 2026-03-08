@@ -3,23 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation2"
-    app:startDestination="@+id/nav_home">
+    app:startDestination="@+id/nav_mobile_lights">
 
     <fragment
-        android:id="@+id/nav_home"
-        android:name="com.osh.ui.home.HomeMobileFragment"
-        android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home_mobile" />
+        android:id="@+id/nav_mobile_lights"
+        android:name="com.osh.ui.home.MobileLightsFragment"
+        android:label="@string/mobile_menu_lights"
+        tools:layout="@layout/fragment_mobile_lights" />
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.osh.activity.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        android:id="@+id/nav_mobile_shutters"
+        android:name="com.osh.ui.home.MobileShuttersFragment"
+        android:label="@string/mobile_menu_shutters"
+        tools:layout="@layout/fragment_mobile_shutters" />
 
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.osh.activity.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        android:id="@+id/nav_mobile_audio"
+        android:name="com.osh.ui.home.MobileAudioFragment"
+        android:label="@string/mobile_menu_audio"
+        tools:layout="@layout/fragment_mobile_audio" />
 </navigation>

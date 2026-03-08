@@ -13,6 +13,9 @@ public interface UserDao extends BaseDao<User> {
     @Query("SELECT * FROM " + User.TABLE_NAME)
     List<User> getAll();
 
+    @Query("SELECT * FROM " + User.TABLE_NAME + " WHERE id = :id")
+    User getById(String id);
+
     @Delete
     void delete(User user);
 }

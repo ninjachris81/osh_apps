@@ -54,12 +54,10 @@ public class wgFragment extends AreaFragmentBase {
         String presenceGroupdId = "presence";
 
         getChildFragmentManager().beginTransaction().add(R.id.roomWG1, new RoomFragment("wg1", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
-                .withLight(relayValueGroupId, "8", toggleValueGroupId, "lightWG1")
         ).commit();
 
 
         getChildFragmentManager().beginTransaction().add(R.id.roomWG2, new RoomFragment("wg2", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
-                .withLight(relayValueGroupId, "9", toggleValueGroupId, "lightWG2")
         ).commit();
 
     }

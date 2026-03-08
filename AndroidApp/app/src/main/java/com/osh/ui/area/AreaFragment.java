@@ -51,12 +51,18 @@ public class AreaFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        serviceContext = mainActivity.getServiceContext();
+
+        areaOverlayViewModel = new ViewModelProvider(mainActivity, AreaOverlayViewModelFactory.getInstance()).get(AreaOverlayViewModel.class);
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
-        serviceContext = ((MainActivity) getActivity()).getServiceContext();
-
-        areaOverlayViewModel = new ViewModelProvider(this, AreaOverlayViewModelFactory.getInstance()).get(AreaOverlayViewModel.class);
 
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_area, container, false);
         binding.setAreaOverlayData(areaOverlayViewModel);
