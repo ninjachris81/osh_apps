@@ -3,6 +3,7 @@ package com.osh.core.service;
 import com.osh.core.actor.ActorBase;
 import com.osh.core.actor.ActorCmds;
 import com.osh.core.actor.ShutterActor;
+import com.osh.core.datamodel.meta.KnownArea;
 import com.osh.core.datamodel.meta.KnownRoom;
 import com.osh.core.manager.IMqttSupport;
 import com.osh.core.value.ValueType;
@@ -23,4 +24,7 @@ public interface IActorService extends IMqttSupport {
 
     List<ActorBase> getActors(KnownRoom knownRoom, ValueType valueType);
 
+    List<ActorBase> getActors(KnownArea area, ValueType valueType);
+
+    <T extends ActorBase> List<T> getActors(Class<T> classFilter, ValueType valueType );
 }

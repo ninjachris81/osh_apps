@@ -7,15 +7,42 @@ xmlns:tools="http://schemas.android.com/tools">
 <data>
     <variable
         name="homeData"
-        type="com.osh.ui.home.HomeViewMobileModel" />
+        type="com.osh.ui.mobile.LightsModel" />
 </data>
 
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/activeLightsList"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
-    </androidx.recyclerview.widget.RecyclerView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:text="@{homeData.activeLightsInfo}" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/allLightsOffBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="@{homeData.activeLightsCount>0}"
+                android:text="All off"
+                app:icon="@drawable/ic_lightbulb_off_outline" />
+        </LinearLayout>
+
+        <ExpandableListView
+            android:id="@+id/lightsListView"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="0.5dp" />
+    </LinearLayout>
 
 </layout>

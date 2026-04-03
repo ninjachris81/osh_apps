@@ -9,6 +9,7 @@ import com.osh.core.service.ICommunicationService;
 import com.osh.core.service.IDatabaseService;
 import com.osh.core.service.IDatamodelService;
 import com.osh.core.service.IServiceContext;
+import com.osh.core.service.IStaticConfigurationService;
 import com.osh.core.service.IUserService;
 import com.osh.core.service.IValueService;
 
@@ -23,8 +24,9 @@ public class ServiceContextImpl implements IServiceContext {
     private final ICommunicationService communicationService;
     private final IDeviceDiscoveryService deviceDiscoveryService;
     private final IUserService userService;
+    private final IStaticConfigurationService simpleStorageService;
 
-    public ServiceContextImpl(IActorService actorService, IAudioActorService audioActorService, IAudioSourceService audioSourceService, IDoorUnlockService doorUnlockManager, IValueService valueService, IDatabaseService databaseService, IDatamodelService datamodelService, ICommunicationService communicationService, IDeviceDiscoveryService deviceDiscoveryService, IUserService userService) {
+    public ServiceContextImpl(IActorService actorService, IAudioActorService audioActorService, IAudioSourceService audioSourceService, IDoorUnlockService doorUnlockManager, IValueService valueService, IDatabaseService databaseService, IDatamodelService datamodelService, ICommunicationService communicationService, IDeviceDiscoveryService deviceDiscoveryService, IUserService userService, IStaticConfigurationService simpleStorageService) {
         this.actorService = actorService;
         this.audioActorService = audioActorService;
         this.audioSourceService = audioSourceService;
@@ -35,6 +37,7 @@ public class ServiceContextImpl implements IServiceContext {
         this.communicationService = communicationService;
         this.deviceDiscoveryService = deviceDiscoveryService;
         this.userService = userService;
+        this.simpleStorageService = simpleStorageService;
     }
 
     @Override
@@ -86,4 +89,10 @@ public class ServiceContextImpl implements IServiceContext {
     public IUserService getUserService() {
         return this.userService;
     }
+
+    @Override
+    public IStaticConfigurationService getStaticConfigurationService() {
+        return this.simpleStorageService;
+    }
+
 }

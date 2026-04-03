@@ -7,6 +7,7 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.osh.core.actor.DBActor;
 import com.osh.core.actor.DBAudioActor;
 import com.osh.core.actor.DBShutterActor;
+import com.osh.core.configuration.StaticConfigurationItem;
 import com.osh.core.database.config.DatabaseConfig;
 import com.osh.core.datamodel.meta.AudioPlaybackSource;
 import com.osh.core.datamodel.meta.KnownArea;
@@ -20,6 +21,7 @@ import com.osh.core.value.DBValue;
 import com.osh.core.value.ValueGroup;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +50,8 @@ public class DatabaseServiceImpl extends DatabaseServiceBaseImpl implements IDat
 
     protected Dao<User, String> userDao;
 
+    protected Dao<StaticConfigurationItem, String> staticConfigurationDao;
+
     private final ConnectionSource connectionSource;
 
     public DatabaseServiceImpl(DatabaseConfig config, boolean initDao) throws SQLException {
@@ -73,6 +77,7 @@ public class DatabaseServiceImpl extends DatabaseServiceBaseImpl implements IDat
         knownRoomActorsDao = DaoManager.createDao(connectionSource, KnownRoomActors.class);
         knownDevicesDao = DaoManager.createDao(connectionSource, KnownDevice.class);
         userDao = DaoManager.createDao(connectionSource, User.class);
+        staticConfigurationDao = DaoManager.createDao(connectionSource, StaticConfigurationItem.class);
     }
 
     @Override
@@ -210,4 +215,14 @@ public class DatabaseServiceImpl extends DatabaseServiceBaseImpl implements IDat
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    protected List<StaticConfigurationItem> loadSimpleStorage() {
+        try {
+            return staticConfigurationDao.queryForAll();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

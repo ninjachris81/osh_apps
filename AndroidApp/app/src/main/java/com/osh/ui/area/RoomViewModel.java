@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class RoomViewModel extends ViewModel implements Serializable {
 
     public enum RoomPosition {

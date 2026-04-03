@@ -6,6 +6,7 @@ import androidx.room.RoomDatabase;
 import com.osh.core.actor.DBActor;
 import com.osh.core.actor.DBAudioActor;
 import com.osh.core.actor.DBShutterActor;
+import com.osh.core.configuration.StaticConfigurationItem;
 import com.osh.core.datamodel.meta.AudioPlaybackSource;
 import com.osh.core.datamodel.meta.KnownArea;
 import com.osh.core.datamodel.meta.KnownRoom;
@@ -30,6 +31,7 @@ import com.osh.core.value.ValueGroup;
         KnownRoomActors.class,
         KnownDevice.class,
         User.class,
+        StaticConfigurationItem.class,
         DatabaseVersion.class
 }, version = 1)
 public abstract class LocalAppDatabase extends RoomDatabase {
@@ -61,5 +63,7 @@ public abstract class LocalAppDatabase extends RoomDatabase {
     public abstract VersionDao getVersionDao();
 
     public abstract UserDao getUserDao();
+
+    public abstract StaticConfigurationDao getStaticConfigurationDao();
 
 }

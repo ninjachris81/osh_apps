@@ -5,6 +5,7 @@ import android.content.Context;
 import com.osh.core.actor.DBActor;
 import com.osh.core.actor.DBAudioActor;
 import com.osh.core.actor.DBShutterActor;
+import com.osh.core.configuration.StaticConfigurationItem;
 import com.osh.core.database.config.DatabaseConfig;
 import com.osh.core.datamodel.DatamodelBase;
 import com.osh.core.datamodel.meta.AudioPlaybackSource;
@@ -22,6 +23,7 @@ import com.osh.core.value.ValueGroup;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 import androidx.room.Room;
@@ -59,6 +61,7 @@ public class LocalDatabaseServiceImpl extends DatabaseServiceBaseImpl implements
                 appDB.getKnownRoomActorsDao(),
                 appDB.getKnownDevicesDao(),
                 appDB.getUserDao(),
+                appDB.getStaticConfigurationDao(),
                 appDB.getVersionDao(),
                 version
         );
@@ -162,4 +165,10 @@ public class LocalDatabaseServiceImpl extends DatabaseServiceBaseImpl implements
     protected List<User> loadUsers() {
         return appDB.getUserDao().getAll();
     }
+
+    @Override
+    protected List<StaticConfigurationItem> loadSimpleStorage() {
+        return appDB.getStaticConfigurationDao().getAll();
+    }
+
 }

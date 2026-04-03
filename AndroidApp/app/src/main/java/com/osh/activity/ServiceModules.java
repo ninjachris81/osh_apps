@@ -10,11 +10,13 @@ import com.osh.core.service.IDatabaseService;
 import com.osh.core.service.IDatamodelService;
 import com.osh.core.service.IDeviceDiscoveryService;
 import com.osh.core.service.IServiceContext;
+import com.osh.core.service.IStaticConfigurationService;
 import com.osh.core.service.IUserService;
 import com.osh.core.service.impl.ActorServiceImpl;
 import com.osh.core.service.impl.AudioActorServiceImpl;
 import com.osh.core.service.impl.AudioSourceServiceImpl;
 import com.osh.core.service.impl.ClientDeviceDiscoveryServiceImpl;
+import com.osh.core.service.impl.DatabaseServiceBaseImpl;
 import com.osh.core.service.impl.DatabaseServiceImpl;
 import com.osh.core.service.impl.DatamodelServiceImpl;
 import com.osh.core.service.impl.LocalDatabaseServiceImpl;
@@ -24,6 +26,7 @@ import com.osh.core.service.impl.DoorUnlockServiceImpl;
 import com.osh.core.service.IDoorUnlockService;
 import com.osh.core.service.IValueService;
 import com.osh.core.service.impl.ServiceContextImpl;
+import com.osh.core.service.impl.StaticConfigurationServiceImpl;
 import com.osh.core.service.impl.UserServiceImpl;
 import com.osh.core.service.impl.ValueServiceImpl;
 import com.osh.wbb12.service.IWBB12Service;
@@ -154,8 +157,14 @@ public class ServiceModules {
 
     @Provides
     @Singleton
-    static IServiceContext provideServiceContext(IActorService actorService, IAudioActorService audioActorService, IAudioSourceService audioSourceService, IDoorUnlockService doorUnlockManager, IValueService valueService, IDatabaseService databaseService, IDatamodelService datamodelService, ICommunicationService communicationService, IDeviceDiscoveryService deviceDiscoveryService, IUserService userService) {
-        return new ServiceContextImpl(actorService, audioActorService, audioSourceService, doorUnlockManager, valueService, databaseService, datamodelService, communicationService, deviceDiscoveryService, userService);
+    static IStaticConfigurationService provideSimpleStorageService(IDatamodelService datamodelService) {
+        return new StaticConfigurationServiceImpl(datamodelService);
+    }
+
+    @Provides
+    @Singleton
+    static IServiceContext provideServiceContext(IActorService actorService, IAudioActorService audioActorService, IAudioSourceService audioSourceService, IDoorUnlockService doorUnlockManager, IValueService valueService, IDatabaseService databaseService, IDatamodelService datamodelService, ICommunicationService communicationService, IDeviceDiscoveryService deviceDiscoveryService, IUserService userService, IStaticConfigurationService simpleStorageService) {
+        return new ServiceContextImpl(actorService, audioActorService, audioSourceService, doorUnlockManager, valueService, databaseService, datamodelService, communicationService, deviceDiscoveryService, userService, simpleStorageService);
     }
 
 

@@ -5,6 +5,7 @@ import com.osh.core.actor.AudioPlaybackActor;
 import com.osh.core.actor.DBActor;
 import com.osh.core.actor.DBAudioActor;
 import com.osh.core.actor.DBShutterActor;
+import com.osh.core.configuration.StaticConfigurationItem;
 import com.osh.core.datamodel.DatamodelBase;
 import com.osh.core.datamodel.DynamicDatamodel;
 import com.osh.core.datamodel.meta.AudioPlaybackSource;
@@ -44,6 +45,7 @@ public abstract class DatabaseServiceBaseImpl implements IDatabaseService {
     protected abstract List<KnownRoomActors> loadKnownRoomActors();
     protected abstract List<KnownDevice> loadKnownDevices();
     protected abstract List<User> loadUsers();
+    protected abstract List<StaticConfigurationItem> loadSimpleStorage();
 
     @Override
     public final DatamodelBase loadDatamodel() {
@@ -54,6 +56,8 @@ public abstract class DatabaseServiceBaseImpl implements IDatabaseService {
             loadMetadata(datamodel);
 
             mergeDatamodel(datamodel);
+
+            loadStaticConfiguration(datamodel);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -138,7 +142,7 @@ public abstract class DatabaseServiceBaseImpl implements IDatabaseService {
 
     private void loadMetadata(DatamodelBase datamodel) throws SQLException {
         for (KnownArea knownArea : loadKnownAreas()) {
-            datamodel.addKnownArea(knownArea.getId(), knownArea.getName());
+            datamodel.addKnownArea(knownArea.getId(), knownArea.getName(), knownArea.getDisplayOrder());
         }
 
         for (KnownRoom knownRoom : loadKnownRooms()) {
@@ -171,5 +175,10 @@ public abstract class DatabaseServiceBaseImpl implements IDatabaseService {
         }
     }
 
+    private void loadStaticConfiguration(DatamodelBase datamodel) {
+        for (StaticConfigurationItem staticConfigurationItem : loadSimpleStorage()) {
+            datamodel.addStaticConfiguration(staticConfigurationItem.getId(), staticConfigurationItem.getValue());
+        }
+    }
 
 }

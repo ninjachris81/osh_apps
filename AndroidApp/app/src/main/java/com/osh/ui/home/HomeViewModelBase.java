@@ -29,6 +29,7 @@ import com.osh.activity.OshApplication;
 import com.osh.core.actor.DigitalActor;
 import com.osh.core.log.LogFacade;
 import com.osh.core.service.IServiceContext;
+import com.osh.core.service.IStaticConfigurationService;
 import com.osh.core.service.IUserService;
 import com.osh.core.user.User;
 import com.osh.core.utils.OshValueFormats;
@@ -62,7 +63,7 @@ public class HomeViewModelBase extends ViewModel {
     public interface IBatteryDataChangeListener {
         void onBatteryDataChanged(String text, PieData data);
     }
-
+    public final ObservableField<String> batteryChargeInfo = new ObservableField<>("");
 
     public final ObservableField<String> currentModeText = new ObservableField<>("");
     public final ObservableField<Drawable> currentModeIcon = new ObservableField<>();
@@ -114,6 +115,7 @@ public class HomeViewModelBase extends ViewModel {
     protected EnergyMode lastEnergyMode = EnergyMode.UNKNOWN;
     protected double lastGridPower = 0;
     protected double lastBatteryPower = 0;
+    protected double lastBatteryState = 0;
     protected double lastGeneratorPower = 0;
 
     protected int lastWbb12Consumption = 0;
@@ -406,6 +408,7 @@ public class HomeViewModelBase extends ViewModel {
         batteryPower.addItemChangeListener(item -> {
             lastBatteryPower = batteryPower.getValue(Double.valueOf(0)).doubleValue();
             refreshCurrentMode();
+            refreshBatteryChangeInfo();
         });
 
         DoubleValue gridPower = (DoubleValue) serviceContext.getValueService().getValue("energy.gridPower");
@@ -443,7 +446,11 @@ public class HomeViewModelBase extends ViewModel {
             batteryData.setValueTextSize(0);
 
             batteryDataChangeListener.onBatteryDataChanged(batteryText, batteryData);
+            lastBatteryState = newValue;
+            refreshBatteryChangeInfo();
         }, true, () -> { return this!=null; });
+
+
     }
 
     private PieDataSet getDataset(Context context, float value) {
@@ -469,6 +476,28 @@ public class HomeViewModelBase extends ViewModel {
             lastEnergyMode = EnergyMode.values()[item.getValue(0)];
             refreshCurrentMode();
         }, true, () -> this != null);
+    }
+
+    private void refreshBatteryChangeInfo() {
+        final double capacity = serviceContext.getStaticConfigurationService().getValue(IStaticConfigurationService.CONFIG_BATTERY_CAPACITY, 9930);
+        double deltaToFull = capacity - (capacity * lastBatteryState);
+        double deltaToEmpty = capacity * lastBatteryState;
+        double timeToFull = Math.abs(deltaToFull / lastBatteryPower);
+        double timeToEmpty = Math.abs(deltaToEmpty / lastBatteryPower);
+
+        if (lastBatteryState <= 0.05) {
+            batteryChargeInfo.set("Empty");
+        } else if (lastBatteryState >= 0.98) {
+            batteryChargeInfo.set("Full");
+        } else if (lastBatteryPower > 100 && lastBatteryState > 0.05 && timeToEmpty > 0.01) {
+            // decharging
+            batteryChargeInfo.set(OshValueFormats.formatTime((long) (timeToEmpty * 1000 * 60 * 60)) + " to empty");
+        } else if (lastBatteryPower < 100 && lastBatteryState > 0.05 && timeToFull > 0.01) {
+            // charging
+            batteryChargeInfo.set(OshValueFormats.formatTime((long) (timeToFull * 1000 * 60 * 60)) + " to full");
+        } else {
+            batteryChargeInfo.set("");
+        }
     }
 
     private void refreshCurrentMode() {

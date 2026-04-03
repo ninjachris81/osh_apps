@@ -1,25 +1,23 @@
 package com.osh.ui.components;
 
-import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.TextView;
 
-import androidx.appcompat.content.res.AppCompatResources;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
 import com.osh.R;
+import com.osh.core.actor.ActorBase;
 import com.osh.core.actor.ActorCmds;
 import com.osh.core.actor.ToggleActor;
 import com.osh.core.service.IServiceContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class MobileCardAdapter extends RecyclerView.Adapter<MobileCardAdapter.MyViewHolder> {
+public class MobileCardAdapterLights extends RecyclerView.Adapter<MobileCardAdapterLights.MyViewHolder> {
 
     private final IServiceContext serviceContext;
     private final List<ToggleActor> actorList;
@@ -32,16 +30,19 @@ public class MobileCardAdapter extends RecyclerView.Adapter<MobileCardAdapter.My
         }
     }
 
-    public MobileCardAdapter(IServiceContext serviceContext, List<ToggleActor> actorList) {
+    public MobileCardAdapterLights(IServiceContext serviceContext, List<ActorBase> actorList) {
         this.serviceContext = serviceContext;
-        this.actorList = actorList;
+        this.actorList = new ArrayList<>();
+        for (ActorBase actor : actorList) {
+            this.actorList.add((ToggleActor) actor);
+        }
+
     }
 
     @Override
-    public MobileCardAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.mobile_card_view, parent, false);
-        MyViewHolder vh = new MyViewHolder(v);
-        return vh;
+    public MobileCardAdapterLights.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.mobile_card_view_lights, parent, false);
+        return new MyViewHolder(v);
     }
 
     @Override
@@ -50,6 +51,11 @@ public class MobileCardAdapter extends RecyclerView.Adapter<MobileCardAdapter.My
         holder.button.setOnClickListener(view -> {
             serviceContext.getActorService().publishCmd(actorList.get(position), ActorCmds.ACTOR_CMD_TOGGLE);
         });
+
+        actorList.get(position).addItemChangeListener(item -> {
+            holder.button.setBackgroundColor(item.getValue() ? Color.YELLOW : Color.GRAY);
+        }, true, () -> {return true;});
+
     }
 
     @Override

@@ -7,6 +7,7 @@ import androidx.room.Transaction;
 import com.osh.core.actor.ActorBase;
 import com.osh.core.actor.AudioPlaybackActor;
 import com.osh.core.actor.ShutterActor;
+import com.osh.core.configuration.StaticConfigurationItem;
 import com.osh.core.datamodel.DatamodelBase;
 import com.osh.core.datamodel.meta.AudioPlaybackSource;
 import com.osh.core.datamodel.meta.KnownArea;
@@ -15,6 +16,7 @@ import com.osh.core.datamodel.meta.KnownRoomActors;
 import com.osh.core.datamodel.meta.KnownRoomValues;
 import com.osh.core.device.KnownDevice;
 import com.osh.core.log.LogFacade;
+import com.osh.core.service.impl.DatabaseServiceBaseImpl;
 import com.osh.core.service.impl.DatabaseVersion;
 import com.osh.core.service.impl.LocalDatabaseServiceImpl;
 import com.osh.core.user.User;
@@ -41,6 +43,7 @@ public abstract class MergeDao {
                                KnownRoomActorsDao knownRoomActorsDao,
                                KnownDevicesDao knownDevicesDao,
                                UserDao userDao,
+                               StaticConfigurationDao staticConfigurationDao,
                                VersionDao versionDao,
                                long version) {
 
@@ -103,6 +106,10 @@ public abstract class MergeDao {
         for (User user : datamodel.getUsers().values()) {
             LogFacade.d(TAG, "Inserting user " + user.getId());
             userDao.insert(user);
+        }
+
+        for (StaticConfigurationItem item : datamodel.getStaticConfiguration().values()) {
+            staticConfigurationDao.insert(item);
         }
 
         versionDao.setVersion(new DatabaseVersion(version));

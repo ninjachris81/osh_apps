@@ -10,7 +10,7 @@ import java.util.List;
 @Dao
 public interface KnownAreaDao extends BaseDao<KnownArea> {
 
-    @Query("SELECT * FROM " + KnownArea.TABLE_NAME)
+    @Query("SELECT * FROM " + KnownArea.TABLE_NAME + " ORDER BY display_order ASC")
     List<KnownArea> getAll();
 
 }

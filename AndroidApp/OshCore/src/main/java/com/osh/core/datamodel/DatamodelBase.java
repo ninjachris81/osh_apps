@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import com.osh.core.Identifyable;
 import com.osh.core.actor.ActorBase;
@@ -15,6 +17,7 @@ import com.osh.core.actor.DoorActor;
 import com.osh.core.actor.ShutterActor;
 import com.osh.core.actor.ToggleActor;
 import com.osh.core.actor.ValueActor;
+import com.osh.core.configuration.StaticConfigurationItem;
 import com.osh.core.datamodel.meta.AudioPlaybackSource;
 import com.osh.core.datamodel.meta.KnownArea;
 import com.osh.core.datamodel.meta.KnownRoom;
@@ -39,7 +42,7 @@ public class DatamodelBase extends Identifyable {
 	
 	protected final Map<String, KnownRoom> knownRooms = new HashMap<>();
 
-	protected final Map<String, KnownArea> knownAreas = new HashMap<>();
+	protected final SortedMap<String, KnownArea> knownAreas = new TreeMap<>();
 
 	protected final Map<String, ValueBase> values = new HashMap<>();
 	
@@ -81,6 +84,10 @@ public class DatamodelBase extends Identifyable {
 	public Map<String, AudioPlaybackSource> getAudioPlaybackSources() {
 		return audioPlaybackSources;
 	}
+
+    protected final Map<String, StaticConfigurationItem> staticConfiguration = new HashMap<>();
+
+    public Map<String, StaticConfigurationItem> getStaticConfiguration() { return staticConfiguration; }
 
 	public KnownDevice addKnownDevice(String id, String serviceId, String name, boolean mandatory) {
 	    KnownDevice device = new KnownDevice(id, serviceId, name, mandatory);
@@ -201,8 +208,8 @@ public class DatamodelBase extends Identifyable {
 	}
 
 
-	public KnownArea addKnownArea(String id, String name) {
-		KnownArea knownArea = new KnownArea(id, name);
+	public KnownArea addKnownArea(String id, String name, int displayOrder) {
+		KnownArea knownArea = new KnownArea(id, name, displayOrder);
 		knownAreas.put(knownArea.getId(), knownArea);
 		return knownArea;
 	}
@@ -234,7 +241,7 @@ public class DatamodelBase extends Identifyable {
 
     public List<KnownArea> getKnownAreas() {
 		List<KnownArea> ka = new ArrayList(knownAreas.values());
-		Collections.sort(ka, Comparator.comparingInt(KnownArea::getDisplayOrder));
+		ka.sort(Comparator.comparingInt(KnownArea::getDisplayOrder));
 		return ka;
     }
 
@@ -245,4 +252,8 @@ public class DatamodelBase extends Identifyable {
 	public Map<String, User> getUsers() {
 		return this.users;
 	}
+
+    public void addStaticConfiguration(String id, String value) {
+        this.staticConfiguration.put(id, new StaticConfigurationItem(id, value));
+    }
 }

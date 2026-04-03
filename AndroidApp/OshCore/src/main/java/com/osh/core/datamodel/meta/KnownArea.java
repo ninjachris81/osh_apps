@@ -48,9 +48,10 @@ public class KnownArea {
     }
 
     @Ignore
-    public KnownArea(String id, String name) {
+    public KnownArea(String id, String name, int displayOrder) {
         this.id = id;
         this.name = name;
+        this.displayOrder = displayOrder;
     }
 
     public String getId() {
