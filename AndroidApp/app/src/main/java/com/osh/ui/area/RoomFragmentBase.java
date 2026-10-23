@@ -254,12 +254,10 @@ public abstract class RoomFragmentBase<BINDING_TYPE extends ViewDataBinding> ext
 
     protected void bindWindowState(@IdRes int windowStateIndicator, int index) {
         WindowStateIndicator stateIndicator = binding.getRoot().findViewById(windowStateIndicator);
-        stateIndicator.setVisibility(View.VISIBLE);
     }
 
     protected void bindShutter(@IdRes int shutterModeButton, int index) {
         ShutterModeButton modeButton = binding.getRoot().findViewById(shutterModeButton);
-        modeButton.setVisibility(View.VISIBLE);
 
         ShutterActor shutterActor = roomViewModel.roomShutterActors.get(index);
         EnumValue shutterMode = roomViewModel.roomShutterAutoModes.get(index);

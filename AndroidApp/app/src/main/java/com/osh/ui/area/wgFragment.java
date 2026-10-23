@@ -43,21 +43,11 @@ public class wgFragment extends AreaFragmentBase {
     }
 
     private void setupArea() {
-        String relayValueGroupId= "allRelays1";
-        String toggleValueGroupId = "lightToggles2";
-        String shutterValueGroupId = "allShutters0";
-        String shutterModeValueGroupId = "shutterModes0";
-        String tempValueGroupId = "temps";
-        String humsValueGroupId = "hums";
-        String brightnessValueGroupId = "brightnesses";
-        String windowStateGroupId = "allSwitches1";
-        String presenceGroupdId = "presence";
-
-        getChildFragmentManager().beginTransaction().add(R.id.roomWG1, new RoomFragment("wg1", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
+        getChildFragmentManager().beginTransaction().replace(R.id.roomWG1, new RoomFragment("wg1", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
         ).commit();
 
 
-        getChildFragmentManager().beginTransaction().add(R.id.roomWG2, new RoomFragment("wg2", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
+        getChildFragmentManager().beginTransaction().replace(R.id.roomWG2, new RoomFragment("wg2", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
         ).commit();
 
     }

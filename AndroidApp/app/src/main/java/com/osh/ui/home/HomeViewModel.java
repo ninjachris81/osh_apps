@@ -63,6 +63,6 @@ public class HomeViewModel extends HomeViewModelBase {
         setupMusic();
         setupWater();
         setupExceed();
-
+        setupWaterTank();
     }
 }

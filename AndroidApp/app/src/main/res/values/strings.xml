@@ -214,4 +214,5 @@
     <string name="mobile_menu_lights">Lights</string>
     <string name="mobile_menu_shutters">Shutters</string>
     <string name="mobile_menu_audio">Audio</string>
+    <string name="mobile_menu_misc">Misc</string>
 </resources>

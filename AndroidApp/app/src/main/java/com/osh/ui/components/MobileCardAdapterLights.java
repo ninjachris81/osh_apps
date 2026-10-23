@@ -53,7 +53,7 @@ public class MobileCardAdapterLights extends RecyclerView.Adapter<MobileCardAdap
         });
 
         actorList.get(position).addItemChangeListener(item -> {
-            holder.button.setBackgroundColor(item.getValue() ? Color.YELLOW : Color.GRAY);
+            holder.button.setBackgroundColor(item.getValue(false) ? Color.YELLOW : Color.GRAY);
         }, true, () -> {return true;});
 
     }

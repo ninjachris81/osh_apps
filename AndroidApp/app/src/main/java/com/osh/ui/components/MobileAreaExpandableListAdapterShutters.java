@@ -21,7 +21,7 @@ public class MobileAreaExpandableListAdapterShutters extends MobileAreaExpandabl
 
     @Override
     void setupAdapter(RecyclerView cardRecyclerView, KnownArea knownArea) {
-        MobileCardAdapterShutters adapter = new MobileCardAdapterShutters(serviceContext, serviceContext.getActorService().getActors(knownArea, valueType));
+        MobileCardAdapterShutters adapter = new MobileCardAdapterShutters(serviceContext, serviceContext.getActorService().getActors(knownArea, valueType), serviceContext.getValueService().getValues(knownArea, ValueType.VT_SHUTTER_MODE));
         cardRecyclerView.setAdapter(adapter);
     }
 

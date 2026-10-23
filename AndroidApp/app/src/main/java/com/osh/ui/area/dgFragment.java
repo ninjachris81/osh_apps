@@ -25,8 +25,6 @@ public class dgFragment extends AreaFragmentBase {
     public dgFragment() {
     }
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -45,13 +43,13 @@ public class dgFragment extends AreaFragmentBase {
     }
 
     private void setupArea() {
-        getChildFragmentManager().beginTransaction().add(R.id.roomDG, new RoomFragment("dg", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
+        getChildFragmentManager().beginTransaction().replace(R.id.roomMDG, new RoomFragmentMdg("mdg", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
         ).commit();
 
-        getChildFragmentManager().beginTransaction().add(R.id.roomBDG, new RoomFragment("bdg", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
+        getChildFragmentManager().beginTransaction().replace(R.id.roomBDG, new RoomFragment("bdg", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
         ).commit();
 
-        getChildFragmentManager().beginTransaction().add(R.id.roomHFDG, new RoomFragment("hfdg", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
+        getChildFragmentManager().beginTransaction().replace(R.id.roomFDG, new RoomFragment("fdg", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
         ).commit();
     }
 }

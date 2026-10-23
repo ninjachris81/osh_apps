@@ -22,4 +22,10 @@
         android:name="com.osh.ui.home.MobileAudioFragment"
         android:label="@string/mobile_menu_audio"
         tools:layout="@layout/fragment_mobile_audio" />
+
+    <fragment
+        android:id="@+id/nav_mobile_misc"
+        android:name="com.osh.ui.home.MobileMiscFragment"
+        android:label="@string/mobile_menu_misc"
+        tools:layout="@layout/fragment_mobile_misc" />
 </navigation>

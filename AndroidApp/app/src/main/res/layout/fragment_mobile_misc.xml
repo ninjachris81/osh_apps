@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools">
+
+<data>
+    <variable
+        name="homeData"
+        type="com.osh.ui.mobile.MiscModel" />
+</data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/dryTowelBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dry towel"
+            app:icon="@drawable/ic_hair_dryer" />
+
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/airConditionerState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Air Conditioner"
+            android:checked="@{homeData.airConditionerState}"
+            />
+
+    </LinearLayout>
+
+</layout>

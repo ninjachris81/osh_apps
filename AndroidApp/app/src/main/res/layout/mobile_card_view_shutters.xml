@@ -6,8 +6,8 @@
 
     <androidx.cardview.widget.CardView
         id="@+id/cardView"
-        android:layout_width="150dp"
-        android:layout_height="100dp"
+        android:layout_width="160dp"
+        android:layout_height="90dp"
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
@@ -22,21 +22,28 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/shutterModeLabel"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:textAlignment="center" />
 
-        <com.osh.ui.components.ShutterModeButton
-            android:id="@+id/shutterModeButton"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/shutter_mode_button_height"
-             />
+            <com.osh.ui.components.ShutterModeButton
+                android:id="@+id/shutterModeButton"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/shutterStatus"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:textAlignment="center" />
+
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>

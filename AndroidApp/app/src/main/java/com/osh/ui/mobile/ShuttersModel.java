@@ -25,7 +25,7 @@ public class ShuttersModel extends ViewModel {
     }
 
     private void setupActiveShutters() {
-        List<ShutterActor> shutterActors = serviceContext.getActorService().getActors(ShutterActor.class, ValueType.VT_RELAY_SHUTTER);
+        List<ShutterActor> shutterActors = serviceContext.getActorService().getActors(ShutterActor.class, ValueType.VT_SHUTTER);
 
         for (ShutterActor shutterActor : shutterActors) {
             shutterActor.addItemChangeListener(item -> {

@@ -71,6 +71,14 @@ public class RoomViewModel2 extends ViewModel implements Serializable {
         initTemperatures();
     }
 
+    public boolean hasShutters() {
+        return !roomShutterActors.isEmpty();
+    }
+
+    public boolean hasWindowStates() {
+        return !windowStates.isEmpty();
+    }
+
     public KnownRoom getRoom() {
         return room;
     }
@@ -109,7 +117,7 @@ public class RoomViewModel2 extends ViewModel implements Serializable {
     }
 
     private void initShutterStates() {
-        List<ActorBase> shutterActors = serviceContext.getActorService().getActors(room, ValueType.VT_RELAY_SHUTTER);
+        List<ActorBase> shutterActors = serviceContext.getActorService().getActors(room, ValueType.VT_SHUTTER);
         List<ValueBase> shutterAutoModeValues = serviceContext.getValueService().getValues(room, ValueType.VT_SHUTTER_MODE);
         List<ValueBase> shutterUpTimeValues = serviceContext.getValueService().getValues(room, ValueType.VT_SHUTTER_UP_TIME);
         List<ValueBase> shutterDownTimeValues = serviceContext.getValueService().getValues(room, ValueType.VT_SHUTTER_DOWN_TIME);

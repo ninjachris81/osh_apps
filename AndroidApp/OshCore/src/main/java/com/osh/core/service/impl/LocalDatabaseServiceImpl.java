@@ -69,7 +69,7 @@ public class LocalDatabaseServiceImpl extends DatabaseServiceBaseImpl implements
 
     public LocalDatabaseServiceImpl(Context context, DatabaseConfig config) throws SQLException {
         databasePath = context.getDatabasePath(config.getName()).getAbsolutePath();
-        appDB = Room.databaseBuilder(context, LocalAppDatabase.class, config.getName()).build();
+        appDB = Room.databaseBuilder(context, LocalAppDatabase.class, config.getName()).fallbackToDestructiveMigration().build();
 
         databaseService = new DatabaseServiceImpl(config, false);
     }

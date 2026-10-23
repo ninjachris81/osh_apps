@@ -50,7 +50,7 @@ public class MobileShuttersFragment extends Fragment {
 
         model = new ViewModelProvider(mainActivity, new ShuttersModelFactory(serviceContext)).get(ShuttersModel.class);
 
-        expandableListAdapter = new MobileAreaExpandableListAdapterShutters(getContext(), serviceContext, ValueType.VT_RELAY_SHUTTER, displayMetrics);
+        expandableListAdapter = new MobileAreaExpandableListAdapterShutters(getContext(), serviceContext, ValueType.VT_SHUTTER, displayMetrics);
 
         ExpandableListView listView = binding.shuttersListView;
 

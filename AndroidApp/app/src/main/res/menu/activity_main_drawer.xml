@@ -16,5 +16,9 @@
             android:id="@+id/nav_mobile_audio"
             android:icon="@drawable/ic_music"
             android:title="@string/mobile_menu_audio" />
+        <item
+            android:id="@+id/nav_mobile_misc"
+            android:icon="@drawable/ic_cog"
+            android:title="@string/mobile_menu_misc" />
     </group>
 </menu>

@@ -28,6 +28,7 @@ public enum ValueType {
     VT_RELAY_SHUTTER(51),
     VT_RELAY_TEMP_VALVE(52),
     VT_RELAY_DOOR_OPEN(53),
+    VT_RELAY_GENERIC(59),
 
     VT_AUDIO(60),
     VT_TYPE_AUDIO_VOLUME(61),
@@ -35,8 +36,12 @@ public enum ValueType {
     VT_SOUND_URL(63),
 
     VT_DOOR_OPENER(70),
+
     VT_HEAT_PUMP_DATA(80),
+
     VT_VIRTUAL_ACTOR(90),
+    VT_TIMER(91),
+    VT_SHUTTER(92),
 
     VT_STATIC_TEMP(100)
     ;

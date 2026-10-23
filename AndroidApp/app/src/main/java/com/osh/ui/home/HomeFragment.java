@@ -142,7 +142,7 @@ public class HomeFragment extends Fragment implements HomeViewModel.IBatteryData
         });
 
         setupHomeApplianceButton(binding.dishwasherInfos, "dishwasher", 0);
-        setupHomeApplianceButton(binding.washingmachineInfos, "dishwasher", 1);
+        setupHomeApplianceButton(binding.washingmachineInfos, "washingmachine", 1);
         setupHomeApplianceButton(binding.vacuumcleanerInfos, "vacuumcleaner", 2);
 
         binding.audioInfos.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {

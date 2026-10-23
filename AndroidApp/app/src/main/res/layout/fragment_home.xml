@@ -27,7 +27,7 @@
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
-                android:layout_margin="10dp"
+                android:layout_margin="2dp"
                 app:cardBackgroundColor="@color/seek_bar_background"
                 app:cardCornerRadius="4dp"
                 app:cardElevation="6dp">
@@ -99,7 +99,7 @@
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
-                android:layout_margin="10dp"
+                android:layout_margin="2dp"
                 app:cardBackgroundColor="@color/seek_bar_background"
                 app:cardCornerRadius="4dp"
                 app:cardElevation="6dp">
@@ -273,7 +273,7 @@
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
-                android:layout_margin="10dp"
+                android:layout_margin="2dp"
                 app:cardBackgroundColor="@color/seek_bar_background"
                 app:cardCornerRadius="4dp"
                 app:cardElevation="6dp">
@@ -366,24 +366,25 @@
                         />
 
 
-
-
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/app6"
+                        android:id="@+id/waterTankInfos"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_rowWeight="1"
                         android:layout_columnWeight="1"
                         android:layout_gravity="fill"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        app:icon="@drawable/ic_cloud_question_outline"
-                        app:iconGravity="textTop"
-                        app:iconSize="70dp"
-                        app:iconPadding="0dp"
                         android:clickable="false"
                         android:inputType="text"
-                        />
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:singleLine="true"
+                        android:text="@{homeData.waterTankInfoText}"
+                        android:textAlignment="center"
+                        app:icon="@drawable/ic_watering_can"
+                        app:iconGravity="textTop"
+                        app:iconPadding="0dp"
+                        app:iconSize="70dp"
+                        app:iconTint="@{homeData.waterTankIconTint}" />
 
                     <FrameLayout
                         android:id="@+id/audioInfosLayout"
@@ -424,7 +425,7 @@
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
                 android:layout_gravity="fill"
-                android:layout_margin="10dp"
+                android:layout_margin="2dp"
                 app:cardBackgroundColor="@color/seek_bar_background"
                 app:cardCornerRadius="4dp"
                 app:cardElevation="6dp">
@@ -440,13 +441,22 @@
                     android:rowCount="3">
 
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/dishwasherInfos"
+                    <FrameLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_rowWeight="1"
                         android:layout_columnWeight="1"
                         android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        >
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/dishwasherInfos"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:insetLeft="0dp"
+                        android:insetRight="0dp"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
                         android:clickable="@{homeData.remoteStartAvailable[0]}"
@@ -459,13 +469,35 @@
                         android:inputType="text"
                         />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/washingmachineInfos"
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Dishwasher"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:elevation="3dp"
+                            android:textSize="12sp"/>
+
+
+                    </FrameLayout>
+
+
+                    <FrameLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_rowWeight="1"
                         android:layout_columnWeight="1"
                         android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        >
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/washingmachineInfos"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:insetLeft="0dp"
+                        android:insetRight="0dp"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
                         android:clickable="@{homeData.remoteStartAvailable[1]}"
@@ -478,14 +510,33 @@
                         android:inputType="text"
                         />
 
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Washing Machine"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:elevation="3dp"
+                            android:textSize="12sp"/>
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/vacuumcleanerInfos"
+                    </FrameLayout>
+
+                    <FrameLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_rowWeight="1"
                         android:layout_columnWeight="1"
                         android:layout_gravity="fill"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        >
+
+                        <com.google.android.material.button.MaterialButton
+                        android:id="@+id/vacuumcleanerInfos"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:insetLeft="0dp"
+                        android:insetRight="0dp"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
                         app:iconGravity="textTop"
@@ -497,6 +548,16 @@
                         app:iconTint="@{homeData.homeApplianceIconTints[2]}"
                         android:text="@{homeData.homeApplianceTexts[2]}"
                         />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Vacuum Cleaner"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:elevation="3dp"
+                            android:textSize="12sp"/>
+                    </FrameLayout>
 
 
                     <com.google.android.material.button.MaterialButton

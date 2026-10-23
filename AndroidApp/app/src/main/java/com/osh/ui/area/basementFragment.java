@@ -42,27 +42,27 @@ public class basementFragment extends AreaFragmentBase {
         String brightnessValueGroupId = "brightnesses";
         String presenceGroupdId = "presence";
 
-        getChildFragmentManager().beginTransaction().add(R.id.roomFB, new RoomFragment("fb", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
+        getChildFragmentManager().beginTransaction().replace(R.id.roomFB, new RoomFragment("fb", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
                 //.withLight(relayValueGroupId, "0", toggleValueGroupId, "lightFB")
         ).commit();
 
 
-        getChildFragmentManager().beginTransaction().add(R.id.roomL2, new RoomFragment("l2", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
+        getChildFragmentManager().beginTransaction().replace(R.id.roomL2, new RoomFragment("l2", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
         ).commit();
 
-        getChildFragmentManager().beginTransaction().add(R.id.roomL3, new RoomFragment("l3", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
+        getChildFragmentManager().beginTransaction().replace(R.id.roomL3, new RoomFragment("l3", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
         ).commit();
 
-        getChildFragmentManager().beginTransaction().add(R.id.roomWS, new RoomFragment("ws", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
+        getChildFragmentManager().beginTransaction().replace(R.id.roomWS, new RoomFragment("ws", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
         ).commit();
 
-        getChildFragmentManager().beginTransaction().add(R.id.roomHW, new RoomFragment("hw", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
+        getChildFragmentManager().beginTransaction().replace(R.id.roomHW, new RoomFragment("hw", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
         ).commit();
 
-        getChildFragmentManager().beginTransaction().add(R.id.roomHFB, new RoomFragment("hfb", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
+        getChildFragmentManager().beginTransaction().replace(R.id.roomHFB, new RoomFragment("hfb", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_TOP)
         ).commit();
 
-        getChildFragmentManager().beginTransaction().add(R.id.roomL1, new RoomFragment("l1", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
+        getChildFragmentManager().beginTransaction().replace(R.id.roomL1, new RoomFragment("l1", areaViewModel.getAreaId(), RoomViewModel.RoomPosition.POSITION_BOTTOM)
         ).commit();
 
 

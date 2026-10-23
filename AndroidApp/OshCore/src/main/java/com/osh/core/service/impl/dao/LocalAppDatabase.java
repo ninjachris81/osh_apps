@@ -33,7 +33,7 @@ import com.osh.core.value.ValueGroup;
         User.class,
         StaticConfigurationItem.class,
         DatabaseVersion.class
-}, version = 1)
+}, version = 58)
 public abstract class LocalAppDatabase extends RoomDatabase {
 
     public abstract MergeDao getMergeDao();

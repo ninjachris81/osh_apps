@@ -108,8 +108,7 @@
             android:layout_height="@dimen/shutter_mode_button_height"
             android:layout_marginStart="-200dp"
             android:layout_marginBottom="@dimen/shutter_mode_button_wall_padding"
-            android:visibility="gone"
-            android:alpha="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS ? 1 : 0 }"
+            android:visibility="@{(areaOverlayData.currentOverlay==AreaOverlays.SHUTTERS &amp;&amp; roomData.hasShutters()) ? View.VISIBLE : View.GONE}"
             clickEnabled="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS}"
             app:isAuto="@{roomData.shutterAutoModes[0]}"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -123,11 +122,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="-200dp"
             android:layout_marginBottom="@dimen/window_state_wall_padding"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:alpha="@{areaOverlayData.currentOverlay == AreaOverlays.SENSORS ? 1.0f : 0 }"
+            android:visibility="@{(areaOverlayData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; roomData.hasWindowStates()) ? View.VISIBLE : View.GONE }"
             state='@{roomData.windowStates[0]}'
             />
 
@@ -147,8 +145,7 @@
             android:layout_height="@dimen/shutter_mode_button_height"
             android:layout_marginStart="300dp"
             android:layout_marginBottom="@dimen/shutter_mode_button_wall_padding"
-            android:visibility="gone"
-            android:alpha="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS ? 1 : 0 }"
+            android:visibility="@{(areaOverlayData.currentOverlay==AreaOverlays.SHUTTERS &amp;&amp; roomData.hasShutters()) ? View.VISIBLE : View.GONE}"
             clickEnabled="@{areaOverlayData.currentOverlay == AreaOverlays.SHUTTERS}"
             app:isAuto="@{roomData.shutterAutoModes[1]}"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -162,11 +159,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="300dp"
             android:layout_marginBottom="@dimen/window_state_wall_padding"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:alpha="@{areaOverlayData.currentOverlay == AreaOverlays.SENSORS ? 1.0f : 0 }"
+            android:visibility="@{(areaOverlayData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; roomData.hasWindowStates()) ? View.VISIBLE : View.GONE }"
             state='@{roomData.windowStates[1]}'
             />
 

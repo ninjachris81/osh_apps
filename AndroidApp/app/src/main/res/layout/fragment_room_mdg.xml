@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.osh.ui.area.AreaFragment.AreaOverlays" />
+        <import type="com.osh.ui.area.RoomViewModel.RoomPosition" />
+
+        <import type="android.view.View" />
+
+        <variable
+            name="areaOverlayData"
+            type="com.osh.ui.area.AreaOverlayViewModel" />
+
+        <variable
+            name="areaData"
+            type="com.osh.ui.area.AreaViewModel" />
+
+        <variable
+            name="roomData"
+            type="com.osh.ui.area.RoomViewModel2" />
+    </data>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/roomRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <TextView
+            android:id="@+id/roomLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{roomData.name}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tempLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text='@{(areaOverlayData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; !roomData.temperatures.isEmpty()) ? (String.format("%.1f", roomData.temperatures[0]) + "°") : "" }'
+            android:visibility="@{areaOverlayData.currentOverlay == AreaOverlays.SENSORS ? View.VISIBLE : View.GONE}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/roomLabel" />
+
+        <TextView
+            android:id="@+id/humLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text='@{(areaOverlayData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; !roomData.humidities.isEmpty()) ? (String.format("%.1f", roomData.humidities[0]) + "%") : "" }'
+            android:visibility="@{areaOverlayData.currentOverlay == AreaOverlays.SENSORS ? View.VISIBLE : View.GONE}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tempLabel" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/roomBackground"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="@{(areaOverlayData.currentOverlay==AreaOverlays.LIGHTS &amp;&amp; roomData.lightStates[0]) || (areaOverlayData.currentOverlay==AreaOverlays.PRESENCE &amp;&amp; roomData.roomPresences[0]) ? 1.0f : 0.0f}"
+            >
+
+            <ImageView
+                android:id="@+id/lightBackgroundMDG"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="@{areaOverlayData.currentOverlay==AreaOverlays.LIGHTS ? @drawable/light_background : areaOverlayData.currentOverlay==AreaOverlays.PRESENCE ? @drawable/presence_background : null}"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.osh.ui.components.WindowStateIndicator
+            android:id="@+id/windowStateMDG0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="-170dp"
+            android:layout_marginTop="@dimen/window_state_wall_padding"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:visibility="@{(areaOverlayData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; roomData.hasWindowStates()) ? View.VISIBLE : View.GONE }"
+            state='@{roomData.windowStates[0]}'
+            />
+
+        <com.osh.ui.components.WindowStateIndicator
+            android:id="@+id/windowStateMDG1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:layout_marginTop="@dimen/window_state_wall_padding"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:visibility="@{(areaOverlayData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; roomData.hasWindowStates()) ? View.VISIBLE : View.GONE }"
+            state='@{roomData.windowStates[1]}'
+            />
+
+        <com.osh.ui.components.WindowStateIndicator
+            android:id="@+id/windowStateMDG2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="177dp"
+            android:layout_marginTop="@dimen/window_state_wall_padding"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:visibility="@{(areaOverlayData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; roomData.hasWindowStates()) ? View.VISIBLE : View.GONE }"
+            state='@{roomData.windowStates[2]}'
+            />
+
+        <com.osh.ui.components.WindowStateIndicator
+            android:id="@+id/windowStateMDG3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="350dp"
+            android:layout_marginTop="@dimen/window_state_wall_padding"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:visibility="@{(areaOverlayData.currentOverlay == AreaOverlays.SENSORS &amp;&amp; roomData.hasWindowStates()) ? View.VISIBLE : View.GONE }"
+            state='@{roomData.windowStates[3]}'
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
